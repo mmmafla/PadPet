@@ -1,0 +1,7 @@
+{
+  "name": "PadPet",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
