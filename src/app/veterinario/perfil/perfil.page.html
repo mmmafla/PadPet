@@ -1,0 +1,49 @@
+<app-header  backButton="/home" title="Perfil"></app-header>
+
+<ion-content>
+
+    <!-------------------------------------------------------->
+<ion-card class="card" style="text-align: center;">
+<p>Imagen de perfil :) </p>
+  </ion-card>
+    
+<!-------------------------------------------------------->
+<!-----------------------DATOS PERSONALES --------------------------------->
+<ion-card class="card" style="text-align: center;">
+    <h2>Datos personales</h2>
+    <p>llamar a los datos personales</p>
+      <ion-button [routerLink]="['/datospersonales']" class="editar"> editar información</ion-button>
+   </ion-card>
+   
+   <!-------------------------------------------------------->
+   <!-----------------------PERFIL PROFESIONAL --------------------------------->
+   <ion-card class="card" style="text-align: center;">
+   <h2>Perfil profesional</h2>
+   <p>llamar a los datos profesionales</p>
+      <ion-button [routerLink]="['/datosprofesionales']" class="editar"> editar información</ion-button>
+   </ion-card>
+   
+   <!-------------------------------------------------------->
+   <!-----------------------PREFERENCIAS ATENCION --------------------------------->
+   <ion-card class="card" style="text-align: center;">
+      <h2>Atención médica</h2>
+      <p>personaliza tu atencion médica</p>
+   
+         <ion-button [routerLink]="['/datosatencion']" class="editar"> editar información</ion-button>
+      </ion-card>
+      
+   
+   <!-------------------------------------------------------->
+   <!-----------------------FIRMA PROFESIONAL--------------------------------->
+       <ion-card class="card" style="text-align: center;">
+           <h2>Firma profesional</h2>
+           <p>Mostrar foto firma profesional</p>
+              <ion-button class="editar"> editar</ion-button>
+           </ion-card>
+       
+
+
+
+
+    
+</ion-content>

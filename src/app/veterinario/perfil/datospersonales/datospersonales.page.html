@@ -1,0 +1,39 @@
+<app-header  backButton="/perfil" title="Datos personales"></app-header>
+
+<ion-content class="fondo">
+
+  <ion-card class="ion-card">
+    
+    <form [formGroup]="form" (ngSubmit)="actualizarDatos()">
+      <ion-list>
+        <ion-item>
+          <ion-label position="stacked">Nombre</ion-label>
+          <ion-input type="text" formControlName="nombre_vet"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Apellidos</ion-label>
+          <ion-input type="text" formControlName="apellidos_vet"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Email</ion-label>
+          <ion-input type="email" formControlName="email_vet"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">RUN</ion-label>
+          <ion-input type="text" formControlName="run_vet" readonly></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Teléfono</ion-label>
+          <ion-input type="tel" formControlName="celular_vet"></ion-input>
+        </ion-item>
+
+      </ion-list>
+  
+      <ion-button expand="full" type="submit" [disabled]="form.invalid" shape="round">Actualizar información</ion-button>
+    </form>
+
+  </ion-card>
+
+
+
+</ion-content>

@@ -1,14 +1,15 @@
+<app-header title="Bienvenido"></app-header>
 
 <ion-content>
 
 <ion-grid>
   <!----perfil-->
-  <ion-card class="perfil-card">
+  <ion-card class="perfil-card" [routerLink]="['/perfil']">
     <ion-card-content>
       <ion-grid>
         <ion-row>
           <ion-col size="auto" class="img-perfil">
-            <img src="ruta_de_la_imagen" alt="Foto de perfil" class="profile-img">
+            <img src="" alt="Foto de perfil" class="profile-img">
           </ion-col>
           
           <ion-col size="auto" class="datos-medico">
@@ -25,7 +26,7 @@
 <ion-row>
   <!---TUTORES--->
   <ion-col size="6">
-    <ion-card  class="ion-card-importantes" >
+    <ion-card  class="ion-card-importantes" [routerLink]="['/tutor']">
       <ion-card-header>
         <div>
           <ion-icon name="paw-outline" class="icono2"></ion-icon>
@@ -40,7 +41,7 @@
   <!---TUTORES--->
   <!--- API--->
         <ion-col size="6">
-          <ion-card class="ion-card-importantes" >
+          <ion-card class="ion-card-importantes" [routerLink]="['/agenda']">
             <ion-card-header>
               <div>
                 <ion-icon name="search-outline" class="icono2"></ion-icon>
