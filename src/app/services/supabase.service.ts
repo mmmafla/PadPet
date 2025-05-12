@@ -13,9 +13,32 @@ export class SupabaseService {
     this.supabase = createClient(supabaseUrl, supabaseKey);
   }
 
-  getVeterinario() {
-    return this.supabase.from('veterinario');
+  // Método para acceder a 'auth'
+  get auth() {
+    return this.supabase.auth;
   }
+
+  // Método para acceder a 'from'
+  from(tableName: string) {
+    return this.supabase.from(tableName);
+  }
+
+
+  async getVeterinario(id_auth: string) {
+    const { data, error } = await this.supabase
+      .from('veterinario')
+      .select('nombre_vet, run_vet, apellidos_vet')
+      .eq('id_auth', id_auth)
+      .single();
+  
+    if (error) {
+      console.error('Error al obtener veterinario:', error.message);
+      throw new Error('No se pudo obtener la información del veterinario.');
+    }
+  
+    return data;
+  }
+  
 
 
 async isLoggedIn(): Promise<boolean> {
@@ -90,5 +113,22 @@ async signOut() {
   console.log('Sesión cerrada correctamente');
 }
 //------------------------ CERRAR SESION ---------------------------
+
+
+
+// ------------ obtener region
+async obtenerRegiones() {
+  try {
+    const { data, error } = await this.supabase
+      .from('region')
+      .select('id_region, nombre_region');
+    if (error) throw error;
+    return data ?? [];
+  } catch (error) {
+    console.error('Error al obtener regiones:', error);
+    return [];
+  }
+}
+
 
 }
