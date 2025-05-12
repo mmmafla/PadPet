@@ -51,6 +51,10 @@ const routes: Routes = [
     loadChildren:() => import('./veterinario/perfil/datosprofesionales/datosprofesionales.module').then( m => m.DatosprofesionalesPageModule),
     canActivate: [AuthGuard] 
   },
+  {
+    path: 'datosatencion',
+    loadChildren: () => import('./veterinario/datosatencion/datosatencion.module').then( m => m.DatosatencionPageModule)
+  },
 
 
 
