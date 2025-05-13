@@ -22,6 +22,10 @@ const routes: Routes = [
     loadChildren: () => import('./cuenta/olvidopass/olvidopass.module').then( m => m.OlvidopassPageModule)
   },
   {
+  path: 'nueva-contrasena',
+  loadChildren: () => import('./cuenta/olvidopass/nuevacontrasena/nuevacontrasena.module').then(m =>m.NuevacontrasenaPageModule)
+},
+  {
     path: 'home',
     loadChildren: () => import('./veterinario/home/home.module').then( m => m.HomePageModule),
     canActivate: [AuthGuard] 
