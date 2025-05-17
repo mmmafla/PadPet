@@ -1,0 +1,31 @@
+<app-header backButton="/perfil" title="Datos profesionales"></app-header>
+<ion-content>
+
+  <ion-card class="ion-card">
+    <form [formGroup]="form">
+  
+        <ion-item>
+          <ion-label position="floating">Universidad de Egreso</ion-label>
+          <ion-input formControlName="universidad"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">País</ion-label>
+          <ion-input formControlName="pais"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Especialidad</ion-label>
+          <ion-input formControlName="especialidad"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="floating">Año de Titulación</ion-label>
+          <ion-input type="number" formControlName="anoTitulacion"></ion-input>
+        </ion-item>
+  
+      <ion-button expand="full" type="submit" [disabled]="!form.valid" shape="round">Guardar datos</ion-button>
+    </form>
+  
+  </ion-card>
+  
+
+
+</ion-content>

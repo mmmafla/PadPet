@@ -1,0 +1,38 @@
+<app-header  backButton="/perfil" title="Tutores"></app-header>
+
+
+<ion-content class="fondo">
+<!--------------------------------------------------------------->
+<!-- Agregar Tutor -->
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="agregar">
+        <ion-fab-button >
+            <ion-icon name="add"></ion-icon>
+        </ion-fab-button>
+    </ion-fab>
+<!--------------------------------------------------------------->
+
+<!------------------------------------------------------------------------------->
+<!----------------------lista de tutores----------------------------------------->
+    <ion-card class="ion-card">
+        <ion-card-title>
+            <h2>Lista de tutores</h2>
+        </ion-card-title>
+        <ion-card-content>
+            <ion-list>
+                <ion-item-sliding >
+                    <ion-item>
+                        <ion-label>
+                            <h3>Nombre tutor</h3>
+                            <h4>Mascotas: </h4>
+                                <p>Listado de nombres de mascotas detalle-tutor </p>
+                        </ion-label>
+                        <ion-button slot="end"> Editar
+
+                        </ion-button>
+                    </ion-item>
+                </ion-item-sliding>
+            </ion-list>
+        </ion-card-content>
+    </ion-card>
+<!------------------------------------------------------------------------------->
+</ion-content>
