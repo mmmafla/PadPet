@@ -42,7 +42,7 @@ export class DatospersonalesPage implements OnInit {
   async cargarRegiones() {
     try {
       const { data, error } = await this.supabase
-        .from('region')
+        .from('REGION')
         .select('id_region, nombre_region');
 
       if (error) {
@@ -76,7 +76,7 @@ export class DatospersonalesPage implements OnInit {
       }
 
       const { data, error: vetError } = await this.supabase
-        .from('veterinario')
+        .from('VETERINARIO')
         .select('nombre_vet, apellidos_vet, email_vet, run_vet, celular_vet, direccion_vet, id_region')
         .eq('id_auth', user.id)
         .single();
@@ -123,7 +123,7 @@ export class DatospersonalesPage implements OnInit {
       }
 
       const { data, error: updateError } = await this.supabase
-        .from('veterinario')
+        .from('VETERINARIO')
         .update({
           nombre_vet,
           apellidos_vet,

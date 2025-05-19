@@ -4,7 +4,7 @@ import { RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
 import { FormsModule } from '@angular/forms';
-import { SupabaseService } from 'src/app/services/supabase.service'; // Asegúrate que este servicio exista
+import { SupabaseService } from 'src/app/services/supabase.service';
 
 @Component({
   selector: 'app-olvidopass',
@@ -15,7 +15,7 @@ import { SupabaseService } from 'src/app/services/supabase.service'; // Asegúra
 })
 export class OlvidopassPage implements OnInit {
 
-  opcionSeleccionada: string = 'correo';  // Activado por defecto
+  opcionSeleccionada: string = 'correo';
   telefono: string = '';
   correo: string = '';
 
@@ -27,7 +27,7 @@ export class OlvidopassPage implements OnInit {
   ngOnInit() {}
 
   isPhoneValid(): boolean {
-    const phoneRegex = /^9[0-9]{8}$/; // formato chileno: 9 dígitos comenzando con 9
+    const phoneRegex = /^9[0-9]{8}$/;
     return phoneRegex.test(this.telefono);
   }
 
@@ -39,7 +39,7 @@ export class OlvidopassPage implements OnInit {
   async enviarMensaje() {
     if (this.isPhoneValid()) {
       await this.mostrarToast('Se ha enviado un enlace de recuperación a tu celular.');
-      // Aquí puedes integrar Twilio, SMS API, etc.
+      // Aquí deberías implementar la lógica de envío de SMS
     } else {
       this.mostrarToast('Número de teléfono no válido.', 'danger');
     }

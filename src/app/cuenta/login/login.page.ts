@@ -41,7 +41,7 @@ export class LoginPage implements OnInit {
 
       // Obtener los datos del veterinario usando el id_auth
       const { data: vetData, error: vetError } = await this.supabaseService
-        .from('veterinario')
+        .from('VETERINARIO')
         .select('nombre_vet')
         .eq('id_auth', data.user.id)
         .single();

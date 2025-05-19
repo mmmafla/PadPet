@@ -8,7 +8,6 @@ import { FormularioComponent } from 'src/app/componentes/formulario/formulario.c
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
 import { SupabaseService } from 'src/app/services/supabase.service';
 
-
 interface NuevoVeterinarioForm {
   run: FormControl<string | null>;
   nombre: FormControl<string | null>;
@@ -20,21 +19,15 @@ interface NuevoVeterinarioForm {
   aceptaTerminos: FormControl<boolean | null>;
 }
 
-
 @Component({
   selector: 'app-nuevacuenta',
   templateUrl: './nuevacuenta.page.html',
   styleUrls: ['./nuevacuenta.page.scss'],
-  standalone:true,
+  standalone: true,
   imports: [IonicModule, RouterModule, ReactiveFormsModule, FormularioComponent, CommonModule, HeaderComponent]
 })
-
-
-
 export class NuevacuentaPage implements OnInit {
 
-
-  // formulario para crerar nuevo usuario veterinario
   form = new FormGroup<NuevoVeterinarioForm>({
     run: new FormControl(null, [Validators.required]),
     nombre: new FormControl(null, [Validators.required, Validators.minLength(3)]),
@@ -45,90 +38,73 @@ export class NuevacuentaPage implements OnInit {
     confpassword: new FormControl(null, [Validators.required]),
     aceptaTerminos: new FormControl(false, Validators.requiredTrue),
   }, { validators: this.passwordsMatch });
-  
-  
-  
-
-
 
   router = inject(Router);
   toastController = inject(ToastController);
   supabaseService = inject(SupabaseService);
 
-
   ngOnInit() {}
 
   async submit() {
     if (!this.validarRUN()) { return; }
-  
-    const formValue = this.form.value; // Guardar los valores en una variable
-  
-    // Verificar si los valores del formulario son válidos
+
+    const formValue = this.form.value;
+
     if (!formValue.nombre || !formValue.email || !formValue.celular) {
       this.mostrarToast('Por favor, complete todos los campos requeridos', 'danger');
       return;
     }
-  
+
     const { nombre, apellidos, run, celular, email, password } = formValue;
-  
+
     try {
-      // Llamamos a la función registrarVeterinario que definimos en supabaseService
-      const resultado = await this.supabaseService.registrarVeterinario(run!, nombre!, apellidos!, email!, celular!,password!);
+      // Este método debe estar preparado internamente para interactuar con la tabla 'VETERINARIO'
+      const resultado = await this.supabaseService.registrarVeterinario(run!, nombre!, apellidos!, email!, celular!, password!);
       
-      // Mostrar mensaje de exito
       this.mostrarToast('Veterinario registrado con éxito', 'success');
-      
-      // Redirigir al veterinario al home
       this.router.navigate(['/home']); 
     } catch (error: any) {  
       this.mostrarToast('Error al registrar veterinario: ' + error.message, 'danger');
     }
   }
-  
 
+  validarRUN(): boolean {
+    const run = this.form.controls.run.value?.toString().replace(/\./g, '').replace('-', '') ?? '';
+    if (run.length < 2) {
+      this.form.controls.run.setErrors({ invalidRut: true });
+      return false;
+    }
 
-// --------------------------------------- RUT ---------------------------------------
-validarRUN(): boolean {
-  const run = this.form.controls.run.value?.toString().replace(/\./g, '').replace('-', '') ?? '';
-  if (run.length < 2) {
-    this.form.controls.run.setErrors({ invalidRut: true });
-    return false;
+    const cuerpo = run.slice(0, -1);
+    const dv = run.slice(-1).toUpperCase();
+
+    let suma = 0;
+    let multiplo = 2;
+
+    for (let i = cuerpo.length - 1; i >= 0; i--) {
+      suma += parseInt(cuerpo[i]) * multiplo;
+      multiplo = multiplo < 7 ? multiplo + 1 : 2;
+    }
+
+    const dvEsperado = 11 - (suma % 11);
+    const dvCalc = dvEsperado === 11 ? '0' : dvEsperado === 10 ? 'K' : dvEsperado.toString();
+
+    if (dv !== dvCalc) {
+      this.form.controls.run.setErrors({ invalidRut: true });
+      return false;
+    }
+
+    this.form.controls.run.setErrors(null);
+    return true;
   }
 
-  const cuerpo = run.slice(0, -1);
-  const dv = run.slice(-1).toUpperCase();
-
-  let suma = 0;
-  let multiplo = 2;
-
-  for (let i = cuerpo.length - 1; i >= 0; i--) {
-    suma += parseInt(cuerpo[i]) * multiplo;
-    multiplo = multiplo < 7 ? multiplo + 1 : 2;
+  passwordsMatch(group: AbstractControl): ValidationErrors | null {
+    const password = group.get('password')?.value;
+    const confirm = group.get('confpassword')?.value;
+    return password === confirm ? null : { mismatch: true };
   }
 
-  const dvEsperado = 11 - (suma % 11);
-  const dvCalc = dvEsperado === 11 ? '0' : dvEsperado === 10 ? 'K' : dvEsperado.toString();
-
-  if (dv !== dvCalc) {
-    this.form.controls.run.setErrors({ invalidRut: true });
-    return false;
-  }
-
-  this.form.controls.run.setErrors(null);
-  return true;
-}
-
-
-passwordsMatch(group: AbstractControl): ValidationErrors | null {
-  const password = group.get('password')?.value;
-  const confirm = group.get('confpassword')?.value;
-  return password === confirm ? null : { mismatch: true };
-}
-
-
-  // ------------------------------------------------------------------------------------
-  // -----------------------------------MENSAJE------------------------------------------
-  private  async mostrarToast(mensaje: string, color: string = 'success') {
+  private async mostrarToast(mensaje: string, color: string = 'success') {
     const toast = await this.toastController.create({
       message: mensaje,
       position: 'middle',
