@@ -11,7 +11,7 @@ import { HeaderComponent } from 'src/app/componentes/header/header.component';
   templateUrl: './datosatencion.page.html',
   styleUrls: ['./datosatencion.page.scss'],
   standalone: true,
-  imports: [IonicModule, RouterModule, ReactiveFormsModule, FormularioComponent, CommonModule, HeaderComponent]
+  imports: [IonicModule, RouterModule, ReactiveFormsModule, CommonModule, HeaderComponent]
 
 })
 export class DatosatencionPage implements OnInit {

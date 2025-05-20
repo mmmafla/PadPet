@@ -15,8 +15,6 @@ import { SupabaseService } from 'src/app/services/supabase.service'; // Asegúra
 })
 export class OlvidopassPage implements OnInit {
 
-  opcionSeleccionada: string = 'correo';  // Activado por defecto
-  telefono: string = '';
   correo: string = '';
 
   constructor(
@@ -26,24 +24,12 @@ export class OlvidopassPage implements OnInit {
 
   ngOnInit() {}
 
-  isPhoneValid(): boolean {
-    const phoneRegex = /^9[0-9]{8}$/; // formato chileno: 9 dígitos comenzando con 9
-    return phoneRegex.test(this.telefono);
-  }
 
   isEmailValid(): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(this.correo);
   }
 
-  async enviarMensaje() {
-    if (this.isPhoneValid()) {
-      await this.mostrarToast('Se ha enviado un enlace de recuperación a tu celular.');
-      // Aquí puedes integrar Twilio, SMS API, etc.
-    } else {
-      this.mostrarToast('Número de teléfono no válido.', 'danger');
-    }
-  }
 
   async enviarMensajeCorreo() {
     if (!this.isEmailValid()) {

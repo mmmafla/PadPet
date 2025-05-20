@@ -58,11 +58,7 @@ const routes: Routes = [
   {
     path: 'datosatencion',
     loadChildren: () => import('./veterinario/datosatencion/datosatencion.module').then( m => m.DatosatencionPageModule)
-  },
-
-
-
-
+  }
 
 ];
 

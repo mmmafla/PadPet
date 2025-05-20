@@ -31,20 +31,32 @@ export class LoginPage implements OnInit {
     const { email, password } = this.form.value;
 
     try {
-      const { error, data } = await this.supabaseService.login(email!, password!);
+      // Iniciar sesión
+      const { error: loginError } = await this.supabaseService.login(email!, password!);
 
-      if (error) {
+      if (loginError) {
         this.mostrarToast('Correo o contraseña incorrecta', 'danger');
-        console.error('Error de login:', error.message);
+        console.error('Error de login:', loginError.message);
         return;
       }
 
-      // Obtener los datos del veterinario usando el id_auth
+      // Obtener el usuario autenticado
+      const { data: userData, error: userError } = await this.supabaseService.auth.getUser();
+
+      if (userError || !userData?.user) {
+        this.mostrarToast('No se pudo obtener el usuario autenticado', 'danger');
+        console.error('Error al obtener usuario:', userError?.message);
+        return;
+      }
+
+      const userId = userData.user.id;
+
+      // Buscar al veterinario correspondiente
       const { data: vetData, error: vetError } = await this.supabaseService
         .from('veterinario')
         .select('nombre_vet')
-        .eq('id_auth', data.user.id)
-        .single();
+        .eq('id_auth', userId)
+        .maybeSingle();
 
       if (vetError) {
         console.error('Error al obtener el veterinario:', vetError.message);
@@ -52,12 +64,17 @@ export class LoginPage implements OnInit {
         return;
       }
 
-      // Mostrar el toast personalizado con el nombre del veterinario
-      const nombreVet = (vetData?.nombre_vet || 'Veterinario').toUpperCase();
+      if (!vetData) {
+        this.mostrarToast('Veterinario no registrado en la base de datos', 'danger');
+        return;
+      }
+
+      // Mostrar mensaje de bienvenida
+      const nombreVet = (vetData.nombre_vet || 'Veterinario').toUpperCase();
       this.mostrarToast(`¡Bienvenido MV. ${nombreVet}! Sesión iniciada con éxito`, 'success');
 
       localStorage.setItem('user_veterinario', 'true');
-      this.router.navigate(['/home']); 
+      this.router.navigate(['/home']);
     } catch (err: any) {
       this.mostrarToast('Error inesperado: ' + err.message, 'danger');
     }
