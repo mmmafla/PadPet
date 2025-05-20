@@ -16,33 +16,51 @@ import { Router } from '@angular/router';
 export class DatospersonalesPage implements OnInit {
 
   form: FormGroup;
-
   regiones: any[] = [];
 
-
-  // Injecting SupabaseService and ToastController for toast notifications
   supabase = inject(SupabaseService);
   toastController = inject(ToastController);
   router = inject(Router);
 
   constructor() {
-    // Initialize the form with empty values and validation rules
     this.form = new FormGroup({
       nombre_vet: new FormControl('', [Validators.required]),
       apellidos_vet: new FormControl('', [Validators.required]),
       email_vet: new FormControl('', [Validators.required, Validators.email]),
-      run_vet: new FormControl({ value: '', disabled: true }), // Solo leer
+      run_vet: new FormControl({ value: '', disabled: true }),
       celular_vet: new FormControl('', [Validators.required]),
-      direccion_vet: new FormControl('', [Validators.required])
+      direccion_vet: new FormControl('', [Validators.required]),
+      id_region: new FormControl(null, [Validators.required]) // null para mejor compatibilidad con ion-select
     });
   }
 
-  ngOnInit() {
-    
-    // Cargar los datos actuales del veterinario desde la base de datos
-    this.cargarDatosVeterinario();
+  async ngOnInit() {
+    await this.cargarRegiones();              // Primero cargar regiones
+    await this.cargarDatosVeterinario();      // Luego los datos del veterinario
   }
-  
+
+  async cargarRegiones() {
+    try {
+      const { data, error } = await this.supabase
+        .from('region')
+        .select('id_region, nombre_region');
+
+      if (error) {
+        console.error('Error al obtener las regiones:', error);
+        return;
+      }
+
+      console.log('Regiones obtenidas:', data); // DEBUG
+
+      if (data) {
+        this.regiones = data;
+        console.log('Regiones cargadas:', this.regiones); // Confirmación
+      }
+    } catch (error) {
+      console.error('Error en la consulta de regiones:', error);
+    }
+  }
+
   async cargarDatosVeterinario() {
     try {
       const { data: { user }, error } = await this.supabase.auth.getUser();
@@ -57,10 +75,9 @@ export class DatospersonalesPage implements OnInit {
         return;
       }
 
-      // Obtener los datos del veterinario desde la base de datos
       const { data, error: vetError } = await this.supabase
         .from('veterinario')
-        .select('nombre_vet, apellidos_vet, email_vet, run_vet, celular_vet, direccion_vet')
+        .select('nombre_vet, apellidos_vet, email_vet, run_vet, celular_vet, direccion_vet, id_region')
         .eq('id_auth', user.id)
         .single();
 
@@ -70,7 +87,6 @@ export class DatospersonalesPage implements OnInit {
       }
 
       if (data) {
-        // Asignar los datos al formulario
         this.form.setValue({
           nombre_vet: data.nombre_vet,
           apellidos_vet: data.apellidos_vet,
@@ -78,6 +94,7 @@ export class DatospersonalesPage implements OnInit {
           run_vet: data.run_vet,
           celular_vet: data.celular_vet,
           direccion_vet: data.direccion_vet,
+          id_region: data.id_region ?? null // Garantiza tipo correcto
         });
       }
     } catch (error) {
@@ -88,7 +105,7 @@ export class DatospersonalesPage implements OnInit {
   async actualizarDatos() {
     if (this.form.invalid) return;
 
-    const { nombre_vet, apellidos_vet, email_vet, celular_vet ,direccion_vet} = this.form.value;
+    const { nombre_vet, apellidos_vet, email_vet, celular_vet, direccion_vet, id_region } = this.form.value;
 
     try {
       const { data: { user }, error } = await this.supabase.auth.getUser();
@@ -105,7 +122,6 @@ export class DatospersonalesPage implements OnInit {
         return;
       }
 
-      // Actualizar los datos del veterinario en la base de datos
       const { data, error: updateError } = await this.supabase
         .from('veterinario')
         .update({
@@ -113,7 +129,8 @@ export class DatospersonalesPage implements OnInit {
           apellidos_vet,
           email_vet,
           celular_vet,
-          direccion_vet
+          direccion_vet,
+          id_region
         })
         .eq('id_auth', user.id);
 
@@ -124,7 +141,7 @@ export class DatospersonalesPage implements OnInit {
       }
 
       this.mostrarToast('Datos actualizados correctamente', 'success');
-      this.router.navigate(['/perfil']); // O la ruta que corresponda
+      this.router.navigate(['/perfil']);
     } catch (error) {
       console.error('Error en la actualización:', error);
       this.mostrarToast('Error inesperado: ', 'danger');
