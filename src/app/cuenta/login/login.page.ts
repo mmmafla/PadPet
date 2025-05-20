@@ -15,7 +15,7 @@ import { SupabaseService } from 'src/app/services/supabase.service';
 })
 export class LoginPage implements OnInit {
   form = new FormGroup({
-    email: new FormControl('', [Validators.required, Validators.email]),
+    run: new FormControl('', [Validators.required]),
     password: new FormControl('', [Validators.required]),
   });
 
@@ -28,19 +28,34 @@ export class LoginPage implements OnInit {
   async submit() {
     if (this.form.invalid) return;
 
-    const { email, password } = this.form.value;
+    const { run, password } = this.form.value;
 
     try {
-      // Iniciar sesión
-      const { error: loginError } = await this.supabaseService.login(email!, password!);
+      // Buscar al veterinario por run_vet
+      const { data: vetData, error: vetError } = await this.supabaseService
+        .from('veterinario')
+        .select('id_auth, nombre_vet, email_vet')
+        .eq('run_vet', run)
+        .maybeSingle();
+
+      if (vetError || !vetData) {
+        this.mostrarToast('RUN no registrado', 'danger');
+        console.error('Error al obtener veterinario:', vetError?.message);
+        return;
+      }
+
+      const email = vetData.email_vet;
+
+      // Iniciar sesión con el email encontrado
+      const { error: loginError } = await this.supabaseService.login(email, password!);
 
       if (loginError) {
-        this.mostrarToast('Correo o contraseña incorrecta', 'danger');
+        this.mostrarToast('Contraseña incorrecta', 'danger');
         console.error('Error de login:', loginError.message);
         return;
       }
 
-      // Obtener el usuario autenticado
+      // Obtener usuario autenticado
       const { data: userData, error: userError } = await this.supabaseService.auth.getUser();
 
       if (userError || !userData?.user) {
@@ -49,27 +64,6 @@ export class LoginPage implements OnInit {
         return;
       }
 
-      const userId = userData.user.id;
-
-      // Buscar al veterinario correspondiente
-      const { data: vetData, error: vetError } = await this.supabaseService
-        .from('veterinario')
-        .select('nombre_vet')
-        .eq('id_auth', userId)
-        .maybeSingle();
-
-      if (vetError) {
-        console.error('Error al obtener el veterinario:', vetError.message);
-        this.mostrarToast('Error al obtener los datos del veterinario', 'danger');
-        return;
-      }
-
-      if (!vetData) {
-        this.mostrarToast('Veterinario no registrado en la base de datos', 'danger');
-        return;
-      }
-
-      // Mostrar mensaje de bienvenida
       const nombreVet = (vetData.nombre_vet || 'Veterinario').toUpperCase();
       this.mostrarToast(`¡Bienvenido MV. ${nombreVet}! Sesión iniciada con éxito`, 'success');
 
