@@ -26,7 +26,7 @@
         </ion-item>
         <ion-item>
           <ion-label position="stacked">Domicilio</ion-label>
-          <ion-input type="tel" formControlName="direccion_vet"></ion-input>
+          <ion-input type="text" formControlName="direccion_vet"></ion-input>
         </ion-item>
         <ion-item>
           <ion-label position="stacked">Región</ion-label>
@@ -36,9 +36,15 @@
             </ion-select-option>
           </ion-select>
         </ion-item>
-
+        <ion-item>
+          <ion-label position="stacked">Ciudad</ion-label>
+          <ion-select formControlName="id_ciudad" interface="popover" placeholder="Selecciona una ciudad">
+            <ion-select-option *ngFor="let ciudad of ciudades" [value]="ciudad.id_ciudad">
+              {{ ciudad.nombre_ciudad }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
       </ion-list>
-
       <ion-button expand="full" type="submit" [disabled]="form.invalid" shape="round">Actualizar información</ion-button>
     </form>
   </ion-card>

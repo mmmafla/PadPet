@@ -1,69 +1,32 @@
-<app-header  backButton="/login" title="Recuperar contraseña"></app-header>
+<app-header backButton="/login" title="Recuperar contraseña"></app-header>
 
-<ion-content>
-
-<!-- recuperar pass-->
-<div>
+<ion-content style="text-align: center;">
   <ion-card class="ion-card">
-    <p>Elige cómo deseas recuperar tu contraseña</p>
-    
-    <!-- Grupo de radios para seleccionar entre teléfono o correo -->
-    <ion-radio-group [(ngModel)]="opcionSeleccionada">
-      <ion-list-header>
-        <ion-label>Selecciona un método</ion-label>
-      </ion-list-header>
-      <ion-item>
-        <ion-label>Por Teléfono</ion-label>
-        <ion-radio slot="start" value="telefono"></ion-radio>
-      </ion-item>
-      <ion-item>
-        <ion-label>Por Correo Electrónico</ion-label>
-        <ion-radio slot="start" value="correo"></ion-radio>
-      </ion-item>
-    </ion-radio-group>
-  
-    <!-- Formulario para recuperación por teléfono -->
-    <div *ngIf="opcionSeleccionada === 'telefono'">
-      <p>Te enviaremos un link a tu celular para que puedas restaurar tu contraseña</p>
-      <ion-input
-        type="tel"
-        fill="solid"
-        label="Ingresa número telefónico"
-        labelPlacement="floating"
-        helperText="Ingresa un celular válido (ej: 9XXXXXXXX)"
-        errorText="Teléfono inválido"
-        [(ngModel)]="telefono"
-        required
-        maxlength="9"
-        inputmode="numeric"
-      ></ion-input>
-  
-      <ion-button [disabled]="!isPhoneValid()" (click)="enviarMensaje()" class="submit">
-        Enviar mensaje de recuperación
-      </ion-button>
-    </div>
-  
-    <!-- Formulario para recuperación por correo -->
-    <div *ngIf="opcionSeleccionada === 'correo'">
-      <p>Te enviaremos un link a tu correo para que puedas restaurar tu contraseña</p>
-      <ion-input
-        type="email"
-        fill="solid"
-        label="Ingresa tu correo electrónico"
-        labelPlacement="floating"
-        helperText="Ingresa el correo electrónico con el que te registraste"
-        errorText="Correo inválido"
-        [(ngModel)]="correo"
-        required
-      ></ion-input>
-  
-      <ion-button [disabled]="!isEmailValid()" (click)="enviarMensajeCorreo()" class="submit">
-        Enviar mensaje de recuperación
-      </ion-button>
-    </div>
-  </ion-card>
-  
-  </div>
+    <ion-card-header>
+      <ion-card-title>Recuperar contraseña</ion-card-title>
+    </ion-card-header>
 
-  </ion-content>
-  
+    <ion-card-content>
+      <p>Te enviaremos un enlace a tu correo para que puedas restaurar tu contraseña.</p>
+
+<ion-item class="borde">
+  <ion-input
+    type="email"
+    label="Correo electrónico"
+    labelPlacement="stacked"
+    placeholder="tucorreo@ejemplo.com"
+    [(ngModel)]="correo"
+    class="custom-input"
+    required
+  ></ion-input>
+</ion-item>
+
+      <ion-button 
+        expand="block" 
+        [disabled]="!isEmailValid()" 
+        (click)="enviarMensajeCorreo()">
+        Enviar mensaje de recuperación
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

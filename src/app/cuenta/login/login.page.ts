@@ -15,7 +15,7 @@ import { SupabaseService } from 'src/app/services/supabase.service';
 })
 export class LoginPage implements OnInit {
   form = new FormGroup({
-    email: new FormControl('', [Validators.required, Validators.email]),
+    run: new FormControl('', [Validators.required]),
     password: new FormControl('', [Validators.required]),
   });
 
@@ -28,36 +28,47 @@ export class LoginPage implements OnInit {
   async submit() {
     if (this.form.invalid) return;
 
-    const { email, password } = this.form.value;
+    const { run, password } = this.form.value;
 
     try {
-      const { error, data } = await this.supabaseService.login(email!, password!);
-
-      if (error) {
-        this.mostrarToast('Correo o contraseña incorrecta', 'danger');
-        console.error('Error de login:', error.message);
-        return;
-      }
-
-      // Obtener los datos del veterinario usando el id_auth
+      // Buscar al veterinario por run_vet
       const { data: vetData, error: vetError } = await this.supabaseService
-        .from('VETERINARIO')
-        .select('nombre_vet')
-        .eq('id_auth', data.user.id)
-        .single();
+        .from('veterinario')
+        .select('id_auth, nombre_vet, email_vet')
+        .eq('run_vet', run)
+        .maybeSingle();
 
-      if (vetError) {
-        console.error('Error al obtener el veterinario:', vetError.message);
-        this.mostrarToast('Error al obtener los datos del veterinario', 'danger');
+      if (vetError || !vetData) {
+        this.mostrarToast('RUN no registrado', 'danger');
+        console.error('Error al obtener veterinario:', vetError?.message);
         return;
       }
 
-      // Mostrar el toast personalizado con el nombre del veterinario
-      const nombreVet = (vetData?.nombre_vet || 'Veterinario').toUpperCase();
+      const email = vetData.email_vet;
+
+      // Iniciar sesión con el email encontrado
+      const { error: loginError } = await this.supabaseService.login(email, password!);
+
+      if (loginError) {
+        this.mostrarToast('Contraseña incorrecta', 'danger');
+        console.error('Error de login:', loginError.message);
+        return;
+      }
+
+      // Obtener usuario autenticado
+      const { data: userData, error: userError } = await this.supabaseService.auth.getUser();
+
+      if (userError || !userData?.user) {
+        this.mostrarToast('No se pudo obtener el usuario autenticado', 'danger');
+        console.error('Error al obtener usuario:', userError?.message);
+        return;
+      }
+
+      const nombreVet = (vetData.nombre_vet || 'Veterinario').toUpperCase();
       this.mostrarToast(`¡Bienvenido MV. ${nombreVet}! Sesión iniciada con éxito`, 'success');
 
       localStorage.setItem('user_veterinario', 'true');
-      this.router.navigate(['/home']); 
+      this.router.navigate(['/home']);
     } catch (err: any) {
       this.mostrarToast('Error inesperado: ' + err.message, 'danger');
     }

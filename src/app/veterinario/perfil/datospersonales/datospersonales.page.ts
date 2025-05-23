@@ -17,6 +17,7 @@ export class DatospersonalesPage implements OnInit {
 
   form: FormGroup;
   regiones: any[] = [];
+  ciudades: any[] = [];
 
   supabase = inject(SupabaseService);
   toastController = inject(ToastController);
@@ -30,19 +31,28 @@ export class DatospersonalesPage implements OnInit {
       run_vet: new FormControl({ value: '', disabled: true }),
       celular_vet: new FormControl('', [Validators.required]),
       direccion_vet: new FormControl('', [Validators.required]),
-      id_region: new FormControl(null, [Validators.required]) // null para mejor compatibilidad con ion-select
+      id_region: new FormControl(null, [Validators.required]),
+      id_ciudad: new FormControl(null, [Validators.required])
+    });
+
+    // Cuando cambie la región, actualizar las ciudades correspondientes
+    this.form.get('id_region')?.valueChanges.subscribe(regionId => {
+      this.cargarCiudadesPorRegion(regionId);
+      // También resetear ciudad para que no quede una ciudad que no pertenece a la nueva región
+      this.form.get('id_ciudad')?.setValue(null);
     });
   }
 
   async ngOnInit() {
-    await this.cargarRegiones();              // Primero cargar regiones
-    await this.cargarDatosVeterinario();      // Luego los datos del veterinario
+    await this.cargarRegiones();
+    await this.cargarDatosVeterinario();
   }
 
+  // Carga todas las regiones
   async cargarRegiones() {
     try {
       const { data, error } = await this.supabase
-        .from('REGION')
+        .from('region')
         .select('id_region, nombre_region');
 
       if (error) {
@@ -50,34 +60,51 @@ export class DatospersonalesPage implements OnInit {
         return;
       }
 
-      console.log('Regiones obtenidas:', data); // DEBUG
-
-      if (data) {
-        this.regiones = data;
-        console.log('Regiones cargadas:', this.regiones); // Confirmación
-      }
+      this.regiones = data ?? [];
     } catch (error) {
       console.error('Error en la consulta de regiones:', error);
     }
   }
 
+  // Carga las ciudades según la región seleccionada
+  async cargarCiudadesPorRegion(id_region: number | null) {
+    if (!id_region) {
+      this.ciudades = [];
+      return;
+    }
+
+    try {
+      const { data, error } = await this.supabase
+        .from('ciudad')
+        .select('id_ciudad, nombre_ciudad')
+        .eq('id_region', id_region);
+
+      if (error) {
+        console.error('Error al obtener las ciudades:', error);
+        this.ciudades = [];
+        return;
+      }
+
+      this.ciudades = data ?? [];
+    } catch (error) {
+      console.error('Error en la consulta de ciudades:', error);
+      this.ciudades = [];
+    }
+  }
+
+  // Carga datos del veterinario y establece la región y ciudad seleccionadas
   async cargarDatosVeterinario() {
     try {
       const { data: { user }, error } = await this.supabase.auth.getUser();
 
-      if (error) {
-        console.error('Error al obtener el usuario:', error);
-        return;
-      }
-
-      if (!user) {
-        console.warn('No se encontró un usuario autenticado.');
+      if (error || !user) {
+        console.error('Error al obtener el usuario:', error ?? 'Usuario no autenticado');
         return;
       }
 
       const { data, error: vetError } = await this.supabase
-        .from('VETERINARIO')
-        .select('nombre_vet, apellidos_vet, email_vet, run_vet, celular_vet, direccion_vet, id_region')
+        .from('veterinario')
+        .select('nombre_vet, apellidos_vet, email_vet, run_vet, celular_vet, direccion_vet, id_region, id_ciudad')
         .eq('id_auth', user.id)
         .single();
 
@@ -94,43 +121,53 @@ export class DatospersonalesPage implements OnInit {
           run_vet: data.run_vet,
           celular_vet: data.celular_vet,
           direccion_vet: data.direccion_vet,
-          id_region: data.id_region ?? null // Garantiza tipo correcto
+          id_region: data.id_region ?? null,
+          id_ciudad: data.id_ciudad ?? null
         });
+
+        // Cargar ciudades de la región actual para mostrar en el select
+        if (data.id_region) {
+          await this.cargarCiudadesPorRegion(data.id_region);
+        }
       }
     } catch (error) {
       console.error('Error en la consulta:', error);
     }
   }
 
+  // Actualiza los datos del veterinario
   async actualizarDatos() {
     if (this.form.invalid) return;
 
-    const { nombre_vet, apellidos_vet, email_vet, celular_vet, direccion_vet, id_region } = this.form.value;
+    const {
+      nombre_vet,
+      apellidos_vet,
+      email_vet,
+      celular_vet,
+      direccion_vet,
+      id_region,
+      id_ciudad
+    } = this.form.value;
 
     try {
       const { data: { user }, error } = await this.supabase.auth.getUser();
 
-      if (error) {
-        console.error('Error al obtener el usuario:', error);
+      if (error || !user) {
+        console.error('Error al obtener el usuario:', error ?? 'Usuario no autenticado');
         this.mostrarToast('Error al obtener el usuario', 'danger');
         return;
       }
 
-      if (!user) {
-        console.warn('No se encontró un usuario autenticado.');
-        this.mostrarToast('No se encontró un usuario autenticado', 'danger');
-        return;
-      }
-
-      const { data, error: updateError } = await this.supabase
-        .from('VETERINARIO')
+      const { error: updateError } = await this.supabase
+        .from('veterinario')
         .update({
           nombre_vet,
           apellidos_vet,
           email_vet,
           celular_vet,
           direccion_vet,
-          id_region
+          id_region,
+          id_ciudad
         })
         .eq('id_auth', user.id);
 
@@ -144,7 +181,7 @@ export class DatospersonalesPage implements OnInit {
       this.router.navigate(['/perfil']);
     } catch (error) {
       console.error('Error en la actualización:', error);
-      this.mostrarToast('Error inesperado: ', 'danger');
+      this.mostrarToast('Error inesperado', 'danger');
     }
   }
 

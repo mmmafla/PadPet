@@ -12,7 +12,7 @@ import { HeaderComponent } from 'src/app/componentes/header/header.component';
   templateUrl: './home.page.html',
   styleUrls: ['./home.page.scss'],
   standalone: true,
-  imports: [IonicModule, RouterModule, ReactiveFormsModule, FormularioComponent, CommonModule, HeaderComponent]
+  imports: [IonicModule, RouterModule, ReactiveFormsModule, CommonModule, HeaderComponent]
 })
 export class HomePage implements OnInit {
 
