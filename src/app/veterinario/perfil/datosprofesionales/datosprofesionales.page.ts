@@ -17,6 +17,8 @@ export class DatosprofesionalesPage implements OnInit {
   form!: FormGroup;
   paises: any[] = [];
   especialidades: any[] = [];
+  universidades: any[] = [];
+  universidadesFiltradas: any[] = []; // ← nuevas: universidades por país
   runVet: string = '';
 
   supabase = inject(SupabaseService);
@@ -30,21 +32,32 @@ export class DatosprofesionalesPage implements OnInit {
       especialidad: new FormControl('', Validators.required),
       anoTitulacion: new FormControl('', [
         Validators.required,
-        Validators.min(1900),
+        Validators.min(1980),
         Validators.max(new Date().getFullYear())
       ])
     });
 
     this.cargarCatalogos();
     this.obtenerRunVetYDatos();
+
+    // 🟡 Escucha el cambio en país y filtra universidades
+    this.form.get('pais')?.valueChanges.subscribe((idPaisSeleccionado) => {
+      this.filtrarUniversidadesPorPais(idPaisSeleccionado);
+      this.form.get('universidad')?.setValue('');
+    });
   }
 
   async cargarCatalogos() {
     try {
       const { data: paises } = await this.supabase.from('pais').select('*');
       const { data: especialidades } = await this.supabase.from('especialidad').select('*');
+      const { data: universidades } = await this.supabase
+        .from('universidad')
+        .select('id_uni, nom_uni, id_pais'); // ← incluir id_pais
+
       this.paises = paises ?? [];
       this.especialidades = especialidades ?? [];
+      this.universidades = universidades ?? [];
     } catch (error) {
       console.error('Error cargando catálogos:', error);
     }
@@ -85,15 +98,22 @@ export class DatosprofesionalesPage implements OnInit {
 
       if (data) {
         this.form.patchValue({
-          universidad: data.uni_egreso ?? '',
+          universidad: data.id_uni ?? '',
           pais: data.id_pais ?? '',
           especialidad: data.id_especialidad ?? '',
           anoTitulacion: data.anno_titulacion ?? ''
         });
+
+        // 🟢 Filtrar universidades si ya hay datos
+        this.filtrarUniversidadesPorPais(data.id_pais);
       }
     } catch (error) {
       console.error('Error al cargar datos del veterinario:', error);
     }
+  }
+
+  filtrarUniversidadesPorPais(idPais: number) {
+    this.universidadesFiltradas = this.universidades.filter(u => u.id_pais === idPais);
   }
 
   async guardarDatos() {
@@ -115,7 +135,7 @@ export class DatosprofesionalesPage implements OnInit {
         const { error } = await this.supabase
           .from('dato_profesional')
           .update({
-            uni_egreso: universidad,
+            id_uni: universidad,
             id_pais: pais,
             id_especialidad: especialidad,
             anno_titulacion: anoTitulacion
@@ -129,7 +149,7 @@ export class DatosprofesionalesPage implements OnInit {
           .from('dato_profesional')
           .insert({
             run_vet: this.runVet,
-            uni_egreso: universidad,
+            id_uni: universidad,
             id_pais: pais,
             id_especialidad: especialidad,
             anno_titulacion: anoTitulacion
