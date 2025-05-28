@@ -1,0 +1,33 @@
+<app-header backButton="/login" title="Nueva contraseña"></app-header>
+
+<ion-content class="ion-padding">
+  <ion-card class="ion-card">
+    <ion-card-header>
+      <ion-card-title>Establecer nueva contraseña</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-input
+        type="password"
+        label="Nueva contraseña"
+        labelPlacement="floating"
+        [(ngModel)]="nuevaContrasena"
+        required
+        fill="solid"
+      ></ion-input>
+
+      <ion-input
+        type="password"
+        label="Confirmar contraseña"
+        labelPlacement="floating"
+        [(ngModel)]="confirmarContrasena"
+        required
+        fill="solid"
+      ></ion-input>
+
+      <ion-button expand="block" (click)="cambiarContrasena()" [disabled]="!formValido()">
+        Cambiar contraseña
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
