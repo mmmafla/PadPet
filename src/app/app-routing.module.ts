@@ -60,6 +60,11 @@ const routes: Routes = [
     loadChildren: () => import('./veterinario/datosatencion/datosatencion.module').then( m => m.DatosatencionPageModule),
     canActivate: [AuthGuard] 
   },
+  {
+    path: 'veterinario/tutor/agregar-tutor',
+    loadChildren: () => import('./veterinario/tutor/agregar-tutor/agregar-tutor.module').then( m => m.AgregarTutorPageModule),
+    canActivate: [AuthGuard] 
+  },
 
 
 ];

@@ -8,6 +8,10 @@ const routes: Routes = [
     path: '',
     component: TutorPage
   },
+  {
+    path: 'agregar-tutor',
+    loadChildren: () => import('./agregar-tutor/agregar-tutor.module').then( m => m.AgregarTutorPageModule)
+  },
 ];
 
 @NgModule({
