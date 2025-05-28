@@ -1,0 +1,39 @@
+<app-header backButton="/perfil" title="Tutores"></app-header>
+
+<ion-content class="fondo">
+
+  <!-- Botón para agregar tutor -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="agregar" (click)="irAgregarTutor()">
+    <ion-fab-button>
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+  <!-- Lista de tutores -->
+  <ion-card class="ion-card">
+    <ion-card-title>
+      <h2>Lista de tutores</h2>
+    </ion-card-title>
+    <ion-card-content>
+      <ion-list *ngIf="tutores.length > 0; else sinTutores">
+        <ion-item-sliding *ngFor="let tutor of tutores">
+          <ion-item>
+            <ion-label>
+              <h3>{{ tutor.nombre_tutor }} {{ tutor.apellidos_tutor }}</h3>
+              <p>Correo: {{ tutor.correo_tutor }}</p>
+              <p>Dirección: {{ tutor.direccion_tutor }}</p>
+              <p>Celular: {{ tutor.celular_tutor }}</p>
+            </ion-label>
+            <ion-button slot="end" fill="outline" color="primary">
+              Editar
+            </ion-button>
+          </ion-item>
+        </ion-item-sliding>
+      </ion-list>
+      <ng-template #sinTutores>
+        <p>No hay tutores registrados aún.</p>
+      </ng-template>
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

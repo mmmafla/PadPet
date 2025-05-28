@@ -1,0 +1,26 @@
+.preview-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 150px;
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+  margin: 10px 0;
+}
+
+.preview-container img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+}
+
+
+ion-menu::part(backdrop) {
+  background-color: black;
+}
+
+ion-menu::part(container) {
+  border-radius: 0 20px 20px 0;
+
+  box-shadow: 4px 0px 16px rgba(0, 0, 0, 0.18);
+}

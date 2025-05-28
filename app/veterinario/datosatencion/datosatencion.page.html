@@ -1,0 +1,87 @@
+<app-header backButton="/perfil" title="Preferencias de atención"></app-header>
+
+<ion-content class="fondo">
+
+  <!----------------ESPECIES-------------------->
+  <ion-card class="ion-card">
+    <ion-card-header>
+      <h2>Especies que atiendes</h2>
+      <p style="text-align: center;">Selecciona las especies que atiendes en consulta</p>
+    </ion-card-header>
+    <ion-card-content>
+            <ion-list>
+              <ion-item *ngFor="let especie of especies">
+                <ion-label>{{ especie.nombre_especie }}</ion-label>
+                <ion-checkbox 
+                  [checked]="especiesSeleccionadas.includes(especie.id_especie)" 
+                  (ionChange)="toggleEspecie(especie.id_especie)"
+                      slot="end"
+                      class="checkbox-redondo">
+                </ion-checkbox>
+              </ion-item>
+            </ion-list>
+      <ion-button expand="block" class="boton-editar" (click)="guardarEspecies()">Guardar Especies</ion-button>
+    </ion-card-content>
+  </ion-card>
+
+<!----------------EXAMENES-------------------->
+
+<!-- EXAMENES -->
+<ion-card class="ion-card">
+  <ion-card-header>
+    <h2>Exámenes</h2>
+    <p style="text-align: center;">Selecciona los exámenes que realizas en consulta</p>
+  </ion-card-header>
+  <ion-card-content>
+              <ion-list>
+                <ion-item *ngFor="let examen of examenes">
+                  <ion-label>{{ examen.nombre_examen }}</ion-label>
+                  <ion-checkbox 
+                    [checked]="examenesSeleccionados.includes(examen.id_examen)" 
+                    (ionChange)="toggleExamen(examen.id_examen)"
+                        slot="end"
+                        class="checkbox-redondo">
+                  </ion-checkbox>
+                </ion-item>
+              </ion-list>
+
+    <ion-button expand="block" class="boton-editar" (click)="guardarExamenes()">
+      Guardar Exámenes
+    </ion-button>
+  </ion-card-content>
+</ion-card>
+
+  
+  
+    <!-----------------MUESTRAS MEDICAS------------------->
+
+<!-- Sección para las muestras médicas -->
+<ion-card class="ion-card">
+  <ion-card-header>
+    <h2>Muestras médicas</h2>
+    <p style="text-align: center;">Selecciona las muestras médicas que atiendes</p>
+  </ion-card-header>
+  <ion-card-content>
+
+            <ion-list>
+              <ion-item *ngFor="let muestra of muestras">
+                <ion-label>{{ muestra.nombre_muestra }}</ion-label>
+                <ion-checkbox 
+                  [checked]="muestrasSeleccionadas.includes(muestra.id_muestra)"
+                  (ionChange)="toggleMuestra(muestra.id_muestra)"
+                      slot="end"
+                      class="checkbox-redondo">
+                  
+                </ion-checkbox>
+              </ion-item>
+            </ion-list>
+
+    <!-- Botón para guardar muestras -->
+    <ion-button expand="block" class="boton-editar" (click)="guardarMuestras()">Guardar Muestras</ion-button>
+  </ion-card-content>
+</ion-card>
+
+
+    <!------------------------------------>  
+
+</ion-content>

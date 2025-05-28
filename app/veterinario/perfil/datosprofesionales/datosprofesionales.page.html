@@ -1,0 +1,51 @@
+<app-header backButton="/perfil" title="Datos profesionales"></app-header>
+
+<ion-content>
+
+  <ion-card class="ion-card">
+    <form [formGroup]="form" (ngSubmit)="guardarDatos()">
+
+      <!-- PAÍS -->
+      <ion-item>
+        <ion-label position="floating">País</ion-label>
+        <ion-select formControlName="pais" interface="popover" placeholder="Selecciona un país">
+          <ion-select-option *ngFor="let pais of paises" [value]="pais.id_pais">
+            {{ pais.nom_pais }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- UNIVERSIDAD (filtrada por país) -->
+      <ion-item>
+        <ion-label position="floating">Universidad de Egreso</ion-label>
+        <ion-select formControlName="universidad" interface="popover" placeholder="Selecciona una universidad">
+          <ion-select-option *ngFor="let uni of universidadesFiltradas" [value]="uni.id_uni">
+            {{ uni.nom_uni }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- ESPECIALIDAD -->
+      <ion-item>
+        <ion-label position="floating">Especialidad</ion-label>
+        <ion-select formControlName="especialidad" interface="popover" placeholder="Selecciona una especialidad">
+          <ion-select-option *ngFor="let esp of especialidades" [value]="esp.id_especialidad">
+            {{ esp.nom_especialidad }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- AÑO TITULACIÓN -->
+      <ion-item>
+        <ion-label position="floating">Año de Titulación</ion-label>
+        <ion-input type="number" formControlName="anoTitulacion"></ion-input>
+      </ion-item>
+
+      <!-- BOTÓN GUARDAR -->
+      <ion-button expand="full" type="submit" [disabled]="!form.valid" shape="round">
+        Guardar datos
+      </ion-button>
+    </form>
+  </ion-card>
+
+</ion-content>
