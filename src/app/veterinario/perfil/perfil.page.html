@@ -1,49 +1,47 @@
-<app-header  backButton="/home" title="Perfil"></app-header>
+<app-header backButton="/home" title="Perfil"></app-header>
 
 <ion-content>
 
-    <!-------------------------------------------------------->
-<ion-card class="card" style="text-align: center;">
-<p>Imagen de perfil :) </p>
+  <!-- FOTO DE PERFIL -->
+  <ion-card class="card" style="text-align: center;">
+    <h2>Foto de perfil</h2>
+    <p>Imagen de perfil</p>
+    <img *ngIf="fotoPerfilUrl" [src]="fotoPerfilUrl" alt="Foto de perfil" style="width: 120px; height: 120px; border-radius: 50%; margin: 10px auto;" />
+
+    <ion-button (click)="selectImage()" class="editar">Subir Foto de Perfil</ion-button>
+    <input type="file" accept="image/*" hidden #fileInput (change)="uploadImage($event)" />
+
+    <ion-button *ngIf="fotoPerfilUrl" (click)="eliminarFotoPerfil()" class="editar">
+      Eliminar Foto de Perfil
+    </ion-button>
   </ion-card>
-    
-<!-------------------------------------------------------->
-<!-----------------------DATOS PERSONALES --------------------------------->
-<ion-card class="card" style="text-align: center;">
+
+  <!-- DATOS PERSONALES -->
+  <ion-card class="card" style="text-align: center;">
     <h2>Datos personales</h2>
     <p>llamar a los datos personales</p>
-      <ion-button [routerLink]="['/datospersonales']" class="editar"> editar información</ion-button>
-   </ion-card>
-   
-   <!-------------------------------------------------------->
-   <!-----------------------PERFIL PROFESIONAL --------------------------------->
-   <ion-card class="card" style="text-align: center;">
-   <h2>Perfil profesional</h2>
-   <p>llamar a los datos profesionales</p>
-      <ion-button [routerLink]="['/datosprofesionales']" class="editar"> editar información</ion-button>
-   </ion-card>
-   
-   <!-------------------------------------------------------->
-   <!-----------------------PREFERENCIAS ATENCION --------------------------------->
-   <ion-card class="card" style="text-align: center;">
-      <h2>Atención médica</h2>
-      <p>personaliza tu atencion médica</p>
-   
-         <ion-button [routerLink]="['/datosatencion']" class="editar"> editar información</ion-button>
-      </ion-card>
-      
-   
-   <!-------------------------------------------------------->
-   <!-----------------------FIRMA PROFESIONAL--------------------------------->
-       <ion-card class="card" style="text-align: center;">
-           <h2>Firma profesional</h2>
-           <p>Mostrar foto firma profesional</p>
-              <ion-button class="editar"> editar</ion-button>
-           </ion-card>
-       
+    <ion-button [routerLink]="['/datospersonales']" class="editar">editar información</ion-button>
+  </ion-card>
 
+  <!-- PERFIL PROFESIONAL -->
+  <ion-card class="card" style="text-align: center;">
+    <h2>Perfil profesional</h2>
+    <p>llamar a los datos profesionales</p>
+    <ion-button [routerLink]="['/datosprofesionales']" class="editar">editar información</ion-button>
+  </ion-card>
 
+  <!-- PREFERENCIAS DE ATENCIÓN -->
+  <ion-card class="card" style="text-align: center;">
+    <h2>Atención médica</h2>
+    <p>personaliza tu atención médica</p>
+    <ion-button [routerLink]="['/datosatencion']" class="editar">editar información</ion-button>
+  </ion-card>
 
+  <!-- FIRMA PROFESIONAL -->
+  <ion-card class="card" style="text-align: center;">
+    <h2>Firma profesional</h2>
+    <p>Mostrar foto firma profesional</p>
+    <ion-button class="editar">Cargar foto de firma</ion-button>
+  </ion-card>
 
-    
 </ion-content>

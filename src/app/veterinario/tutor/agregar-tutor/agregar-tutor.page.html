@@ -1,0 +1,51 @@
+<app-header backButton="/home" title="Agregar tutor"></app-header>
+
+<ion-content class="fondo">
+  <ion-card class="ion-card">
+    <form [formGroup]="tutorForm" (ngSubmit)="guardarTutor()">
+      <ion-list>
+        <ion-item>
+          <ion-label position="stacked">RUN Tutor</ion-label>
+          <ion-input type="text" formControlName="run_tutor"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Nombre</ion-label>
+          <ion-input type="text" formControlName="nombre_tutor"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Apellidos</ion-label>
+          <ion-input type="text" formControlName="apellidos_tutor"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Dirección</ion-label>
+          <ion-input type="text" formControlName="direccion_tutor"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Correo</ion-label>
+          <ion-input type="email" formControlName="correo_tutor"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Celular</ion-label>
+          <ion-input type="number" formControlName="celular_tutor"></ion-input>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Región</ion-label>
+          <ion-select formControlName="id_region" interface="popover" placeholder="Selecciona una región" (ionChange)="cargarCiudades()">
+            <ion-select-option *ngFor="let region of regiones" [value]="region.id_region">
+              {{ region.nombre_region }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label position="stacked">Ciudad</ion-label>
+          <ion-select formControlName="id_ciudad" interface="popover" placeholder="Selecciona una ciudad">
+            <ion-select-option *ngFor="let ciudad of ciudades" [value]="ciudad.id_ciudad">
+              {{ ciudad.nombre_ciudad }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+      </ion-list>
+      <ion-button expand="full" type="submit" [disabled]="tutorForm.invalid" shape="round">Guardar Tutor</ion-button>
+    </form>
+  </ion-card>
+</ion-content>
