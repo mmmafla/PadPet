@@ -57,9 +57,23 @@ const routes: Routes = [
   },
   {
     path: 'datosatencion',
-    loadChildren: () => import('./veterinario/datosatencion/datosatencion.module').then( m => m.DatosatencionPageModule)
+    loadChildren: () => import('./veterinario/datosatencion/datosatencion.module').then( m => m.DatosatencionPageModule),
+    canActivate: [AuthGuard] 
+  },
+  {
+    path: 'veterinario/tutor/agregar-tutor',
+    loadChildren: () => import('./veterinario/tutor/agregar-tutor/agregar-tutor.module').then( m => m.AgregarTutorPageModule),
+    canActivate: [AuthGuard] 
+  },
+  {
+    path: 'veterinario/tutor/editar-tutor/:runTutor',
+    loadComponent: () => import('./veterinario/tutor/editar-tutor/editar-tutor.page').then(m => m.EditarTutorPage),
+    canActivate: [AuthGuard]
+  },
+  {
+  path: 'veterinario/tutor/mascotas/:run_tutor',
+  loadComponent: () => import('./veterinario/tutor/mascotas/mascotas.page').then(m => m.MascotasPage)
   }
-
 ];
 
 @NgModule({
