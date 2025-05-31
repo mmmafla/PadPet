@@ -1,13 +1,32 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>olvidopass</ion-title>
-  </ion-toolbar>
-</ion-header>
+<app-header backButton="/login" title="Recuperar contraseña"></app-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">olvidopass</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content style="text-align: center;">
+  <ion-card class="ion-card">
+    <ion-card-header>
+      <ion-card-title>Recuperar contraseña</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <p>Te enviaremos un enlace a tu correo para que puedas restaurar tu contraseña.</p>
+
+<ion-item class="borde">
+  <ion-input
+    type="email"
+    label="Correo electrónico"
+    labelPlacement="stacked"
+    placeholder="tucorreo@ejemplo.com"
+    [(ngModel)]="correo"
+    class="custom-input"
+    required
+  ></ion-input>
+</ion-item>
+
+      <ion-button 
+        expand="block" 
+        [disabled]="!isEmailValid()" 
+        (click)="enviarMensajeCorreo()">
+        Enviar mensaje de recuperación
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

@@ -1,0 +1,23 @@
+<app-header  backButton="/atencion-medica" title="Agregar Atención"></app-header>
+
+<ion-content [fullscreen]="true">
+
+  <ion-card *ngIf="tutor; else sinTutor">
+    <ion-card-header>
+      <ion-card-title>{{ tutor.nombre_tutor }} {{ tutor.apellidos_tutor }}</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <p><strong>RUN:</strong> {{ tutor.run_tutor }}</p>
+      <p><strong>Correo:</strong> {{ tutor.correo_tutor }}</p>
+      <p><strong>Dirección:</strong> {{ tutor.direccion_tutor }}</p>
+      <p><strong>Celular:</strong> {{ tutor.celular_tutor }}</p>
+    </ion-card-content>
+  </ion-card>
+
+  <ng-template #sinTutor>
+    <ion-text color="medium">
+      <p>No hay tutor afiliado registrado para este veterinario.</p>
+    </ion-text>
+  </ng-template>
+
+</ion-content>

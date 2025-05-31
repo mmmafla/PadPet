@@ -7,6 +7,10 @@ const routes: Routes = [
   {
     path: '',
     component: OlvidopassPage
+  },
+  {
+    path: 'nuevacontrasena',
+    loadChildren: () => import('./nuevacontrasena/nuevacontrasena.module').then( m => m.NuevacontrasenaPageModule)
   }
 ];
 
