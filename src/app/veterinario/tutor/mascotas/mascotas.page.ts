@@ -29,7 +29,7 @@ export class MascotasPage implements OnInit {
   ) {}
 
   async ngOnInit() {
-    this.runTutor = this.route.snapshot.paramMap.get('runTutor') || '';
+    this.runTutor = this.route.snapshot.paramMap.get('run_tutor') || '';
     await this.cargarMascotas();
   }
 
@@ -46,8 +46,9 @@ export class MascotasPage implements OnInit {
     }
   }
 
+  // ✅ Ruta corregida aquí:
   irAgregarMascota() {
-    this.router.navigate(['/veterinario/tutor/mascotas/agregar-mascota', this.runTutor]);
+    this.router.navigate([`/veterinario/tutor/mascotas/${this.runTutor}/agregar`]);
   }
 
   irEditarMascota(idMasc: number) {

@@ -7,7 +7,11 @@ const routes: Routes = [
   {
     path: '',
     component: MascotasPage
+  },  {
+    path: 'agregar-mascota',
+    loadChildren: () => import('./agregar-mascota/agregar-mascota.module').then( m => m.AgregarMascotaPageModule)
   }
+
 ];
 
 @NgModule({

@@ -71,8 +71,13 @@ const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
-  path: 'veterinario/tutor/mascotas/:run_tutor',
-  loadComponent: () => import('./veterinario/tutor/mascotas/mascotas.page').then(m => m.MascotasPage)
+    path: 'veterinario/tutor/mascotas/:run_tutor',
+    loadComponent: () => import('./veterinario/tutor/mascotas/mascotas.page').then(m => m.MascotasPage)
+  },
+  {
+    path: 'veterinario/tutor/mascotas/:run_tutor/agregar',
+    loadComponent: () => import('./veterinario/tutor/mascotas/agregar-mascota/agregar-mascota.page').then(m => m.AgregarMascotaPage),
+    canActivate: [AuthGuard]
   }
 ];
 
