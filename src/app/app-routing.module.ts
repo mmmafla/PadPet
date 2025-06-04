@@ -65,6 +65,16 @@ const routes: Routes = [
     loadChildren: () => import('./veterinario/tutor/agregar-tutor/agregar-tutor.module').then( m => m.AgregarTutorPageModule),
     canActivate: [AuthGuard] 
   },
+  {
+    path: 'atencion-medica',
+    loadChildren: () => import('./veterinario/atencion-medica/atencion-medica.module').then( m => m.AtencionMedicaPageModule),
+    canActivate: [AuthGuard] 
+  },
+  {
+    path: 'veterinario/atencion-medica/agregar-atencion-medica',
+    loadChildren: () => import('./veterinario/atencion-medica/agregar-atencion-medica/agregar-atencion-medica.module').then( m => m.AgregarAtencionMedicaPageModule),
+    canActivate: [AuthGuard] 
+  },
 
 
 ];
