@@ -5,6 +5,11 @@ import { CommonModule } from '@angular/common';
 import { SupabaseService } from 'src/app/services/supabase.service';
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
 import { Router } from '@angular/router';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = 'https://irorlonysbmkbdthvrmt.supabase.co';
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyb3Jsb255c2Jta2JkdGh2cm10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYyODgwMDQsImV4cCI6MjA2MTg2NDAwNH0.s-ZEteHxMWX43NCQIuNmTWpbBoEUxseKyg_YaXpi6Ek';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 @Component({
   selector: 'app-datosprofesionales',
@@ -18,8 +23,12 @@ export class DatosprofesionalesPage implements OnInit {
   paises: any[] = [];
   especialidades: any[] = [];
   universidades: any[] = [];
-  universidadesFiltradas: any[] = []; // ← nuevas: universidades por país
+  universidadesFiltradas: any[] = []; // ← universidades filtradas por país
   runVet: string = '';
+
+  // Nueva propiedad para manejar la imagen del certificado
+  fotoTituloUrl: string | null = null;       // Para mostrar preview
+  fotoTituloFileName: string | null = null;  // Nombre de archivo en Storage para eliminar
 
   supabase = inject(SupabaseService);
   toastController = inject(ToastController);
@@ -40,7 +49,7 @@ export class DatosprofesionalesPage implements OnInit {
     this.cargarCatalogos();
     this.obtenerRunVetYDatos();
 
-    // 🟡 Escucha el cambio en país y filtra universidades
+    // Escucha cambios en país para filtrar universidades
     this.form.get('pais')?.valueChanges.subscribe((idPaisSeleccionado) => {
       this.filtrarUniversidadesPorPais(idPaisSeleccionado);
       this.form.get('universidad')?.setValue('');
@@ -53,7 +62,7 @@ export class DatosprofesionalesPage implements OnInit {
       const { data: especialidades } = await this.supabase.from('especialidad').select('*');
       const { data: universidades } = await this.supabase
         .from('universidad')
-        .select('id_uni, nom_uni, id_pais'); // ← incluir id_pais
+        .select('id_uni, nom_uni, id_pais');
 
       this.paises = paises ?? [];
       this.especialidades = especialidades ?? [];
@@ -104,8 +113,13 @@ export class DatosprofesionalesPage implements OnInit {
           anoTitulacion: data.anno_titulacion ?? ''
         });
 
-        // 🟢 Filtrar universidades si ya hay datos
         this.filtrarUniversidadesPorPais(data.id_pais);
+
+        // Cargar foto título si existe
+        if (data.foto_titulo) {
+          this.fotoTituloFileName = data.foto_titulo;
+          this.fotoTituloUrl = await this.descargarImagenCertificado(data.foto_titulo);
+        }
       }
     } catch (error) {
       console.error('Error al cargar datos del veterinario:', error);
@@ -139,6 +153,7 @@ export class DatosprofesionalesPage implements OnInit {
             id_pais: pais,
             id_especialidad: especialidad,
             anno_titulacion: anoTitulacion
+            // Nota: foto_titulo se guarda al subir imagen, no aquí
           })
           .eq('run_vet', this.runVet);
 
@@ -152,7 +167,8 @@ export class DatosprofesionalesPage implements OnInit {
             id_uni: universidad,
             id_pais: pais,
             id_especialidad: especialidad,
-            anno_titulacion: anoTitulacion
+            anno_titulacion: anoTitulacion,
+            foto_titulo: this.fotoTituloFileName  // si ya hay imagen la insertamos
           });
 
         if (error) throw error;
@@ -174,5 +190,100 @@ export class DatosprofesionalesPage implements OnInit {
       position: 'middle',
     });
     toast.present();
+  }
+
+  // Función para descargar imagen desde bucket image-certificate
+  async descargarImagenCertificado(path: string): Promise<string | null> {
+    try {
+      const { data, error } = await supabase.storage
+        .from('image-certificate')
+        .download(path);
+      if (error) {
+        console.error('Error descargando imagen certificado:', error);
+        return null;
+      }
+      return URL.createObjectURL(data);
+    } catch (error) {
+      console.error('Error al descargar imagen certificado:', error);
+      return null;
+    }
+  }
+
+  // Función para subir imagen al bucket image-certificate
+  async subirImagenCertificado(event: Event) {
+    const element = event.target as HTMLInputElement;
+    if (!element.files || element.files.length === 0) {
+      return;
+    }
+    const file = element.files[0];
+    if (!file) return;
+
+    // Crear un nombre único basado en runVet
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${this.runVet}_certificado.${fileExt}`;
+    const filePath = fileName;
+
+    try {
+      // Eliminar imagen anterior si existe
+      if (this.fotoTituloFileName) {
+        await supabase.storage.from('image-certificate').remove([this.fotoTituloFileName]);
+      }
+
+      // Subir nueva imagen
+      const { error: uploadError } = await supabase.storage
+        .from('image-certificate')
+        .upload(filePath, file, { upsert: true });
+
+      if (uploadError) throw uploadError;
+
+      this.fotoTituloFileName = filePath;
+      this.fotoTituloUrl = await this.descargarImagenCertificado(filePath);
+
+      // Guardar ruta en la tabla dato_profesional
+      const { error: updateError } = await supabase
+        .from('dato_profesional')
+        .upsert({
+          run_vet: this.runVet,
+          foto_titulo: filePath,
+        }, { onConflict: 'run_vet' });
+
+      if (updateError) throw updateError;
+
+      this.mostrarToast('Certificado subido correctamente');
+    } catch (error) {
+      console.error('Error al subir imagen certificado:', error);
+      this.mostrarToast('Error al subir certificado', 'danger');
+    }
+  }
+
+  // Función para eliminar imagen certificado
+  async eliminarImagenCertificado() {
+    if (!this.fotoTituloFileName) {
+      this.mostrarToast('No hay imagen para eliminar', 'warning');
+      return;
+    }
+
+    try {
+      const { error } = await supabase.storage
+        .from('image-certificate')
+        .remove([this.fotoTituloFileName]);
+
+      if (error) throw error;
+
+      // Actualizar la DB removiendo referencia
+      const { error: updateError } = await supabase
+        .from('dato_profesional')
+        .update({ foto_titulo: null })
+        .eq('run_vet', this.runVet);
+
+      if (updateError) throw updateError;
+
+      this.fotoTituloFileName = null;
+      this.fotoTituloUrl = null;
+      this.mostrarToast('Certificado eliminado');
+    } catch (error) {
+      console.error('Error eliminando certificado:', error);
+      this.mostrarToast('Error al eliminar certificado', 'danger');
+    }
   }
 }

@@ -40,15 +40,14 @@
    
    <!-------------------------------------------------------->
    <!-----------------------FIRMA PROFESIONAL--------------------------------->
-       <ion-card class="card" style="text-align: center;">
-           <h2>Firma profesional</h2>
-           <p>Mostrar foto firma profesional</p>
-              <ion-button class="editar">Cargar foto de firma</ion-button>
-           </ion-card>
-       
+      <ion-card class="card" style="text-align: center; margin-top: 30px;">
+         <h2>Firma</h2>
+         <p>Imagen de la firma del veterinario</p>
+         <img *ngIf="firmaUrl" [src]="firmaUrl" alt="Firma del veterinario"
+            style="width: 200px; height: auto; margin: 10px auto;" />
+         <ion-button (click)="selectFirma()" class="editar">Subir Firma</ion-button>
+         <input type="file" accept="image/*" hidden #fileInputFirma (change)="uploadFirma($event)" />
+         <ion-button color="danger" *ngIf="firmaUrl" (click)="eliminarFirma()">Eliminar Firma</ion-button>
+      </ion-card>
 
-
-
-
-    
 </ion-content>
