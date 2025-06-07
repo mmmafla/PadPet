@@ -1,0 +1,80 @@
+<app-header title="Bienvenido"></app-header>
+
+<ion-content class="fondo">
+
+<ion-grid>
+  <!----perfil-->
+  <ion-card class="perfil-card" [routerLink]="['/perfil']">
+    <ion-card-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="auto" class="img-perfil">
+       <!---    <img src="" alt="Foto de perfil" class="profile-img"> -->
+          </ion-col>       
+          <ion-col size="auto" class="datos-medico">
+            <ion-card-title class="nombre">MV. {{ nombreVet || 'Cargando nombre'}}</ion-card-title>
+            <p class="run">RUN: {{ runVet || 'cargando run'}}</p>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-card-content>
+  </ion-card>
+<!--------------------------->
+
+
+<ion-row>
+  <!---TUTORES--->
+  <ion-col size="6">
+    <ion-card  class="ion-card-importantes" [routerLink]="['/tutor']">
+      <ion-card-header>
+        <div>
+          <ion-icon name="paw-outline" class="icono2"></ion-icon>
+          <ion-card-title>Tutores</ion-card-title>
+        </div>
+      </ion-card-header>
+      <ion-card-content class="texto">
+        Agrega tutores y sus mascotas
+      </ion-card-content>
+    </ion-card>
+  </ion-col>
+  <!---TUTORES--->
+  <!--- API--->
+        <ion-col size="6">
+          <ion-card class="ion-card-importantes" [routerLink]="['/agenda']">
+            <ion-card-header>
+              <div>
+                <ion-icon name="search-outline" class="icono2"></ion-icon>
+                <ion-card-title>Agenda</ion-card-title>
+              </div>
+            </ion-card-header>
+            <ion-card-content class="texto">
+              Sincronizado con Google Calendar
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+  <!--- API--->
+
+      <!---CONFIGURACION--->
+      <ion-col size="12">
+        <ion-card  class="ion-card-otros" [routerLink]="['/atencion-medica']">
+          <ion-card-header>
+            <div>
+              <ion-card-title>CITA MÉDICA</ion-card-title>
+            </div>
+          </ion-card-header>
+          <ion-card-content class="texto">
+            Agrega una nueva consulta médica
+          </ion-card-content>
+        </ion-card>
+      </ion-col>
+      <!---CONFIGURACION--->
+</ion-row>
+
+
+
+
+
+
+</ion-grid>
+
+</ion-content>

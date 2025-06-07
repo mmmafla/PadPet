@@ -1,0 +1,12 @@
+<app-header  backButton="/home" title="Atención"></app-header>
+
+<ion-content [fullscreen]="true">
+
+  <!-- Botón para agregar una atencion -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" class="agregar" (click)="irAgregarAtencion()">
+    <ion-fab-button>
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+  
+</ion-content>

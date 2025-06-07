@@ -1,0 +1,54 @@
+<app-header  backButton="/home" title="Perfil"></app-header>
+
+<ion-content class="fondo">
+
+<!-----------------------DATOS PERSONALES --------------------------------->
+<ion-card class="card" style="text-align: center;">
+    <h2>Datos personales</h2>
+    <p>Información personal del profesional</p>
+      <ion-button [routerLink]="['/datospersonales']" class="editar"> editar información</ion-button>
+   </ion-card>
+   
+   <!-------------------------------------------------------->
+   <!-----------------------PERFIL PROFESIONAL --------------------------------->
+   <ion-card class="card" style="text-align: center;">
+   <h2>Perfil profesional</h2>
+   <p>Información para habilitar la cuenta</p>
+      <ion-button [routerLink]="['/datosprofesionales']" class="editar"> editar información</ion-button>
+   </ion-card>
+   
+   <!-------------------------------------------------------->
+   <!-----------------------PREFERENCIAS ATENCION --------------------------------->
+   <ion-card class="card" style="text-align: center;">
+      <h2>Atención médica</h2>
+      <p>Personaliza tus preferencias al momento de atender</p>
+   
+         <ion-button [routerLink]="['/datosatencion']" class="editar"> editar información</ion-button>
+      </ion-card>
+      
+   
+   <!-------------------------------------------------------->
+   <!---------------------IMÁGENES--------------------------------->
+<ion-card class="card" style="text-align: center;">
+         <h2>Imágenes</h2>
+
+      <h3>Foto de perfil</h3>
+            <img *ngIf="fotoPerfilUrl" [src]="fotoPerfilUrl" alt="Foto de perfil" style="width: 120px; height: 120px; border-radius: 50%; margin: 10px auto;" />
+      <ion-button (click)="selectImage()" class="editar">Subir Foto de Perfil</ion-button>
+      <input type="file" accept="image/*" hidden #fileInput (change)="uploadImage($event)" />
+      <ion-button color="danger" *ngIf="fotoPerfilUrl" (click)="eliminarFotoPerfil()">Eliminar Foto de Perfil</ion-button>
+
+      <h3 style="padding-top: 40px;">Firma profesional</h3>
+               <img *ngIf="firmaUrl" [src]="firmaUrl" alt="Firma del veterinario"
+            style="width: 200px; height: auto; margin: 10px auto;" />
+      
+            <p>Recomendamos que la imágen de la firma tenga fondo blanco para un mejor uso*</p>
+         <ion-button (click)="selectFirma()" class="editar">Subir Firma</ion-button>
+         <input type="file" accept="image/*" hidden #fileInputFirma (change)="uploadFirma($event)" />
+         <ion-button color="danger" *ngIf="firmaUrl" (click)="eliminarFirma()">Eliminar Firma</ion-button>
+
+   
+   
+</ion-card>
+
+</ion-content>

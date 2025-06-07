@@ -1,0 +1,53 @@
+ion-button {
+    --background: #B5E2FA;
+    --background-hover: #F7A072;
+    --background-activated: #F7A072;
+    --background-focused: #F7A072;
+    --color: #000000 ;
+    --border-radius: 10px;
+  
+    --box-shadow: 0
+    --ripple-color:#0FA3B1 ;
+  
+    margin-top: 20px;
+    display: block;
+    --padding-top: 10px;
+    --padding-bottom: 10px;
+  }
+  
+  .botonolvido{
+    --background: none;
+    --color: #0FA3B1 ;
+    --border-radius: 0px;
+    --box-shadow: 0;
+  
+    margin-top: 20px;
+    display: block;
+    --padding-top: 10px;
+    --padding-bottom: 10px;
+  }
+
+  .ingresar{
+    --border-radius: 20px; /* Borde redondeado */
+    
+
+  }
+
+  .crearcuenta {
+    --background: var(--color);
+    --color: rgb(251, 249, 249);
+    --border-radius: 20px; /* Borde redondeado */
+    color: #000000;
+    border: 1px solid #00bfff;  /* Borde cuadrado celeste */
+    border-radius: 20px;  /* Borde redondeado */
+    
+    transition: all 0.3s ease; /* Transición suave para efectos de hover */
+  
+    &:hover {
+      --background-color: #00bfff;
+      color: #008cff; 
+      border-color: #008cff; 
+    }
+ 
+  }
+  
