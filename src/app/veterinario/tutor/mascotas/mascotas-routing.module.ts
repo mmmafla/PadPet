@@ -10,6 +10,10 @@ const routes: Routes = [
   },  {
     path: 'agregar-mascota',
     loadChildren: () => import('./agregar-mascota/agregar-mascota.module').then( m => m.AgregarMascotaPageModule)
+  },
+  {
+    path: 'editar-mascota',
+    loadChildren: () => import('./editar-mascota/editar-mascota.module').then( m => m.EditarMascotaPageModule)
   }
 
 ];

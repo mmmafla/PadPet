@@ -1,0 +1,116 @@
+<app-header [backButton]="'/veterinario/tutor/mascotas/' + runTutor" title="Editar Mascota"></app-header>
+
+<ion-content class="fondo">
+  <ion-card class="ion-card">
+    <form [formGroup]="mascotaForm" (ngSubmit)="actualizarMascota()">
+      <ion-list>
+
+        <ion-item>
+          <ion-label position="stacked">Nombre de la mascota</ion-label>
+          <ion-input type="text" formControlName="masc_nom" required></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Fecha de nacimiento</ion-label>
+          <ion-datetime
+            presentation="date"
+            formControlName="masc_nacimiento"
+            (ionChange)="actualizarEdad()"
+          ></ion-datetime>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Edad (años)</ion-label>
+          <ion-input type="number" formControlName="masc_edad"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Peso (kg)</ion-label>
+          <ion-input type="number" formControlName="masc_peso"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Color</ion-label>
+          <ion-input type="text" formControlName="masc_color"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Tamaño</ion-label>
+          <ion-input type="text" formControlName="masc_tamano"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Pelaje</ion-label>
+          <ion-input type="text" formControlName="masc_pelaje"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">¿Esterilizado?</ion-label>
+          <ion-input type="text" formControlName="masc_esterilizado"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Número de Chip</ion-label>
+          <ion-input type="number" formControlName="masc_num_chip"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Especie</ion-label>
+          <ion-select
+            interface="popover"
+            formControlName="id_especie"
+            (ionChange)="cargarDependencias()"
+            required
+          >
+            <ion-select-option
+              *ngFor="let especie of especies"
+              [value]="especie.id_especie"
+            >
+              {{ especie.nom_especie }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Raza</ion-label>
+          <ion-select interface="popover" formControlName="id_raza">
+            <ion-select-option *ngFor="let raza of razas" [value]="raza.id_raza">
+              {{ raza.nom_raza }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Grupo Sanguíneo</ion-label>
+          <ion-select interface="popover" formControlName="id_grupo_sanguineo">
+            <ion-select-option
+              *ngFor="let grupo of gruposSanguineos"
+              [value]="grupo.id_grupo_sanguineo"
+            >
+              {{ grupo.nom_grupo_sanguineo }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Observaciones previas</ion-label>
+          <ion-textarea formControlName="masc_observaciones"></ion-textarea>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Estado</ion-label>
+          <ion-select interface="popover" formControlName="id_estado" required>
+            <ion-select-option *ngFor="let estado of estados" [value]="estado.id_estado">
+              {{ estado.estado }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+      </ion-list>
+
+      <ion-button expand="full" type="submit" [disabled]="mascotaForm.invalid" shape="round">
+        Actualizar Mascota
+      </ion-button>
+    </form>
+  </ion-card>
+</ion-content>
