@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { IonicModule, ToastController } from '@ionic/angular';
+import { AlertController, IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
@@ -23,17 +23,19 @@ export class EditarTutorPage implements OnInit {
   regiones: any[] = [];
   ciudades: any[] = [];
   runTutorParam: string = '';
+  tutorActual: any; // Variable para guardar el tutor cargado
 
   constructor(
     private fb: FormBuilder,
     private toastController: ToastController,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private alertController: AlertController,
   ) {}
 
   async ngOnInit() {
     this.tutorForm = this.fb.group({
-      run_tutor: [{value: '', disabled: true}, Validators.required], // disabled para que no sea editable
+      run_tutor: [{ value: '', disabled: true }, Validators.required],
       nombre_tutor: ['', Validators.required],
       apellidos_tutor: ['', Validators.required],
       direccion_tutor: ['', Validators.required],
@@ -43,7 +45,6 @@ export class EditarTutorPage implements OnInit {
       id_ciudad: ['', Validators.required]
     });
 
-    // Obtener parámetro runTutor para cargar datos
     this.runTutorParam = this.route.snapshot.paramMap.get('runTutor') || '';
     if (this.runTutorParam) {
       await this.cargarTutor(this.runTutorParam);
@@ -52,7 +53,6 @@ export class EditarTutorPage implements OnInit {
     await this.cargarRegiones();
   }
 
-  // Carga datos del tutor a editar
   async cargarTutor(runTutor: string) {
     const { data, error } = await supabase
       .from('tutor')
@@ -66,7 +66,8 @@ export class EditarTutorPage implements OnInit {
       return;
     }
 
-    // Setear valores en el formulario, id_region primero para luego cargar ciudades
+    this.tutorActual = data;
+
     this.tutorForm.patchValue({
       run_tutor: data.run_tutor,
       nombre_tutor: data.nombre_tutor,
@@ -84,17 +85,16 @@ export class EditarTutorPage implements OnInit {
     });
   }
 
-  // Carga regiones
   async cargarRegiones() {
     const { data, error } = await supabase.from('region').select('*');
-    if (!error) {
-      this.regiones = data;
-    } else {
+    if (error) {
       console.error('Error al cargar regiones:', error);
+      this.mostrarToast('Error al cargar regiones', 'danger');
+      return;
     }
+    this.regiones = data;
   }
 
-  // Carga ciudades según región seleccionada
   async cargarCiudades() {
     const regionId = this.tutorForm.get('id_region')?.value;
     if (regionId) {
@@ -103,23 +103,24 @@ export class EditarTutorPage implements OnInit {
         .select('*')
         .eq('id_region', regionId);
 
-      if (!error) {
-        this.ciudades = data;
-      } else {
+      if (error) {
         console.error('Error al cargar ciudades:', error);
+        this.mostrarToast('Error al cargar ciudades', 'danger');
+        return;
       }
+
+      this.ciudades = data;
     } else {
       this.ciudades = [];
     }
   }
 
-  // Guardar cambios
   async guardarCambios() {
     if (this.tutorForm.invalid) {
+      this.mostrarToast('Por favor completa todos los campos requeridos', 'warning');
       return;
     }
 
-    // Obtener valores incluyendo los campos deshabilitados
     const tutorActualizado = this.tutorForm.getRawValue();
 
     const { error } = await supabase
@@ -136,6 +137,47 @@ export class EditarTutorPage implements OnInit {
         this.router.navigate(['/tutor']);
       }, 2000);
     }
+  }
+
+  async confirmarEliminarTutor(tutor: any) {
+    const alert = await this.alertController.create({
+      header: 'Confirmar eliminación',
+      message: `¿Seguro que quieres eliminar a ${tutor.nombre_tutor} ${tutor.apellidos_tutor}?`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Eliminar',
+          handler: () => this.eliminarTutor(tutor.run_tutor)
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  async eliminarTutor(runTutor: string) {
+    const { error } = await supabase
+      .from('tutor')
+      .delete()
+      .eq('run_tutor', runTutor);
+
+    if (error) {
+      console.error('Error al eliminar tutor:', error);
+      this.mostrarToast('Error al eliminar tutor', 'danger');
+      return;
+    }
+
+    const toast = await this.toastController.create({
+      message: 'Tutor eliminado correctamente',
+      duration: 2000,
+      color: 'success'
+    });
+
+    await toast.present();
+    this.router.navigate(['/tutor']);
   }
 
   async mostrarToast(mensaje: string, color: string = 'success') {

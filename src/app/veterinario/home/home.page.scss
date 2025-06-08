@@ -5,7 +5,6 @@
   }
   //  card datos medico
   .perfil-card{
-    box-shadow: 0 0 0;
     background: rgb(241, 246, 255);
     border-radius: 20px;
 
@@ -16,6 +15,7 @@
     padding-bottom: 20px;
 
     border: 1px solid rgb(255, 255, 255);
+
         cursor: pointer;
 
   }
@@ -54,7 +54,7 @@
     padding-left: 5%;
     padding-right: 5%;
     border: 1px solid rgb(133, 157, 175);
-    box-shadow: 0 0 0px;
+    box-shadow: #658faf;
     background: #fffffa;
     border-radius: 20px; 
     text-align: center;
@@ -74,7 +74,7 @@
     padding-left: 5%;
     padding-right: 5%;
     border: 1px solid rgb(133, 157, 175);
-    box-shadow: 0 0 0px;
+    box-shadow: #658faf;
     background: #fffffa;
     border-radius: 20px; 
     text-align: center;

@@ -46,6 +46,7 @@
         </ion-item>
       </ion-list>
       <ion-button expand="full" type="submit" [disabled]="tutorForm.invalid" shape="round">Guardar Cambios</ion-button>
+     <ion-button size="small" color="danger" (click)="confirmarEliminarTutor(tutorActual)"> Eliminar tutor</ion-button>
     </form>
   </ion-card>
 </ion-content>

@@ -2,32 +2,43 @@
 
 <ion-content class="fondo ion-padding">
 
-  <!-- Refresher para actualizar tutores -->
+  <!-- Refresher -->
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <!-- Botón para agregar tutor centrado abajo -->
+  <!-- Botón agregar tutor -->
   <ion-fab vertical="bottom" horizontal="center" slot="fixed" (click)="irAgregarTutor()">
     <ion-fab-button>
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
 
-  <!-- Lista de tutores -->
+    <!-- Botón agregar tutor -->
+
   <ion-card class="ion-card">
     <ion-card-title>
       <h2>Lista de tutores</h2>
     </ion-card-title>
     <ion-card-content>
-      <ion-list *ngIf="tutores.length > 0; else sinTutores">
-        <ion-item-sliding *ngFor="let tutor of tutores">
-          <ion-item>
+
+      <!-- Barra de búsqueda -->
+      <ion-searchbar
+        [(ngModel)]="busqueda"
+        placeholder="Buscar tutor por nombre"
+        (ionInput)="filtrarTutores()"
+        debounce="300"
+      ></ion-searchbar>
+
+      <!-- Lista de tutores filtrados -->
+      <ion-list *ngIf="tutoresFiltrados.length > 0; else sinTutores">
+        <div *ngFor="let tutor of tutoresFiltrados" class="tutor-container">
+          <!-- Datos del tutor -->
+          <ion-item lines="full">
             <ion-label>
               <h3>{{ tutor.nombre_tutor }} {{ tutor.apellidos_tutor }}</h3>
-              <p>Correo: {{ tutor.correo_tutor }}</p>
-              <p>Dirección: {{ tutor.direccion_tutor }}</p>
               <p>Celular: {{ tutor.celular_tutor }}</p>
+              <p>Dirección: {{ tutor.direccion_tutor }}</p>
             </ion-label>
             <div slot="end" style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
               <ion-button size="small" color="primary" (click)="irEditarTutor(tutor.run_tutor)">
@@ -36,16 +47,26 @@
               <ion-button size="small" style="--background: orange; color: white;" (click)="irVerMascotas(tutor.run_tutor)">
                 Mascotas
               </ion-button>
-              <ion-button size="small" color="danger" (click)="confirmarEliminarTutor(tutor)">
-                Eliminar
-              </ion-button>
             </div>
           </ion-item>
-        </ion-item-sliding>
+
+          <!-- Lista de mascotas -->
+          <div *ngIf="tutor.mascota?.length" class="mascotas-container" style="padding: 8px 16px 0;">
+            <h3 style="margin: 0 0 4px;">Mascotas:</h3>
+            <ul style="margin: 0; padding-left: 16px;">
+              <li *ngFor="let masc of tutor.mascota" style="text-transform: capitalize; font-weight: 300; color: black;">
+                {{ masc.masc_nom }}
+              </li>
+            </ul>
+          </div>
+        </div>
       </ion-list>
+
+      <!-- Si no hay tutores -->
       <ng-template #sinTutores>
         <p>No hay tutores registrados aún.</p>
       </ng-template>
+
     </ion-card-content>
   </ion-card>
 

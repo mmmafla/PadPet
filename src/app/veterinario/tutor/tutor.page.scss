@@ -1,0 +1,33 @@
+.tutor-container {
+  margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #ccc; /* Línea entre tutores */
+}
+.tutor-container:last-child {
+  border-bottom: none; /* Opcional: no dibujar línea en el último */
+}
+
+.mascotas-container {
+  padding-left: 16px;
+  padding-top: 4px;
+  padding-bottom: 12px;
+  border-bottom: none; 
+  margin-top: -8px; 
+}
+
+ion-item {
+  --border-color: transparent;
+  --ion-item-border-style: none;
+}
+
+ion-searchbar {
+  --border-radius: 16px;
+  --background: #f4f4f4;
+  --box-shadow: 0 0px 0px rgba(0, 0, 0, 0.1);
+  --color: #222;
+  --placeholder-color: #999;
+  margin-bottom: 16px;
+  padding: 0 8px;
+}
+
+
