@@ -7,14 +7,6 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <!-- Botón agregar tutor -->
-  <ion-fab vertical="bottom" horizontal="center" slot="fixed" (click)="irAgregarTutor()">
-    <ion-fab-button>
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
-
-    <!-- Botón agregar tutor -->
 
   <ion-card class="ion-card">
     <ion-card-title>
@@ -70,4 +62,14 @@
     </ion-card-content>
   </ion-card>
 
+
+        <!-- Botón agregar tutor -->
+      <ion-footer class="ion-padding">
+        <ion-button expand="block" (click)="irAgregarTutor()">
+          <ion-icon name="add" slot="start"></ion-icon>
+          Agregar tutor
+        </ion-button>
+      </ion-footer>
+
+          <!-- Botón agregar tutor -->
 </ion-content>
