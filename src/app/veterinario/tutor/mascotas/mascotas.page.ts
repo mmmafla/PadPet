@@ -33,6 +33,11 @@ export class MascotasPage implements OnInit {
     await this.cargarMascotas();
   }
 
+    // Se ejecuta cada vez que vuelves a esta vista
+  async ionViewWillEnter() {
+    await this.cargarMascotas();
+  }
+
   async cargarMascotas() {
     // 1. Mascotas básicas
     const { data: mascotasData, error: err1 } = await supabase
