@@ -1,10 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-  ReactiveFormsModule,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
@@ -16,19 +11,20 @@ const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 @Component({
-  selector: 'app-agregar-mascota',
-  templateUrl: './agregar-mascota.page.html',
-  styleUrls: ['./agregar-mascota.page.scss'],
+  selector: 'app-editar-mascota',
+  templateUrl: './editar-mascota.page.html',
+  styleUrls: ['./editar-mascota.page.scss'],
   standalone: true,
   imports: [IonicModule, ReactiveFormsModule, CommonModule, HeaderComponent],
 })
-export class AgregarMascotaPage implements OnInit {
+export class EditarMascotaPage implements OnInit {
   mascotaForm!: FormGroup;
   especies: any[] = [];
   razas: any[] = [];
   gruposSanguineos: any[] = [];
   estados: any[] = [];
   runTutor!: string;
+  idMasc!: number;
 
   constructor(
     private fb: FormBuilder,
@@ -38,7 +34,9 @@ export class AgregarMascotaPage implements OnInit {
   ) {}
 
   async ngOnInit() {
+    this.idMasc = Number(this.route.snapshot.paramMap.get('id_masc'));
     this.runTutor = this.route.snapshot.paramMap.get('run_tutor') || '';
+
     this.mascotaForm = this.fb.group({
       masc_nom: ['', Validators.required],
       masc_nacimiento: [null],
@@ -47,7 +45,7 @@ export class AgregarMascotaPage implements OnInit {
       masc_color: [''],
       masc_tamano: [''],
       masc_pelaje: [''],
-      masc_esterilizado: [''], // texto manual
+      masc_esterilizado: [''],
       masc_num_chip: [null],
       id_especie: ['', Validators.required],
       id_raza: [null],
@@ -59,15 +57,12 @@ export class AgregarMascotaPage implements OnInit {
 
     await this.cargarEspecies();
     await this.cargarEstados();
+    await this.cargarMascota();
   }
 
   async cargarEspecies() {
     const { data, error } = await supabase.from('especie').select('*');
-    if (error) {
-      console.error('Error cargando especies:', error);
-    } else {
-      this.especies = data || [];
-    }
+    if (!error) this.especies = data || [];
   }
 
   async cargarDependencias() {
@@ -85,11 +80,23 @@ export class AgregarMascotaPage implements OnInit {
 
   async cargarEstados() {
     const { data, error } = await supabase.from('estado_mascota').select('*');
-    if (error) {
-      console.error('Error cargando estados:', error);
-    } else {
-      this.estados = data || [];
+    if (!error) this.estados = data || [];
+  }
+
+  async cargarMascota() {
+    const { data, error } = await supabase
+      .from('mascota')
+      .select('*')
+      .eq('id_masc', this.idMasc)
+      .single();
+
+    if (error || !data) {
+      this.presentToast('Error al cargar datos de la mascota', 'danger');
+      return;
     }
+
+    this.mascotaForm.patchValue(data);
+    await this.cargarDependencias();
   }
 
   actualizarEdad() {
@@ -98,6 +105,7 @@ export class AgregarMascotaPage implements OnInit {
       this.mascotaForm.patchValue({ masc_edad: null });
       return;
     }
+
     const nacimiento = new Date(fechaNacimiento);
     const hoy = new Date();
     let edad = hoy.getFullYear() - nacimiento.getFullYear();
@@ -105,13 +113,13 @@ export class AgregarMascotaPage implements OnInit {
     if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
       edad--;
     }
+
     this.mascotaForm.patchValue({ masc_edad: edad });
   }
 
-  async guardarMascota() {
+  async actualizarMascota() {
     const formData = { ...this.mascotaForm.value };
 
-    // Conversión a número donde corresponde
     formData.masc_num_chip = formData.masc_num_chip ? Number(formData.masc_num_chip) : null;
     formData.masc_edad = formData.masc_edad ? Number(formData.masc_edad) : null;
     formData.id_especie = Number(formData.id_especie);
@@ -119,12 +127,15 @@ export class AgregarMascotaPage implements OnInit {
     formData.id_grupo_sanguineo = formData.id_grupo_sanguineo ? Number(formData.id_grupo_sanguineo) : null;
     formData.id_estado = Number(formData.id_estado);
 
-    const { error } = await supabase.from('mascota').insert([formData]);
+    const { error } = await supabase
+      .from('mascota')
+      .update(formData)
+      .eq('id_masc', this.idMasc);
 
     if (error) {
-      this.presentToast('Error guardando mascota: ' + error.message, 'danger');
+      this.presentToast('Error actualizando mascota: ' + error.message, 'danger');
     } else {
-      this.presentToast('Mascota guardada correctamente', 'success');
+      this.presentToast('Mascota actualizada correctamente', 'success');
       this.router.navigate(['/veterinario/tutor/mascotas', this.runTutor]);
     }
   }

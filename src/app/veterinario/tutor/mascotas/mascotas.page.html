@@ -2,19 +2,16 @@
 
 <ion-content class="fondo ion-padding">
 
-  <!-- Refresher para actualizar mascotas -->
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <!-- Botón para agregar mascota centrado abajo -->
   <ion-fab vertical="bottom" horizontal="center" slot="fixed" (click)="irAgregarMascota()">
     <ion-fab-button>
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
 
-  <!-- Lista de mascotas -->
   <ion-card class="ion-card">
     <ion-card-title>
       <h2>Lista de mascotas</h2>
@@ -24,19 +21,13 @@
         <ion-item-sliding *ngFor="let mascota of mascotas">
           <ion-item>
             <ion-label>
-              <h3>{{ mascota.nombre_masc }}</h3>
-              <p>Especie: {{ mascota.especie }}</p>
-              <p>Raza: {{ mascota.raza }}</p>
-              <p>Edad: {{ mascota.edad }}</p>
+              <h3>{{ mascota.masc_nom }}</h3>
+              <p>Especie: {{ mascota.nom_especie }}</p>
+              <p>Estado: {{ mascota.estado }}</p>
             </ion-label>
-            <div slot="end" style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
-              <ion-button size="small" color="primary" (click)="irEditarMascota(mascota.id_masc)">
-                Editar
-              </ion-button>
-              <ion-button size="small" color="danger" (click)="confirmarEliminarMascota(mascota)">
-                Eliminar
-              </ion-button>
-            </div>
+            <ion-button slot="end" size="small" color="primary" (click)="irEditarMascota(mascota.id_masc)">
+              Editar
+            </ion-button>
           </ion-item>
         </ion-item-sliding>
       </ion-list>

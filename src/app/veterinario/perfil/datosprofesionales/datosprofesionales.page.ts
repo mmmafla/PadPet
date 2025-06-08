@@ -18,14 +18,14 @@ export class DatosprofesionalesPage implements OnInit {
   paises: any[] = [];
   especialidades: any[] = [];
   universidades: any[] = [];
-  universidadesFiltradas: any[] = []; // ← nuevas: universidades por país
+  universidadesFiltradas: any[] = [];
   runVet: string = '';
 
   supabase = inject(SupabaseService);
   toastController = inject(ToastController);
   router = inject(Router);
 
-  ngOnInit() {
+  async ngOnInit() {
     this.form = new FormGroup({
       universidad: new FormControl('', Validators.required),
       pais: new FormControl('', Validators.required),
@@ -37,10 +37,9 @@ export class DatosprofesionalesPage implements OnInit {
       ])
     });
 
-    this.cargarCatalogos();
-    this.obtenerRunVetYDatos();
+    await this.cargarCatalogos();
+    await this.obtenerRunVetYDatos();
 
-    // 🟡 Escucha el cambio en país y filtra universidades
     this.form.get('pais')?.valueChanges.subscribe((idPaisSeleccionado) => {
       this.filtrarUniversidadesPorPais(idPaisSeleccionado);
       this.form.get('universidad')?.setValue('');
@@ -53,7 +52,7 @@ export class DatosprofesionalesPage implements OnInit {
       const { data: especialidades } = await this.supabase.from('especialidad').select('*');
       const { data: universidades } = await this.supabase
         .from('universidad')
-        .select('id_uni, nom_uni, id_pais'); // ← incluir id_pais
+        .select('id_uni, nom_uni, id_pais');
 
       this.paises = paises ?? [];
       this.especialidades = especialidades ?? [];
@@ -98,14 +97,16 @@ export class DatosprofesionalesPage implements OnInit {
 
       if (data) {
         this.form.patchValue({
-          universidad: data.id_uni ?? '',
           pais: data.id_pais ?? '',
           especialidad: data.id_especialidad ?? '',
           anoTitulacion: data.anno_titulacion ?? ''
         });
 
-        // 🟢 Filtrar universidades si ya hay datos
         this.filtrarUniversidadesPorPais(data.id_pais);
+
+        this.form.patchValue({
+          universidad: data.id_uni ?? ''
+        });
       }
     } catch (error) {
       console.error('Error al cargar datos del veterinario:', error);

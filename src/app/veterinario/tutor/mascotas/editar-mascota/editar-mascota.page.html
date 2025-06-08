@@ -1,8 +1,8 @@
-<app-header backButton="/veterinario/tutor" title="Agregar Mascota"></app-header>
+<app-header [backButton]="'/veterinario/tutor/mascotas/' + runTutor" title="Editar Mascota"></app-header>
 
 <ion-content class="fondo">
   <ion-card class="ion-card">
-    <form [formGroup]="mascotaForm" (ngSubmit)="guardarMascota()">
+    <form [formGroup]="mascotaForm" (ngSubmit)="actualizarMascota()">
       <ion-list>
 
         <ion-item>
@@ -109,7 +109,7 @@
       </ion-list>
 
       <ion-button expand="full" type="submit" [disabled]="mascotaForm.invalid" shape="round">
-        Guardar Mascota
+        Actualizar Mascota
       </ion-button>
     </form>
   </ion-card>
