@@ -10,60 +10,64 @@ const routes: Routes = [
   },
   {
     path: 'login',
-    loadChildren: () => import('./cuenta/login/login.module').then( m => m.LoginPageModule),
-
+    loadChildren: () => import('./cuenta/login/login.module').then(m => m.LoginPageModule),
   },
   {
     path: 'nuevacuenta',
-    loadChildren: () => import('./cuenta/nuevacuenta/nuevacuenta.module').then( m => m.NuevacuentaPageModule)
+    loadChildren: () => import('./cuenta/nuevacuenta/nuevacuenta.module').then(m => m.NuevacuentaPageModule)
   },
   {
     path: 'olvidopass',
-    loadChildren: () => import('./cuenta/olvidopass/olvidopass.module').then( m => m.OlvidopassPageModule)
+    loadChildren: () => import('./cuenta/olvidopass/olvidopass.module').then(m => m.OlvidopassPageModule)
   },
   {
-  path: 'nueva-contrasena',
-  loadChildren: () => import('./cuenta/olvidopass/nuevacontrasena/nuevacontrasena.module').then(m =>m.NuevacontrasenaPageModule)
-},
+    path: 'nueva-contrasena',
+    loadChildren: () => import('./cuenta/olvidopass/nuevacontrasena/nuevacontrasena.module').then(m => m.NuevacontrasenaPageModule)
+  },
   {
     path: 'home',
-    loadChildren: () => import('./veterinario/home/home.module').then( m => m.HomePageModule),
-    canActivate: [AuthGuard] 
+    loadChildren: () => import('./veterinario/home/home.module').then(m => m.HomePageModule),
+    canActivate: [AuthGuard]
   },
   {
     path: 'perfil',
-    loadChildren: () => import('./veterinario/perfil/perfil.module').then( m => m.PerfilPageModule),
-    canActivate: [AuthGuard] 
+    loadChildren: () => import('./veterinario/perfil/perfil.module').then(m => m.PerfilPageModule),
+    canActivate: [AuthGuard]
   },
   {
     path: 'tutor',
-    loadChildren: () => import('./veterinario/tutor/tutor.module').then( m => m.TutorPageModule),
-    canActivate: [AuthGuard] 
+    loadChildren: () => import('./veterinario/tutor/tutor.module').then(m => m.TutorPageModule),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'veterinario/tutor',
+    loadChildren: () => import('./veterinario/tutor/tutor.module').then(m => m.TutorPageModule),
+    canActivate: [AuthGuard]
   },
   {
     path: 'agenda',
-    loadChildren: () => import('./veterinario/agenda/agenda.module').then( m => m.AgendaPageModule),
-    canActivate: [AuthGuard] 
+    loadChildren: () => import('./veterinario/agenda/agenda.module').then(m => m.AgendaPageModule),
+    canActivate: [AuthGuard]
   },
   {
     path: 'datospersonales',
-    loadChildren:() => import('./veterinario/perfil/datospersonales/datospersonales.module').then( m => m.DatospersonalesPageModule),
-    canActivate: [AuthGuard] 
+    loadChildren: () => import('./veterinario/perfil/datospersonales/datospersonales.module').then(m => m.DatospersonalesPageModule),
+    canActivate: [AuthGuard]
   },
   {
     path: 'datosprofesionales',
-    loadChildren:() => import('./veterinario/perfil/datosprofesionales/datosprofesionales.module').then( m => m.DatosprofesionalesPageModule),
-    canActivate: [AuthGuard] 
+    loadChildren: () => import('./veterinario/perfil/datosprofesionales/datosprofesionales.module').then(m => m.DatosprofesionalesPageModule),
+    canActivate: [AuthGuard]
   },
   {
     path: 'datosatencion',
-    loadChildren: () => import('./veterinario/datosatencion/datosatencion.module').then( m => m.DatosatencionPageModule),
-    canActivate: [AuthGuard] 
+    loadChildren: () => import('./veterinario/datosatencion/datosatencion.module').then(m => m.DatosatencionPageModule),
+    canActivate: [AuthGuard]
   },
   {
     path: 'veterinario/tutor/agregar-tutor',
-    loadChildren: () => import('./veterinario/tutor/agregar-tutor/agregar-tutor.module').then( m => m.AgregarTutorPageModule),
-    canActivate: [AuthGuard] 
+    loadChildren: () => import('./veterinario/tutor/agregar-tutor/agregar-tutor.module').then(m => m.AgregarTutorPageModule),
+    canActivate: [AuthGuard]
   },
   {
     path: 'veterinario/tutor/editar-tutor/:runTutor',
@@ -77,6 +81,11 @@ const routes: Routes = [
   {
     path: 'veterinario/tutor/mascotas/:run_tutor/agregar',
     loadComponent: () => import('./veterinario/tutor/mascotas/agregar-mascota/agregar-mascota.page').then(m => m.AgregarMascotaPage),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'veterinario/tutor/mascotas/editar-mascota/:run_tutor/:id_masc',
+    loadComponent: () => import('./veterinario/tutor/mascotas/editar-mascota/editar-mascota.page').then(m => m.EditarMascotaPage),
     canActivate: [AuthGuard]
   }
 ];
