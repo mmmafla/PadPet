@@ -82,7 +82,12 @@ const routes: Routes = [
   {
     path: 'atencion-medica',
     loadChildren: () => import('./veterinario/atencion-medica/atencion-medica.module').then( m => m.AtencionMedicaPageModule)
-  }
+  },
+    {
+    path: 'veterinario/atencion-medica/agregar-atencion-medica',
+    loadChildren: () => import('./veterinario/atencion-medica/agregar-atencion-medica/agregar-atencion-medica.module').then( m => m.AgregarAtencionMedicaPageModule),
+    canActivate: [AuthGuard] 
+  },
 ];
 
 @NgModule({

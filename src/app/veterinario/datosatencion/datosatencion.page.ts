@@ -3,6 +3,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { IonicModule, ToastController } from '@ionic/angular';
+
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
 import { SupabaseService } from 'src/app/services/supabase.service';
 
@@ -11,7 +12,13 @@ import { SupabaseService } from 'src/app/services/supabase.service';
   templateUrl: './datosatencion.page.html',
   styleUrls: ['./datosatencion.page.scss'],
   standalone: true,
-  imports: [IonicModule, RouterModule, ReactiveFormsModule, CommonModule, HeaderComponent]
+  imports: [
+    IonicModule,
+    RouterModule,
+    ReactiveFormsModule,
+    CommonModule,
+    HeaderComponent
+  ]
 })
 export class DatosatencionPage implements OnInit {
   supabase = inject(SupabaseService);
@@ -28,49 +35,47 @@ export class DatosatencionPage implements OnInit {
 
   id_usuario: string = '';
 
-  ngOnInit() {
-    this.obtenerUsuario();
-    this.cargarEspecies();
-    this.cargarExamenes();
-    this.cargarMuestras();
+  async ngOnInit() {
+    await this.ionViewWillEnter();
   }
 
-  async obtenerUsuario() {
+  async ionViewWillEnter() {
+    await this.obtenerUsuario();
+    await this.cargarEspecies();
+    await this.cargarExamenes();
+    await this.cargarMuestras();
+    await this.cargarSeleccionadas();
+  }
+
+  private async obtenerUsuario() {
     const { data } = await this.supabase.auth.getUser();
     if (data?.user) {
       this.id_usuario = data.user.id;
     }
   }
 
-  async cargarEspecies() {
+  private async cargarEspecies() {
     const { data, error } = await this.supabase.from('tipo_especie').select('*');
-    if (error) {
-      this.mostrarToast('Error al cargar especies', 'danger');
-      return;
-    }
+    if (error) return this.mostrarToast('Error al cargar especies', 'danger');
     this.especies = data;
   }
 
-  async cargarExamenes() {
+  private async cargarExamenes() {
     const { data, error } = await this.supabase.from('tipo_examen').select('*');
-    if (error) {
-      this.mostrarToast('Error al cargar exámenes', 'danger');
-      return;
-    }
+    if (error) return this.mostrarToast('Error al cargar exámenes', 'danger');
     this.examenes = data;
   }
 
-  async cargarMuestras() {
+  private async cargarMuestras() {
     const { data, error } = await this.supabase.from('tipo_muestra_medica').select('*');
-    if (error) {
-      this.mostrarToast('Error al cargar muestras médicas', 'danger');
-      return;
-    }
+    if (error) return this.mostrarToast('Error al cargar muestras médicas', 'danger');
     this.muestras = data;
   }
 
   toggleItem(lista: string[], id: string): string[] {
-    return lista.includes(id) ? lista.filter(i => i !== id) : [...lista, id];
+    return lista.includes(id)
+      ? lista.filter(i => i !== id)
+      : [...lista, id];
   }
 
   toggleEspecie(id: string) {
@@ -85,28 +90,47 @@ export class DatosatencionPage implements OnInit {
     this.muestrasSeleccionadas = this.toggleItem(this.muestrasSeleccionadas, id);
   }
 
-  async guardarEspecies() {
-    try {
-      const { data: existe, error } = await this.supabase
+  private async obtenerIdPreferencia(): Promise<number> {
+    let { data: preferencia, error } = await this.supabase
+      .from('preferencias_atencion')
+      .select('id_preferencia')
+      .eq('id_auth', this.id_usuario)
+      .single();
+
+    if (error && error.code === 'PGRST116') {
+      const { data: nueva, error: errorInsert } = await this.supabase
         .from('preferencias_atencion')
-        .select('id_preferencias_atencion, id_examen, id_muestra')
-        .eq('id_auth', this.id_usuario)
+        .insert({ id_auth: this.id_usuario })
+        .select('id_preferencia')
         .single();
 
-      const payload = {
-        id_auth: this.id_usuario,
-        id_especie: this.especiesSeleccionadas.length > 0 ? this.especiesSeleccionadas : null,
-        id_examen: existe?.id_examen ?? null,
-        id_muestra: existe?.id_muestra ?? null
-      };
-
-      console.log('Payload (guardarEspecies):', payload);
-
-      const { error: errorInsert } = existe
-        ? await this.supabase.from('preferencias_atencion').update(payload).eq('id_auth', this.id_usuario)
-        : await this.supabase.from('preferencias_atencion').insert(payload);
-
       if (errorInsert) throw errorInsert;
+      preferencia = nueva;
+    }
+
+    return preferencia!.id_preferencia;
+  }
+
+  async guardarEspecies() {
+    try {
+      const idPreferencia = await this.obtenerIdPreferencia();
+
+      await this.supabase
+        .from('preferencia_especie')
+        .delete()
+        .eq('id_preferencia', idPreferencia);
+
+      const registros = this.especiesSeleccionadas.map(id => ({
+        id_preferencia: idPreferencia,
+        id_especie: id
+      }));
+
+      if (registros.length > 0) {
+        const { error } = await this.supabase
+          .from('preferencia_especie')
+          .insert(registros);
+        if (error) throw error;
+      }
 
       this.mostrarToast('Especies guardadas correctamente');
     } catch (error: any) {
@@ -117,26 +141,24 @@ export class DatosatencionPage implements OnInit {
 
   async guardarExamenes() {
     try {
-      const { data: existe, error } = await this.supabase
-        .from('preferencias_atencion')
-        .select('id_preferencias_atencion, id_especie, id_muestra')
-        .eq('id_auth', this.id_usuario)
-        .single();
+      const idPreferencia = await this.obtenerIdPreferencia();
 
-      const payload = {
-        id_auth: this.id_usuario,
-        id_especie: existe?.id_especie ?? null,
-        id_examen: this.examenesSeleccionados.length > 0 ? this.examenesSeleccionados : null,
-        id_muestra: existe?.id_muestra ?? null
-      };
+      await this.supabase
+        .from('preferencia_examen')
+        .delete()
+        .eq('id_preferencia', idPreferencia);
 
-      console.log('Payload (guardarExamenes):', payload);
+      const registros = this.examenesSeleccionados.map(id => ({
+        id_preferencia: idPreferencia,
+        id_examen: id
+      }));
 
-      const { error: errorInsert } = existe
-        ? await this.supabase.from('preferencias_atencion').update(payload).eq('id_auth', this.id_usuario)
-        : await this.supabase.from('preferencias_atencion').insert(payload);
-
-      if (errorInsert) throw errorInsert;
+      if (registros.length > 0) {
+        const { error } = await this.supabase
+          .from('preferencia_examen')
+          .insert(registros);
+        if (error) throw error;
+      }
 
       this.mostrarToast('Exámenes guardados correctamente');
     } catch (error: any) {
@@ -147,31 +169,62 @@ export class DatosatencionPage implements OnInit {
 
   async guardarMuestras() {
     try {
-      const { data: existe, error } = await this.supabase
-        .from('preferencias_atencion')
-        .select('id_preferencias_atencion, id_especie, id_examen')
-        .eq('id_auth', this.id_usuario)
-        .single();
+      const idPreferencia = await this.obtenerIdPreferencia();
 
-      const payload = {
-        id_auth: this.id_usuario,
-        id_especie: existe?.id_especie ?? null,
-        id_examen: existe?.id_examen ?? null,
-        id_muestra: this.muestrasSeleccionadas.length > 0 ? this.muestrasSeleccionadas : null
-      };
+      await this.supabase
+        .from('preferencia_muestra')
+        .delete()
+        .eq('id_preferencia', idPreferencia);
 
-      console.log('Payload (guardarMuestras):', payload);
+      const registros = this.muestrasSeleccionadas.map(id => ({
+        id_preferencia: idPreferencia,
+        id_muestra: id
+      }));
 
-      const { error: errorInsert } = existe
-        ? await this.supabase.from('preferencias_atencion').update(payload).eq('id_auth', this.id_usuario)
-        : await this.supabase.from('preferencias_atencion').insert(payload);
-
-      if (errorInsert) throw errorInsert;
+      if (registros.length > 0) {
+        const { error } = await this.supabase
+          .from('preferencia_muestra')
+          .insert(registros);
+        if (error) throw error;
+      }
 
       this.mostrarToast('Muestras guardadas correctamente');
     } catch (error: any) {
       console.error('Error guardarMuestras:', error.message || error);
       this.mostrarToast('Error al guardar muestras: ' + error.message, 'danger');
+    }
+  }
+
+  private async cargarSeleccionadas() {
+    const idPreferencia = await this.obtenerIdPreferencia();
+
+    const [especies, examenes, muestras] = await Promise.all([
+      this.supabase
+        .from('preferencia_especie')
+        .select('id_especie')
+        .eq('id_preferencia', idPreferencia),
+
+      this.supabase
+        .from('preferencia_examen')
+        .select('id_examen')
+        .eq('id_preferencia', idPreferencia),
+
+      this.supabase
+        .from('preferencia_muestra')
+        .select('id_muestra')
+        .eq('id_preferencia', idPreferencia)
+    ]);
+
+    if (especies.data) {
+      this.especiesSeleccionadas = especies.data.map(e => e.id_especie);
+    }
+
+    if (examenes.data) {
+      this.examenesSeleccionados = examenes.data.map(e => e.id_examen);
+    }
+
+    if (muestras.data) {
+      this.muestrasSeleccionadas = muestras.data.map(e => e.id_muestra);
     }
   }
 
