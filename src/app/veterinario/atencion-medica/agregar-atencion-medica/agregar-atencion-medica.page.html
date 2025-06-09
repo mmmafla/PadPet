@@ -56,20 +56,20 @@
     <ion-card-content>
       <form>
 <!---------------------------------FECHA Y HORA DE ATENCION ---------------------------------->
-        <ion-item>
-          <ion-label>Fecha de atención</ion-label>
-          <ion-button expand="block" (click)="abrirSelectorFecha()" class="btn-accion btn-editar">
-            {{ atencion.fecha && atencion.hora ? atencion.fecha + ' ' + atencion.hora : 'Seleccionar fecha y hora' }}
-          </ion-button>
-        </ion-item>
+<ion-item>
+  <ion-label>Fecha de atención</ion-label>
+  <ion-button expand="block" (click)="abrirSelectorFecha()" class="btn-accion btn-editar">
+    {{ atencion.fecha && atencion.hora ? (atencion.fecha + ' - ' + atencion.hora) : 'Seleccionar fecha y hora' }}
+  </ion-button>
+</ion-item>
 <!---------------------------------FECHA Y HORA DE ATENCION ---------------------------------->
 <!---------------------------------MOTIVO DE CONSULTA ---------------------------------->
         <ion-item class="consulta-item" lines="full">
           <ion-label position="stacked">Motivo de consulta</ion-label>
           <ion-select [(ngModel)]="atencion.motivo" name="motivo" 
-              placeholder="Selecciona un motivo de consulta"
+              placeholder="Selecciona motivo"
               interface="popover"
-              class="custom-select" 
+              class="custom-select"
               required >
             <ion-select-option *ngFor="let motivo of motivosConsulta" [value]="motivo.id">
               {{ motivo.motivo }}
@@ -77,7 +77,70 @@
           </ion-select>
         </ion-item>
 <!---------------------------------MOTIVO DE CONSULTA ---------------------------------->
+<!---------------------------------ANAMNESIS---------------------------------->
+        <ion-item class="consulta-item">
+          <ion-label position="stacked">Anamnesis</ion-label>
+          <ion-textarea [(ngModel)]="atencion.anamnesis" name="anamnesis" placeholder="Anamnesis..."></ion-textarea>
+        </ion-item>
+<!---------------------------------ANAMNESIS---------------------------------->
+<!---------------------------EXAMEN OBJETIVO GENERAL---------------------------------------->
 
+<ion-accordion-group expand="inset">
+  <ion-accordion value="examenGeneral" >
+    <ion-item slot="header" class="acordeon-consulta">
+      <ion-label><strong>Examen Objetivo General</strong></ion-label>
+    </ion-item>
+    <div slot="content">
+
+      <ion-item>
+        <ion-label position="stacked">Mucosa</ion-label>
+        <ion-textarea [(ngModel)]="examen.mucosa"></ion-textarea>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Temperatura (°C)</ion-label>
+        <ion-input type="number" [(ngModel)]="examen.temperatura"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Peso (Kg)</ion-label>
+        <ion-input type="number" [(ngModel)]="examen.peso"></ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-label position="stacked">Condición corporal</ion-label>
+        <ion-textarea [(ngModel)]="examen.condicion_corporal"></ion-textarea>
+      </ion-item>
+
+<ion-item>
+  <ion-label>Estado sensorial</ion-label>
+  <ion-select [(ngModel)]="atencion.estado_sensorial_id" interface="popover" slot="end">
+    <ion-select-option *ngFor="let estado of estadoSensorial" [value]="estado.id_estado_sensorial">
+      {{ estado.estado_sensorial }}
+    </ion-select-option>
+  </ion-select>
+</ion-item>
+
+<ion-item>
+  <ion-label>Hidratación</ion-label>
+  <ion-select [(ngModel)]="atencion.hidratacion_id" interface="popover" slot="end">
+    <ion-select-option *ngFor="let h of nivelesHidratacion" [value]="h.hidratacion_id">
+      {{ h.estado_hidratacion }}
+    </ion-select-option>
+  </ion-select>
+</ion-item>
+
+
+      <ion-item>
+        <ion-label position="stacked">Observaciones</ion-label>
+        <ion-textarea [(ngModel)]="examen.observacion"></ion-textarea>
+      </ion-item>
+
+    </div>
+  </ion-accordion>
+</ion-accordion-group>
+
+<!---------------------------EXAMEN OBJETIVO GENERAL---------------------------------------->
 <!---------------------------------DIAGNOSTICO---------------------------------->
         <ion-item class="consulta-item">
           <ion-label position="stacked">Diagnóstico</ion-label>

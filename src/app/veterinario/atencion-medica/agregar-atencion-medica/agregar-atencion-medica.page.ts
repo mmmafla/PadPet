@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { IonicModule, ModalController } from '@ionic/angular';
+import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 import { createClient } from '@supabase/supabase-js';
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
 import { ModalFechaComponent } from 'src/app/modal-fecha/modal-fecha.component';
@@ -24,25 +24,45 @@ export class AgregarAtencionMedicaPage implements OnInit {
   tutorSeleccionado: any = null;
   mascotaSeleccionada: any = null;
 
+  estadoSensorial: any[] = [];
+  nivelesHidratacion: any[] = [];
+
   motivosConsulta: any[] = [];
 
   atencion = {
     motivo: '',
+    anamnesis: '',
     sintomas: '',
     diagnostico: '',
     tratamiento: '',
     observaciones: '',
     fecha: '',
     hora: '',
+    estado_sensorial_id: null,
+    hidratacion_id: null,
   };
 
+  examen = {
+  mucosa: '',
+  temperatura: null,
+  peso: null,
+  condicion_corporal: '',
+  estado_sensorial: '',
+  hidratacion: '',
+  observacion: ''
+};
+
+
   constructor(
-    private modalCtrl: ModalController
+    private modalCtrl: ModalController,
+    private toastController: ToastController
   ) {}
 
   ngOnInit() {
     this.cargarTutores();
     this.cargarMotivosConsulta();
+    this.cargarEstadosSensoriales();
+    this.cargarNivelesHidratacion();
   }
 
   async cargarTutores() {
@@ -100,72 +120,144 @@ export class AgregarAtencionMedicaPage implements OnInit {
     this.tutoresFiltrados = [];
     this.mascotaSeleccionada = null;
   }
-   
 
- guardarAtencion() {
-  if (!this.tutorSeleccionado || !this.mascotaSeleccionada || !this.atencion.motivo || !this.atencion.fecha) {
-    alert('Debes completar todos los campos obligatorios.');
-    return;
+
+  // ----
+  async cargarEstadosSensoriales() {
+  const { data, error } = await supabase
+    .from('estado_sensorial')
+    .select('id_estado_sensorial, estado_sensorial');
+
+  if (error) {
+    console.error('Error al cargar estados sensoriales:', error);
+  } else {
+    this.estadoSensorial = data;
   }
-
-  // Combinar fecha y hora
-  const fecha = this.atencion.fecha; // formato: YYYY-MM-DD
-  const hora = this.atencion.hora || '00:00'; // si no se elige, será medianoche
-  const fechaHora = `${fecha}T${hora}`;
-
-  const nuevaAtencion = {
-    tutor_run: this.tutorSeleccionado.run_tutor,
-    mascota_id: this.mascotaSeleccionada.id,
-    motivo_id: this.atencion.motivo,
-    sintomas: this.atencion.sintomas,
-    diagnostico: this.atencion.diagnostico,
-    tratamiento: this.atencion.tratamiento,
-    observaciones: this.atencion.observaciones,
-    fecha_hora: fechaHora, // este es el campo que se insertará en la BD
-  };
-
-  console.log("Guardando atención:", nuevaAtencion);
-  // Aquí luego puedes hacer la inserción a Supabase
 }
 
+async cargarNivelesHidratacion() {
+  const { data, error } = await supabase
+    .from('hidratacion')
+    .select('hidratacion_id, estado_hidratacion');
+
+  if (error) {
+    console.error('Error al cargar niveles de hidratación:', error);
+  } else {
+    this.nivelesHidratacion = data;
+  }
+}
+// ----
+   
+//----------------------------------FECHA Y HORA DE ATENCION-----------------------------
 mostrarSelectorFecha = false;
 mostrarSelectorHora = false;
-
-
 
 abrirSelectorHora() {
   this.mostrarSelectorHora = true;
 }
-
 seleccionarFecha(event: any) {
   this.atencion.fecha = event.detail.value.split('T')[0]; // solo YYYY-MM-DD
 }
-
 seleccionarHora(event: any) {
-  this.atencion.hora = event.detail.value.split('T')[1].substring(0, 5); // solo HH:mm
+  this.atencion.hora = event.detail.value.split('T')[1].substring(0, 5); // HH:mm
 }
-
 async abrirSelectorFecha() {
-  const fechaHoraActual = this.atencion.fecha && this.atencion.hora
-    ? `${this.atencion.fecha}T${this.atencion.hora}`
-    : '';
-
   const modal = await this.modalCtrl.create({
     component: ModalFechaComponent,
-    componentProps: { fechaActual: fechaHoraActual }
+    componentProps: { fecha: this.atencion.fecha }
   });
 
   await modal.present();
 
   const { data } = await modal.onDidDismiss();
   if (data) {
-    // Separar fecha y hora seleccionadas
-    const [fecha, hora] = data.split('T');
-    this.atencion.fecha = fecha;
-    this.atencion.hora = hora.substring(0, 5); // HH:mm
+    this.atencion.fecha = data.fecha;
+    this.atencion.hora = data.hora;
+  }
+}
+//----------------------------------FECHA Y HORA DE ATENCION-----------------------------
+//----------------------------------GUARDAR ATENCION-----------------------------
+async guardarAtencion() {
+  if (!this.tutorSeleccionado || !this.mascotaSeleccionada || !this.atencion.motivo || !this.atencion.fecha || !this.atencion.hora) {
+    this.mostrarToast('Debes completar todos los campos obligatorios.', 'danger');
+   
+    return;
+  }
+
+  // Combinar fecha y hora en un solo string ISO
+  const fechaHora = `${this.atencion.fecha}T${this.atencion.hora}`;
+
+  const nuevaAtencion = {
+    id_masc: this.mascotaSeleccionada.id_masc,
+    motivo_id: this.atencion.motivo,
+    anamnesis: this.atencion.anamnesis,
+    diagnostico: this.atencion.diagnostico,
+    tratamiento: this.atencion.tratamiento,
+    observaciones: this.atencion.observaciones,
+    fecha_hora_atencion: fechaHora,
+    estado_sensorial_id: this.atencion.estado_sensorial_id,
+    hidratacion_id: this.atencion.hidratacion_id,
+
+    // Campos del examen objetivo general
+    mucosa: this.examen.mucosa,
+    temperatura: this.examen.temperatura,
+    peso: this.examen.peso,
+    condicion_corporal: this.examen.condicion_corporal,
+    observacion_examen: this.examen.observacion
+  };
+
+  try {
+    const { data, error } = await supabase.from('atencion_medica').insert([nuevaAtencion]);
+    if (error) {
+      console.error('Error guardando atención médica:', error);
+      this.mostrarToast('Error al guardar la atención médica.', 'danger');
+    } else {
+      this.mostrarToast('Atención médica guardada correctamente.');
+      this.limpiarFormulario();
+    }
+  } catch (err) {
+    console.error('Error inesperado:', err);
+    this.mostrarToast('Ocurrió un error inesperado.', 'danger');
   }
 }
 
+limpiarFormulario() {
+  this.tutorSeleccionado = null;
+  this.mascotaSeleccionada = null;
+  this.busquedaTutor = '';
+  this.tutoresFiltrados = [];
+  this.atencion = {
+    motivo: '',
+    anamnesis: '',
+    sintomas: '',
+    diagnostico: '',
+    tratamiento: '',
+    observaciones: '',
+    fecha: '',
+    hora: '',
+    estado_sensorial_id: null,
+    hidratacion_id: null,
+  };
+  this.examen = {
+    mucosa: '',
+    temperatura: null,
+    peso: null,
+    condicion_corporal: '',
+    estado_sensorial: '',
+    hidratacion: '',
+    observacion: ''
+  };
+}
+
+ private async mostrarToast(mensaje: string, color: string = 'success') {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: 2000,
+      color,
+      position: 'middle',
+    });
+    toast.present();
+  }
 
 
 }

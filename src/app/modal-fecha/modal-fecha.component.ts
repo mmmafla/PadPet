@@ -11,20 +11,31 @@ import { FormsModule } from '@angular/forms';
   imports: [IonicModule, CommonModule, FormsModule],
 })
 export class ModalFechaComponent {
-  @Input() fechaActual: string = ''; 
-  fechaSeleccionada: string = '';
+ @Input() fecha = '';
+  hora = '';
 
   constructor(private modalCtrl: ModalController) {}
 
-  seleccionar(event: any) {
-    this.fechaSeleccionada = event.detail.value;
+  onFechaSeleccionada(event: any) {
+    this.fecha = event.detail.value.split('T')[0];
   }
 
-  cerrar() {
+  onHoraSeleccionada(event: any) {
+    this.hora = event.detail.value.split('T')[1].substring(0, 5);
+  }
+
+aceptar() {
+  this.modalCtrl.dismiss({
+    fecha: this.fecha,
+    hora: this.hora
+  });
+}
+
+
+    cerrar() {
     this.modalCtrl.dismiss();
   }
-
-  aceptar() {
-    this.modalCtrl.dismiss(this.fechaSeleccionada || this.fechaActual);
-  }
 }
+
+
+

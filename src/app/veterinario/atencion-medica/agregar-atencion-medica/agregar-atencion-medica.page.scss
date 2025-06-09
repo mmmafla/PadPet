@@ -64,3 +64,10 @@ ion-select::part(text) {
   text-transform: capitalize;
   transition: transform 0.2s ease;
 }
+
+.acordeon-consulta {
+  --background: #f4f4f4;
+  --box-shadow: 0 0 0 rgba(0, 0, 0, 0.1);
+
+}
+
