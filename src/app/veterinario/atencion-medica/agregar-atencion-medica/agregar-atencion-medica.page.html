@@ -86,7 +86,7 @@
 <!---------------------------EXAMEN OBJETIVO GENERAL---------------------------------------->
 
 <ion-accordion-group expand="inset">
-  <ion-accordion value="examenGeneral" >
+  <ion-accordion  >
     <ion-item slot="header" class="acordeon-consulta">
       <ion-label><strong>Examen Objetivo General</strong></ion-label>
     </ion-item>
@@ -94,27 +94,27 @@
 
       <ion-item>
         <ion-label position="stacked">Mucosa</ion-label>
-        <ion-textarea [(ngModel)]="examen.mucosa"></ion-textarea>
+        <ion-textarea [(ngModel)]="atencion.mucosa" name="mucosa"></ion-textarea>
       </ion-item>
 
       <ion-item>
         <ion-label position="stacked">Temperatura (°C)</ion-label>
-        <ion-input type="number" [(ngModel)]="examen.temperatura"></ion-input>
+        <ion-input type="number" [(ngModel)]="atencion.temperatura" name="temperatura"></ion-input>
       </ion-item>
 
       <ion-item>
         <ion-label position="stacked">Peso (Kg)</ion-label>
-        <ion-input type="number" [(ngModel)]="examen.peso"></ion-input>
+        <ion-input type="number" [(ngModel)]="atencion.peso" name="peso"></ion-input>
       </ion-item>
 
       <ion-item>
         <ion-label position="stacked">Condición corporal</ion-label>
-        <ion-textarea [(ngModel)]="examen.condicion_corporal"></ion-textarea>
+        <ion-textarea [(ngModel)]="atencion.condicion_corporal" name="condicion_corporal"></ion-textarea>
       </ion-item>
 
 <ion-item>
   <ion-label>Estado sensorial</ion-label>
-  <ion-select [(ngModel)]="atencion.estado_sensorial_id" interface="popover" slot="end">
+  <ion-select [(ngModel)]="atencion.estado_sensorial_id" name="estado_sensorial_id" interface="popover" slot="end">
     <ion-select-option *ngFor="let estado of estadoSensorial" [value]="estado.id_estado_sensorial">
       {{ estado.estado_sensorial }}
     </ion-select-option>
@@ -123,7 +123,7 @@
 
 <ion-item>
   <ion-label>Hidratación</ion-label>
-  <ion-select [(ngModel)]="atencion.hidratacion_id" interface="popover" slot="end">
+  <ion-select [(ngModel)]="atencion.hidratacion_id" name="hidratacion_id" interface="popover" slot="end">
     <ion-select-option *ngFor="let h of nivelesHidratacion" [value]="h.hidratacion_id">
       {{ h.estado_hidratacion }}
     </ion-select-option>
@@ -133,7 +133,7 @@
 
       <ion-item>
         <ion-label position="stacked">Observaciones</ion-label>
-        <ion-textarea [(ngModel)]="examen.observacion"></ion-textarea>
+        <ion-textarea [(ngModel)]="atencion.observacion" name="observacion"></ion-textarea>
       </ion-item>
 
     </div>

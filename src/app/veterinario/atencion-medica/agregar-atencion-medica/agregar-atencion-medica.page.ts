@@ -29,28 +29,23 @@ export class AgregarAtencionMedicaPage implements OnInit {
 
   motivosConsulta: any[] = [];
 
-  atencion = {
-    motivo: '',
-    anamnesis: '',
-    sintomas: '',
-    diagnostico: '',
-    tratamiento: '',
-    observaciones: '',
-    fecha: '',
-    hora: '',
-    estado_sensorial_id: null,
-    hidratacion_id: null,
-  };
-
-  examen = {
+atencion = {
+  motivo: null,
+  anamnesis: '',
+  diagnostico: '',
+  tratamiento: '',
+  observaciones: '',
   mucosa: '',
   temperatura: null,
   peso: null,
   condicion_corporal: '',
-  estado_sensorial: '',
-  hidratacion: '',
-  observacion: ''
+  observacion: '',
+  estado_sensorial_id: null,
+  hidratacion_id: null,
+  fecha: '',
+  hora: ''
 };
+
 
 
   constructor(
@@ -178,76 +173,84 @@ async abrirSelectorFecha() {
 //----------------------------------FECHA Y HORA DE ATENCION-----------------------------
 //----------------------------------GUARDAR ATENCION-----------------------------
 async guardarAtencion() {
-  if (!this.tutorSeleccionado || !this.mascotaSeleccionada || !this.atencion.motivo || !this.atencion.fecha || !this.atencion.hora) {
-    this.mostrarToast('Debes completar todos los campos obligatorios.', 'danger');
-   
+  if (!this.tutorSeleccionado || !this.mascotaSeleccionada) {
+    this.mostrarToast('Debes seleccionar un tutor y una mascota.');
     return;
   }
 
-  // Combinar fecha y hora en un solo string ISO
-  const fechaHora = `${this.atencion.fecha}T${this.atencion.hora}`;
+  if (!this.atencion.fecha || !this.atencion.hora || !this.atencion.motivo) {
+    this.mostrarToast('Completa los campos obligatorios: fecha, hora y motivo.');
+    return;
+  }
 
-  const nuevaAtencion = {
-    id_masc: this.mascotaSeleccionada.id_masc,
+  const fechaHoraAtencion = new Date(`${this.atencion.fecha}T${this.atencion.hora}`);
+
+  const { error } = await supabase.from('atencion_medica').insert([{
     motivo_id: this.atencion.motivo,
     anamnesis: this.atencion.anamnesis,
     diagnostico: this.atencion.diagnostico,
     tratamiento: this.atencion.tratamiento,
     observaciones: this.atencion.observaciones,
-    fecha_hora_atencion: fechaHora,
+    mucosa: this.atencion.mucosa,
+    temperatura: this.atencion.temperatura,
+    peso: this.atencion.peso,
+    condicion_corporal: this.atencion.condicion_corporal,
+    observacion_examen: this.atencion.observacion,
     estado_sensorial_id: this.atencion.estado_sensorial_id,
     hidratacion_id: this.atencion.hidratacion_id,
+    id_masc: this.mascotaSeleccionada.id_masc,
+    fecha_hora_atencion: fechaHoraAtencion.toISOString()
+  }]);
 
-    // Campos del examen objetivo general
-    mucosa: this.examen.mucosa,
-    temperatura: this.examen.temperatura,
-    peso: this.examen.peso,
-    condicion_corporal: this.examen.condicion_corporal,
-    observacion_examen: this.examen.observacion
-  };
+  if (error) {
+    console.error('Error al guardar la atención:', error);
+    this.mostrarToast('Hubo un error al guardar la atención.');
+  } else {
+    this.mostrarToast('Atención médica guardada exitosamente.');
 
-  try {
-    const { data, error } = await supabase.from('atencion_medica').insert([nuevaAtencion]);
-    if (error) {
-      console.error('Error guardando atención médica:', error);
-      this.mostrarToast('Error al guardar la atención médica.', 'danger');
-    } else {
-      this.mostrarToast('Atención médica guardada correctamente.');
-      this.limpiarFormulario();
-    }
-  } catch (err) {
-    console.error('Error inesperado:', err);
-    this.mostrarToast('Ocurrió un error inesperado.', 'danger');
+    console.log('Valores a insertar:', {
+  motivo_id: this.atencion.motivo,
+  anamnesis: this.atencion.anamnesis,
+  diagnostico: this.atencion.diagnostico,
+  tratamiento: this.atencion.tratamiento,
+  observaciones: this.atencion.observaciones,
+  mucosa: this.atencion.mucosa,
+  temperatura: this.atencion.temperatura,
+  peso: this.atencion.peso,
+  condicion_corporal: this.atencion.condicion_corporal,
+  observacion_examen: this.atencion.observacion,
+  estado_sensorial_id: this.atencion.estado_sensorial_id,
+  hidratacion_id: this.atencion.hidratacion_id,
+  id_masc: this.mascotaSeleccionada.id_masc,
+  fecha_hora_atencion: fechaHoraAtencion.toISOString()
+});
+
+    this.reiniciarFormulario();
   }
 }
 
-limpiarFormulario() {
-  this.tutorSeleccionado = null;
-  this.mascotaSeleccionada = null;
-  this.busquedaTutor = '';
-  this.tutoresFiltrados = [];
+reiniciarFormulario() {
   this.atencion = {
-    motivo: '',
+    motivo: null,
     anamnesis: '',
-    sintomas: '',
     diagnostico: '',
     tratamiento: '',
     observaciones: '',
-    fecha: '',
-    hora: '',
-    estado_sensorial_id: null,
-    hidratacion_id: null,
-  };
-  this.examen = {
     mucosa: '',
     temperatura: null,
     peso: null,
     condicion_corporal: '',
-    estado_sensorial: '',
-    hidratacion: '',
-    observacion: ''
+    observacion: '',
+    estado_sensorial_id: null,
+    hidratacion_id: null,
+    fecha: '',
+    hora: ''
   };
+  this.tutorSeleccionado = null;
+  this.mascotaSeleccionada = null;
 }
+
+
 
  private async mostrarToast(mensaje: string, color: string = 'success') {
     const toast = await this.toastController.create({
