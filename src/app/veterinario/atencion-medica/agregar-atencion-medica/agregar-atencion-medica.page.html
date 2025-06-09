@@ -1,23 +1,99 @@
-<app-header  backButton="/atencion-medica" title="Agregar Atención"></app-header>
+<app-header backButton="/atencion-medica" title="Agregar Atención"></app-header>
 
-<ion-content [fullscreen]="true">
+<ion-content class="fondo">
 
-  <ion-card *ngIf="tutor; else sinTutor">
-    <ion-card-header>
-      <ion-card-title>{{ tutor.nombre_tutor }} {{ tutor.apellidos_tutor }}</ion-card-title>
-    </ion-card-header>
+<ion-card class="ion-card-atencion"> 
+  <h3 style="text-align: center;">Buscar Tutor</h3>
+
+  <ion-card-content>
+<!------------------------- Buscador tutor ----------------------->
+    <ion-item class="buscador">
+      <ion-icon name="search-outline" slot="start"></ion-icon>
+      <ion-input
+        [(ngModel)]="busquedaTutor" (ionInput)="filtrarTutores()" placeholder="Ingrese nombre del tutor">
+      </ion-input>
+    </ion-item>
+<!------------- Lista de tutores filtrados ----------------->
+    <ion-list *ngIf="tutoresFiltrados.length > 0">
+      <ion-item button detail  *ngFor="let tutor of tutoresFiltrados" (click)="seleccionarTutor(tutor)">
+        <ion-label>
+          {{ tutor.nombre_tutor }} {{ tutor.apellidos_tutor }}
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+<!--------------------buscador mascota---------------------------------->
+    <div *ngIf="tutorSeleccionado">
+      <h3 style="text-align: center;">Mascotas de {{ tutorSeleccionado.nombre_tutor }}</h3>
+      <ion-item class="buscador">
+        <ion-label>Mascota</ion-label>
+        <ion-select [(ngModel)]="mascotaSeleccionada" interface="popover" slot="end">
+          <ion-select-option *ngFor="let mascota of tutorSeleccionado.mascota" [value]="mascota" >
+            {{ mascota.masc_nom }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+    </div>
+<!--------------------buscador mascota---------------------------------->
+  </ion-card-content>  
+</ion-card>
+<!-------------------------------------------------------------------------------->
+      <!-- Mensaje informativo si no hay tutor o mascota seleccionada -->
+      <ion-card *ngIf="!tutorSeleccionado || !mascotaSeleccionada" class="ion-card">
+        <ion-card-content class="ion-text-center">
+          <ion-icon name="information-circle-outline" size="large" color="medium"></ion-icon>
+          <p style="margin-top: 10px;">
+            Para poder generar una atención médica primero debes seleccionar un tutor y una mascota.
+          </p>
+        </ion-card-content>
+      </ion-card>
+      <!-- Mensaje informativo si no hay tutor o mascota seleccionada -->
+<!-------------------------------------------------------------------------------->
+<!-------------- Formulario de atención médica -------------->
+  <ion-card *ngIf="mascotaSeleccionada" class="ion-card-atencion">
+    <h2>Atención Médica</h2>
+
     <ion-card-content>
-      <p><strong>RUN:</strong> {{ tutor.run_tutor }}</p>
-      <p><strong>Correo:</strong> {{ tutor.correo_tutor }}</p>
-      <p><strong>Dirección:</strong> {{ tutor.direccion_tutor }}</p>
-      <p><strong>Celular:</strong> {{ tutor.celular_tutor }}</p>
+      <form>
+        <ion-item class="consulta-item" lines="full">
+          <ion-label position="stacked">Motivo de consulta</ion-label>
+          <ion-select [(ngModel)]="atencion.motivo" name="motivo" 
+              placeholder="Selecciona un motivo de consulta"
+              interface="popover"
+              class="custom-select" 
+              required >
+            <ion-select-option *ngFor="let motivo of motivosConsulta" [value]="motivo.id">
+              {{ motivo.motivo }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+
+        <ion-item>
+          <ion-label position="stacked">Diagnóstico</ion-label>
+          <ion-textarea [(ngModel)]="atencion.diagnostico" name="diagnostico" placeholder="Escribe el diagnóstico..."></ion-textarea>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Tratamiento/Indicaciones</ion-label>
+          <ion-textarea [(ngModel)]="atencion.tratamiento" name="tratamiento" placeholder="Indica el tratamiento..."></ion-textarea>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Observaciones</ion-label>
+          <ion-textarea [(ngModel)]="atencion.observaciones" name="Observaciones" placeholder="Escribe observaciones..."></ion-textarea>
+        </ion-item>
+
+        <ion-item>
+          <ion-label>Proximo control</ion-label>
+        </ion-item>
+
+        <ion-button expand="block" color="primary" (click)="guardarAtencion()">
+          <ion-icon name="save-outline" slot="start"></ion-icon>
+          Guardar Atención
+        </ion-button>
+      </form>
     </ion-card-content>
   </ion-card>
-
-  <ng-template #sinTutor>
-    <ion-text color="medium">
-      <p>No hay tutor afiliado registrado para este veterinario.</p>
-    </ion-text>
-  </ng-template>
 
 </ion-content>

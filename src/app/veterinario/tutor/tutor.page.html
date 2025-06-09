@@ -8,19 +8,14 @@
   </ion-refresher>
 
 
-  <ion-card class="ion-card">
+  <ion-card class="ion-card-tutor">
     <ion-card-title>
       <h2>Lista de tutores</h2>
     </ion-card-title>
     <ion-card-content>
 
       <!-- Barra de búsqueda -->
-      <ion-searchbar
-        [(ngModel)]="busqueda"
-        placeholder="Buscar tutor por nombre"
-        (ionInput)="filtrarTutores()"
-        debounce="300"
-      ></ion-searchbar>
+      <ion-searchbar  [(ngModel)]="busqueda" placeholder="Buscar tutor por nombre" (ionInput)="filtrarTutores()" debounce="300"  ></ion-searchbar>
 
       <!-- Lista de tutores filtrados -->
       <ion-list *ngIf="tutoresFiltrados.length > 0; else sinTutores">
@@ -33,12 +28,11 @@
               <p>Dirección: {{ tutor.direccion_tutor }}</p>
             </ion-label>
             <div slot="end" style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
-              <ion-button size="small" color="primary" (click)="irEditarTutor(tutor.run_tutor)">
-                Editar
-              </ion-button>
-              <ion-button size="small" style="--background: orange; color: white;" (click)="irVerMascotas(tutor.run_tutor)">
-                Mascotas
-              </ion-button>
+
+                  <ion-button class="btn-accion btn-editar"  size="small" (click)="irEditarTutor(tutor.run_tutor)"> Tutor</ion-button>
+                  <ion-button class="btn-accion btn-mascotas" size="small" (click)="irVerMascotas(tutor.run_tutor)"> Mascotas</ion-button>
+
+
             </div>
           </ion-item>
 
@@ -62,14 +56,15 @@
     </ion-card-content>
   </ion-card>
 
+<!----------- Botón agregar tutor ---------------->
+<div class="boton-agregar">
+  <ion-button class="agregar-tutor" expand="block"  (click)="irAgregarTutor()">
+    <ion-icon name="add" slot="start"></ion-icon> Agregar tutor
+  </ion-button>
+</div>
+<!----------- Botón agregar tutor ---------------->
 
-        <!-- Botón agregar tutor -->
-      <ion-footer class="ion-padding">
-        <ion-button expand="block" (click)="irAgregarTutor()">
-          <ion-icon name="add" slot="start"></ion-icon>
-          Agregar tutor
-        </ion-button>
-      </ion-footer>
 
-          <!-- Botón agregar tutor -->
 </ion-content>
+
+
