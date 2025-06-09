@@ -1,0 +1,20 @@
+<ion-header>
+  <ion-toolbar>
+    <h3>Seleccionar fecha y hora</h3>
+    <ion-buttons slot="end">
+      <ion-button (click)="cerrar()">Cerrar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <h3 style="text-align: center;">Fecha de atención</h3>
+  <ion-datetime
+    presentation="date-time"
+    [value]="fechaActual"
+    (ionChange)="seleccionar($event)">
+  </ion-datetime>
+
+  <ion-button expand="block" (click)="aceptar()">Guardar Fecha y Hora de atención</ion-button>
+</ion-content>

@@ -44,3 +44,23 @@ ion-select::part(text) {
   color: #222;
   font-weight: 500;
 }
+
+
+.btn-editar {
+  --background: #b0b9d1; 
+  --color: #fff;
+  --border-radius: 12px;
+  font-size: 14px;
+  font-weight: 300;
+  text-transform: capitalize;
+}
+
+.btn-accion {
+  --color: #fff;
+  --border-radius: 12px;
+  width: 40%;
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: capitalize;
+  transition: transform 0.2s ease;
+}

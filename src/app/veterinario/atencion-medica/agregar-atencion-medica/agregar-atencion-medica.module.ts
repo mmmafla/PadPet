@@ -7,13 +7,15 @@ import { IonicModule } from '@ionic/angular';
 import { AgregarAtencionMedicaPageRoutingModule } from './agregar-atencion-medica-routing.module';
 
 import { AgregarAtencionMedicaPage } from './agregar-atencion-medica.page';
+import { ModalFechaComponent } from 'src/app/modal-fecha/modal-fecha.component';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    AgregarAtencionMedicaPageRoutingModule
+    AgregarAtencionMedicaPageRoutingModule,
+    ModalFechaComponent
   ]
 })
 export class AgregarAtencionMedicaPageModule {}

@@ -55,6 +55,15 @@
 
     <ion-card-content>
       <form>
+<!---------------------------------FECHA Y HORA DE ATENCION ---------------------------------->
+        <ion-item>
+          <ion-label>Fecha de atención</ion-label>
+          <ion-button expand="block" (click)="abrirSelectorFecha()" class="btn-accion btn-editar">
+            {{ atencion.fecha && atencion.hora ? atencion.fecha + ' ' + atencion.hora : 'Seleccionar fecha y hora' }}
+          </ion-button>
+        </ion-item>
+<!---------------------------------FECHA Y HORA DE ATENCION ---------------------------------->
+<!---------------------------------MOTIVO DE CONSULTA ---------------------------------->
         <ion-item class="consulta-item" lines="full">
           <ion-label position="stacked">Motivo de consulta</ion-label>
           <ion-select [(ngModel)]="atencion.motivo" name="motivo" 
@@ -67,28 +76,29 @@
             </ion-select-option>
           </ion-select>
         </ion-item>
+<!---------------------------------MOTIVO DE CONSULTA ---------------------------------->
 
-
-        <ion-item>
+<!---------------------------------DIAGNOSTICO---------------------------------->
+        <ion-item class="consulta-item">
           <ion-label position="stacked">Diagnóstico</ion-label>
-          <ion-textarea [(ngModel)]="atencion.diagnostico" name="diagnostico" placeholder="Escribe el diagnóstico..."></ion-textarea>
+          <ion-textarea [(ngModel)]="atencion.diagnostico" name="diagnostico" placeholder="Diagnóstico..."></ion-textarea>
         </ion-item>
-
+<!---------------------------------DIAGNOSTICO---------------------------------->
         <ion-item>
           <ion-label position="stacked">Tratamiento/Indicaciones</ion-label>
           <ion-textarea [(ngModel)]="atencion.tratamiento" name="tratamiento" placeholder="Indica el tratamiento..."></ion-textarea>
         </ion-item>
 
-        <ion-item>
+        <ion-item class="consulta-item">
           <ion-label position="stacked">Observaciones</ion-label>
-          <ion-textarea [(ngModel)]="atencion.observaciones" name="Observaciones" placeholder="Escribe observaciones..."></ion-textarea>
+          <ion-textarea [(ngModel)]="atencion.observaciones" name="Observaciones" placeholder="Observaciones..."></ion-textarea>
         </ion-item>
 
         <ion-item>
           <ion-label>Proximo control</ion-label>
         </ion-item>
 
-        <ion-button expand="block" color="primary" (click)="guardarAtencion()">
+        <ion-button (click)="guardarAtencion()" class="boton-guardar-generico">
           <ion-icon name="save-outline" slot="start"></ion-icon>
           Guardar Atención
         </ion-button>
