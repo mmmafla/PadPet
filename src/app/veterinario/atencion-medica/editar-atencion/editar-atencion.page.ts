@@ -21,6 +21,9 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 export class EditarAtencionPage implements OnInit {
 
 atencion: any;
+  estadoSensorial: any[] = [];
+  nivelesHidratacion: any[] = [];
+
 
 constructor(private router: Router) {
   const nav = this.router.getCurrentNavigation();
@@ -28,8 +31,37 @@ constructor(private router: Router) {
 }
 
 
-  ngOnInit() {
+async ngOnInit() {
+  await this.cargarNivelesHidratacion();
+  await this.cargarestadoSensorial();
+}
+
+async cargarestadoSensorial(){
+    const { data, error } = await supabase
+    .from('estado_sensorial')
+    .select('*')
+    .order('estado_sensorial', { ascending: true });
+
+  if (error) {
+    console.error('Error cargando estado sensorial :', error.message);
+  } else {
+    this.estadoSensorial = data;
   }
+
+}
+
+async cargarNivelesHidratacion() {
+  const { data, error } = await supabase
+    .from('hidratacion')
+    .select('*')
+    .order('estado_hidratacion', { ascending: true });
+
+  if (error) {
+    console.error('Error cargando niveles de hidratación:', error.message);
+  } else {
+    this.nivelesHidratacion = data;
+  }
+}
 
 
   async guardarCambios() {

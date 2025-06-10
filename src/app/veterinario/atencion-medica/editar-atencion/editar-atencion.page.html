@@ -2,9 +2,14 @@
 
 <ion-content class="fondo">
 
-
-  <ion-content *ngIf="atencion">
+<ion-card class="card3" *ngIf="atencion">
   <ion-list>
+
+        <ion-item>
+      <ion-label position="stacked">Anamnesis</ion-label>
+      <ion-input [(ngModel)]="atencion.anamnesis"></ion-input>
+    </ion-item>
+
     <ion-item>
       <ion-label position="stacked">Diagnóstico</ion-label>
       <ion-input [(ngModel)]="atencion.diagnostico"></ion-input>
@@ -15,11 +20,74 @@
       <ion-textarea [(ngModel)]="atencion.tratamiento"></ion-textarea>
     </ion-item>
 
-    <!-- Puedes seguir agregando más campos -->
+    <ion-item>
+      <ion-label position="stacked">Indicaciones</ion-label>
+      <ion-textarea [(ngModel)]="atencion.indicaciones"></ion-textarea>
+    </ion-item>
 
-    <ion-button expand="full" (click)="guardarCambios()">Guardar cambios</ion-button>
+    <ion-item>
+      <ion-label position="stacked">Observaciones</ion-label>
+      <ion-textarea [(ngModel)]="atencion.observaciones"></ion-textarea>
+    </ion-item>
+
+
+<h3 style="text-align: center;"> Examen objetivo general</h3>
+    <ion-item>
+      <ion-label position="stacked">Mucosa</ion-label>
+      <ion-textarea [(ngModel)]="atencion.mucosa"></ion-textarea>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Temperatura (°C)</ion-label>
+      <ion-textarea [(ngModel)]="atencion.temperatura"></ion-textarea>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Peso</ion-label>
+      <ion-textarea [(ngModel)]="atencion.peso"></ion-textarea>
+    </ion-item>
+    <ion-item>
+    <ion-label position="stacked">Condicion corporal</ion-label>
+      <ion-textarea [(ngModel)]="atencion.condicion_corporal"></ion-textarea>
+    </ion-item>
+
+    <ion-item>
+  <ion-label>Estado sensorial</ion-label>
+  <ion-select [(ngModel)]="atencion.estado_sensorial_id" name="estado_sensorial_id" interface="popover" slot="end">
+    <ion-select-option *ngFor="let estado of estadoSensorial" [value]="estado.id_estado_sensorial">
+      {{ estado.estado_sensorial }}
+    </ion-select-option>
+  </ion-select>
+</ion-item>
+
+
+<ion-item>
+  <ion-label>Hidratación</ion-label>
+  <ion-select [(ngModel)]="atencion.hidratacion_id" name="hidratacion_id" interface="popover" slot="end">
+    <ion-select-option *ngFor="let h of nivelesHidratacion" [value]="h.hidratacion_id">
+      {{ h.estado_hidratacion }}
+    </ion-select-option>
+  </ion-select>
+</ion-item>
+
+
+
+  
+        <ion-item>
+    <ion-label position="stacked">Observaciones</ion-label>
+      <ion-textarea [(ngModel)]="atencion.observacion"></ion-textarea>
+    </ion-item>
+
+
+
+    
+
+
+    <ion-button expand="full" color="success" (click)="guardarCambios()">Guardar Cambios</ion-button>
+
   </ion-list>
-</ion-content>
 
+
+
+</ion-card>
+ 
 
 </ion-content>

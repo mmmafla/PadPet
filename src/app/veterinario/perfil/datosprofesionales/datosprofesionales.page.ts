@@ -107,13 +107,15 @@ export class DatosprofesionalesPage implements OnInit {
 
       if (data) {
         this.form.patchValue({
-          universidad: data.id_uni ?? '',
           pais: data.id_pais ?? '',
           especialidad: data.id_especialidad ?? '',
           anoTitulacion: data.anno_titulacion ?? ''
         });
 
         this.filtrarUniversidadesPorPais(data.id_pais);
+                this.form.patchValue({
+          universidad: data.id_uni ?? ''
+               });
 
         // Cargar foto título si existe
         if (data.foto_titulo) {

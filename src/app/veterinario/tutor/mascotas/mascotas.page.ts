@@ -32,9 +32,7 @@ export class MascotasPage implements OnInit {
     this.runTutor = this.route.snapshot.paramMap.get('run_tutor') || '';
     await this.cargarMascotas();
   }
-
-    // Se ejecuta cada vez que vuelves a esta vista
-  async ionViewWillEnter() {
+    async ionViewWillEnter() {
     await this.cargarMascotas();
   }
 

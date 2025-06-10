@@ -79,6 +79,11 @@ const routes: Routes = [
     loadComponent: () => import('./veterinario/tutor/mascotas/agregar-mascota/agregar-mascota.page').then(m => m.AgregarMascotaPage),
     canActivate: [AuthGuard]
   },
+    {
+    path: 'veterinario/tutor/mascotas/editar-mascota/:run_tutor/:id_masc',
+    loadComponent: () => import('./veterinario/tutor/mascotas/editar-mascota/editar-mascota.page').then(m => m.EditarMascotaPage),
+    canActivate: [AuthGuard]
+  },
   {
     path: 'atencion-medica',
     loadChildren: () => import('./veterinario/atencion-medica/atencion-medica.module').then( m => m.AtencionMedicaPageModule)
@@ -88,6 +93,17 @@ const routes: Routes = [
     loadChildren: () => import('./veterinario/atencion-medica/agregar-atencion-medica/agregar-atencion-medica.module').then( m => m.AgregarAtencionMedicaPageModule),
     canActivate: [AuthGuard] 
   },
+    {
+    path: 'detalle-atencion',
+    loadChildren: () => import('./veterinario/atencion-medica/detalle-atencion/detalle-atencion.module').then( m => m.DetalleAtencionPageModule ),
+    canActivate: [AuthGuard] 
+  },
+  {
+    path: 'editar-atencion',
+    loadChildren: () => import('./veterinario/atencion-medica/editar-atencion/editar-atencion.module').then( m => m.EditarAtencionPageModule ),
+    
+  }
+ 
 ];
 
 @NgModule({
