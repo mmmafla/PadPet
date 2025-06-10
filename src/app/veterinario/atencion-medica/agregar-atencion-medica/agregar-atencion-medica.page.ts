@@ -170,6 +170,26 @@ async abrirSelectorFecha() {
     this.atencion.hora = data.hora;
   }
 }
+// ---------------------------------------
+    async obtenerRunVet(): Promise<number | null> {
+    const { data: userData } = await supabase.auth.getUser();
+    const userId = userData.user?.id;
+
+    if (!userId) return null;
+
+    const { data, error } = await supabase
+      .from('veterinario')
+      .select('run_vet')
+      .eq('id_auth', userId)
+      .single();
+
+    if (error || !data) {
+      console.error('No se pudo obtener run_vet:', error?.message);
+      return null;
+    }
+
+    return data.run_vet;
+  }
 //----------------------------------FECHA Y HORA DE ATENCION-----------------------------
 //----------------------------------GUARDAR ATENCION-----------------------------
 async guardarAtencion() {
@@ -180,6 +200,11 @@ async guardarAtencion() {
 
   if (!this.atencion.fecha || !this.atencion.hora || !this.atencion.motivo) {
     this.mostrarToast('Completa los campos obligatorios: fecha, hora y motivo.');
+    return;
+  }
+    const runVet = await this.obtenerRunVet();
+  if (!runVet) {
+    this.mostrarToast('No se pudo identificar al veterinario.');
     return;
   }
 
@@ -199,7 +224,8 @@ async guardarAtencion() {
     estado_sensorial_id: this.atencion.estado_sensorial_id,
     hidratacion_id: this.atencion.hidratacion_id,
     id_masc: this.mascotaSeleccionada.id_masc,
-    fecha_hora_atencion: fechaHoraAtencion.toISOString()
+    fecha_hora_atencion: fechaHoraAtencion.toISOString(),
+    run_vet: runVet,
   }]);
 
   if (error) {
