@@ -16,10 +16,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
   templateUrl: './atencion-medica.page.html',
   styleUrls: ['./atencion-medica.page.scss'],
     standalone: true,
-    imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule, HeaderComponent]
-
-
-    
+    imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule, HeaderComponent] 
 
 })
 export class AtencionMedicaPage implements OnInit {
@@ -68,12 +65,24 @@ async cargarHistorial() {
   const { data, error } = await supabase
     .from('atencion_medica')
     .select(`
-      *,
-      mascota (
-        masc_nom
-      ),
-        motivo_consulta (
-        motivo)
+    *,
+    mascota (
+      masc_nom,
+      tutor (
+        nombre_tutor,
+        apellidos_tutor
+      )
+    ),
+    motivo_consulta (
+      motivo
+        ),
+      hidratacion(
+        estado_hidratacion
+        ),
+      estado_sensorial(
+        estado_sensorial
+        )
+
     `)
     .eq('run_vet', runVet)  // filtro con el run_vet del veterinario
     .order('fecha_hora_atencion', { ascending: false });
@@ -95,5 +104,8 @@ async cargarHistorial() {
       this.router.navigate(['/veterinario/atencion-medica/agregar-atencion-medica']);
   }
 
+verDetalle(atencion: any) {
+  this.router.navigate(['/detalle-atencion'], { state: { atencion } });
+}
 
 }

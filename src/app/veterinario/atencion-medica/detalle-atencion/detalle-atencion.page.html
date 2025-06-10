@@ -1,0 +1,38 @@
+<app-header  backButton="/home" title="Detalle de Atención"></app-header>
+
+<ion-content class="fondo">
+
+<ion-card class="card3">
+    <h2>Atención de {{ atencion?.mascota?.masc_nom }}</h2>
+  <h3 style="text-align: center;">Dueño: {{atencion.mascota?.tutor?.nombre_tutor}} {{atencion.mascota?.tutor?.apellidos_tutor}} </h3>
+  <p><strong>Fecha:</strong> {{ atencion?.fecha_hora_atencion | date:'medium' }}</p>
+  <p><strong>Motivo:</strong> {{ atencion?.motivo_consulta?.motivo }}</p>
+  <p><strong>Anamnesis:</strong> {{atencion?.anamnesis}}</p>
+  <p><strong>Diagnóstico:</strong> {{ atencion?.diagnostico }}</p>
+  <p><strong>Observaciones:</strong> {{atencion?.observaciones}}</p>
+  <p><strong>Tratamiento/Indicaciones:</strong> {{ atencion?.tratamiento }}</p>
+
+     <h4 style="text-align: center;">Examen objetivo general</h4>
+
+      <p><strong>Mucosas:</strong> {{atencion?.mucosa}}</p>
+      <p><strong>Temperatura:</strong> {{atencion?.temperatura}} C°</p>
+      <p><strong>Peso:</strong> {{atencion?.peso}} Kg</p>
+      <p><strong>Condicion corporal:</strong> {{atencion?.condicion_corporal}}</p>
+      <p><strong>Estado sensorial:</strong> {{atencion?.estado_sensorial?.estado_sensorial}}</p>
+      <p><strong>Hidratación:</strong> {{atencion?.hidratacion?.estado_hidratacion}}</p>
+      <p><strong>Observación:</strong> {{atencion?.observacion_examen}}</p>
+       
+        <h4 style="text-align: center;"> Examamen objetivo particular</h4>
+
+        <h4 style="text-align: center;"> Alimentación</h4>
+        <h4 style="text-align: center;"> Productos aplicados</h4>
+        <h4 style="text-align: center;"> Próximo control</h4>
+
+
+    <ion-button expand="block" (click)="modificarConsulta()">Modificar consulta</ion-button>
+
+    <ion-button expand="block"> Enviar atención</ion-button>
+    
+  </ion-card>
+ 
+</ion-content>

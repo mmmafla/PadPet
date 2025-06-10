@@ -1,0 +1,25 @@
+<app-header  backButton="/home" title="Modificar consulta"></app-header>
+
+<ion-content class="fondo">
+
+
+  <ion-content *ngIf="atencion">
+  <ion-list>
+    <ion-item>
+      <ion-label position="stacked">Diagnóstico</ion-label>
+      <ion-input [(ngModel)]="atencion.diagnostico"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="stacked">Tratamiento</ion-label>
+      <ion-textarea [(ngModel)]="atencion.tratamiento"></ion-textarea>
+    </ion-item>
+
+    <!-- Puedes seguir agregando más campos -->
+
+    <ion-button expand="full" (click)="guardarCambios()">Guardar cambios</ion-button>
+  </ion-list>
+</ion-content>
+
+
+</ion-content>
