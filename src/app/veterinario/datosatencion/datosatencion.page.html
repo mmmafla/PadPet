@@ -11,7 +11,7 @@
     <ion-card-content>
             <ion-list>
               <ion-item *ngFor="let especie of especies">
-                <ion-label>{{ especie.nombre_especie }}</ion-label>
+                <ion-label>{{ especie.nom_especie }}</ion-label>
                 <ion-checkbox 
                   [checked]="especiesSeleccionadas.includes(especie.id_especie)" 
                   (ionChange)="toggleEspecie(especie.id_especie)"
@@ -80,6 +80,7 @@
     <ion-button expand="block" class="boton-editar" (click)="guardarMuestras()">Guardar Muestras</ion-button>
   </ion-card-content>
 </ion-card>
+
 
 
     <!------------------------------------>  

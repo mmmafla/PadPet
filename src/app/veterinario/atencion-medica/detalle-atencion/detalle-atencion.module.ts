@@ -4,16 +4,16 @@ import { FormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
 
-import { EditarMascotaPageRoutingModule } from './editar-mascota-routing.module';
+import { DetalleAtencionPageRoutingModule } from './detalle-atencion-routing.module';
 
-import { EditarMascotaPage } from './editar-mascota.page';
+import { DetalleAtencionPage } from './detalle-atencion.page';
 
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    EditarMascotaPageRoutingModule
+    DetalleAtencionPageRoutingModule
   ]
 })
-export class EditarMascotaPageModule {}
+export class DetalleAtencionPageModule {}

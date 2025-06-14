@@ -1,0 +1,34 @@
+<app-header  backButton="/home" title="Atención"></app-header>
+
+<ion-content class="fondo">
+
+<!-----------------------HISTORIAL DE ATENCION----------------------------------->
+
+<h2>Historial de atención</h2>
+
+  <ion-card *ngFor="let atencion of historialAtenciones" class="card2" (click)="verDetalle(atencion)">
+      <h3>{{ atencion.mascota.masc_nom }}</h3>
+      <p><strong>Fecha:</strong> {{ atencion.fecha_hora_atencion | date: 'medium'}}</p>
+      <p><strong>Motivo:</strong> {{ atencion.motivo_consulta.motivo }}</p>
+      <p><strong>Diagnóstico:</strong> {{ atencion.diagnostico }}</p>
+
+  </ion-card>
+
+  <ion-card *ngIf="historialAtenciones.length === 0" class="card2">
+    <ion-card-content class="ion-text-center">
+      No hay atenciones médicas registradas aún.
+    </ion-card-content>
+  </ion-card>
+
+
+<!-----------------------HISTORIAL DE ATENCION----------------------------------->
+
+  <!----------- Botón agregar atencion ---------------->
+<div class="boton-agregar">
+  <ion-button class="agregar-atencion" expand="block"  (click)="irAgregarAtencion()">
+    <ion-icon name="add" slot="start"></ion-icon> Nueva Atención
+  </ion-button>
+</div>
+<!----------- Botón agregar atencion ---------------->
+  
+</ion-content>

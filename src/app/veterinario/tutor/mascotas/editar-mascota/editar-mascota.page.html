@@ -2,7 +2,7 @@
 
 <ion-content class="fondo">
   <ion-card class="ion-card">
-    <form [formGroup]="mascotaForm" (ngSubmit)="actualizarMascota()">
+    <form [formGroup]="mascotaForm" (ngSubmit)="guardarMascota()">
       <ion-list>
 
         <ion-item>
@@ -59,7 +59,6 @@
           <ion-select
             interface="popover"
             formControlName="id_especie"
-            (ionChange)="cargarDependencias()"
             required
           >
             <ion-select-option

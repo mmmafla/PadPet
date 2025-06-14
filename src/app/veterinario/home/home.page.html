@@ -1,6 +1,6 @@
 <app-header title="Bienvenido"></app-header>
 
-<ion-content>
+<ion-content class="fondo">
 
 <ion-grid>
   <!----perfil-->
@@ -56,14 +56,14 @@
 
       <!---CONFIGURACION--->
       <ion-col size="12">
-        <ion-card  class="ion-card-otros">
+        <ion-card  class="ion-card-otros" [routerLink]="['/atencion-medica']">
           <ion-card-header>
             <div>
-              <ion-card-title>CITAS</ion-card-title>
+              <ion-card-title>CITA MÉDICA</ion-card-title>
             </div>
           </ion-card-header>
           <ion-card-content class="texto">
-            Agrega una nueva cita medica
+            Agrega una nueva consulta médica
           </ion-card-content>
         </ion-card>
       </ion-col>

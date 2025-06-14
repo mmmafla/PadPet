@@ -5,11 +5,19 @@
   }
   //  card datos medico
   .perfil-card{
-    box-shadow: 0 0 0;
-    background: rgba(168, 207, 255, 0.6);
-    border-radius: 20px; 
-    margin-bottom: 50px;
-    margin-top: 20px;
+    background: rgb(241, 246, 255);
+    border-radius: 20px;
+
+    margin-top: 50px;
+    margin-bottom: 40px;
+
+    padding-top: 20px;
+    padding-bottom: 20px;
+
+    border: 1px solid rgb(255, 255, 255);
+
+        cursor: pointer;
+
   }
   .img-perfil {
     display: flex;
@@ -33,15 +41,9 @@
   }
  // 
 
- .icono {
-  font-size: 50px; 
-  color: #F7A072;
-
-}
-
 .icono2 {
   font-size: 50px; 
-  color: #0FA3B1 ;
+  color: #658faf ;
 
 }
 
@@ -51,8 +53,8 @@
     padding-bottom: 1%;
     padding-left: 5%;
     padding-right: 5%;
-    border: 1px solid rgb(100, 181, 239);
-    box-shadow: 0 0 0px;
+    border: 1px solid rgb(133, 157, 175);
+    box-shadow: #658faf;
     background: #fffffa;
     border-radius: 20px; 
     text-align: center;
@@ -71,8 +73,8 @@
     padding-bottom: 1%;
     padding-left: 5%;
     padding-right: 5%;
-    border: 1px solid rgb(100, 181, 239);
-    box-shadow: 0 0 0px;
+    border: 1px solid rgb(133, 157, 175);
+    box-shadow: #658faf;
     background: #fffffa;
     border-radius: 20px; 
     text-align: center;

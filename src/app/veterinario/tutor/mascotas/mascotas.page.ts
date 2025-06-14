@@ -32,6 +32,9 @@ export class MascotasPage implements OnInit {
     this.runTutor = this.route.snapshot.paramMap.get('run_tutor') || '';
     await this.cargarMascotas();
   }
+    async ionViewWillEnter() {
+    await this.cargarMascotas();
+  }
 
   async cargarMascotas() {
     // 1. Mascotas básicas

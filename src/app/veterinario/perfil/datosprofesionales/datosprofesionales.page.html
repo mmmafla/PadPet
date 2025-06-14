@@ -1,8 +1,12 @@
 <app-header backButton="/perfil" title="Datos profesionales"></app-header>
 
-<ion-content>
+<ion-content class="fondo">
+
 
   <ion-card class="ion-card">
+
+      <h2>Datos profesionales</h2>
+<p style="text-align: center;">Necesitas completar tú perfil como médico veterinario para utilizar nuestra aplicación</p>
     <form [formGroup]="form" (ngSubmit)="guardarDatos()">
 
       <!-- PAÍS -->
@@ -41,10 +45,28 @@
         <ion-input type="number" formControlName="anoTitulacion"></ion-input>
       </ion-item>
 
+      <!-- FOTO TÍTULO PROFESIONAL -->
+      <ion-item lines="none">
+        <ion-label>Imagen Título Profesional</ion-label>
+      </ion-item>
+
+      <ion-item lines="none">
+        <input type="file" (change)="subirImagenCertificado($event)" accept="image/*,.pdf" />
+      </ion-item>
+
+      <ion-item *ngIf="fotoTituloUrl" lines="none" class="ion-padding-top">
+        <img [src]="fotoTituloUrl" alt="Foto Título" style="max-width: 100%; border-radius: 12px;" />
+      </ion-item>
+
+      <ion-button *ngIf="fotoTituloUrl" color="danger" expand="full" shape="round" (click)="eliminarImagenCertificado()">
+        Eliminar imagen
+      </ion-button>
+
       <!-- BOTÓN GUARDAR -->
       <ion-button expand="full" type="submit" [disabled]="!form.valid" shape="round">
-        Guardar datos
+        Enviar información
       </ion-button>
+
     </form>
   </ion-card>
 
