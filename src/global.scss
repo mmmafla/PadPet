@@ -1,5 +1,5 @@
-fondo{
-    --background: linear-gradient(0deg, rgb(105, 176, 247) 0%, rgb(253, 253, 253) 30%);
+.fondo{
+    --background: linear-gradient(20deg, rgb(175, 186, 235) 10%, rgb(253, 253, 253) 60%);
   }
 
 
@@ -26,6 +26,33 @@ fondo{
     border-radius: 20px; 
 }
 
+  .card2{
+    padding-top: 1%;
+    padding-bottom: 1%;
+    padding-left: 5%;
+    padding-right: 5%;
+    margin-left: 5%;
+    margin-right: 5%;
+    background: rgb(251, 251, 251);
+    border: 1px solid rgb(100, 181, 239);
+    box-shadow: 0 0 0px;
+    border-radius: 20px; 
+}
+  .card3{
+    padding-top:5%;
+    padding-bottom: 5%;
+    padding-left: 5%;
+    padding-right: 5%;
+    margin-left: 5%;
+    margin-right: 5%;
+    background: rgb(251, 251, 251);
+    border: 1px solid rgb(100, 181, 239);
+    box-shadow: 0 0 0px;
+    border-radius: 20px; 
+}
+
+
+
   h2{
     font-family: system-ui;
     text-align: center;
@@ -37,8 +64,8 @@ fondo{
   h3{
     font-family: system-ui;
     text-transform: uppercase;
+    font-size: medium;
     letter-spacing: 2px;
-    font-weight:bolder;
     color: #192c72 ;
   }
   h4{
@@ -68,6 +95,21 @@ p{
     margin-top: 20px;
     display: block;
 
+  }
+
+  .boton-guardar-generico{
+  --background: #ffbf9a ; 
+  --color: #000000;
+  --border-radius: 15px;
+  align-items: center;
+  font-size: 15px;
+  font-weight: 500;
+  text-transform: uppercase;
+      margin-top: 20px;
+    display: block;
+
+   
+    
   }
 
 
