@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'; 
+import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -38,7 +38,6 @@ export class AgregarMascotaPage implements OnInit {
     private router: Router,
     private toastController: ToastController
   ) {
-    // Inicializo el formGroup aquí para que nunca sea undefined
     this.mascotaForm = this.fb.group({
       masc_nom: ['', Validators.required],
       masc_nacimiento: [null],
@@ -50,7 +49,7 @@ export class AgregarMascotaPage implements OnInit {
       masc_esterilizado: [''],
       masc_num_chip: [null],
       id_especie: ['', Validators.required],
-      id_raza: [null],
+      id_raza: [null, Validators.required], // requerido
       id_grupo_sanguineo: [null],
       masc_observaciones: [''],
       id_estado: ['', Validators.required],
@@ -62,7 +61,6 @@ export class AgregarMascotaPage implements OnInit {
     this.runTutor = this.route.snapshot.paramMap.get('run_tutor') || '';
     this.mascotaForm.patchValue({ run_tutor: this.runTutor });
 
-    // Obtener id_auth del usuario logueado (cliente Supabase)
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -75,9 +73,18 @@ export class AgregarMascotaPage implements OnInit {
 
     this.id_auth = user.id;
 
-    // Cargar especies filtradas según preferencias usando id_auth
     await this.cargarEspeciesFiltradas();
     await this.cargarEstados();
+
+    // Detectar cambio de especie para cargar razas y grupos sanguíneos
+    this.mascotaForm.get('id_especie')?.valueChanges.subscribe(() => {
+      this.cargarDependencias();
+    });
+
+    // Detectar cambio de fecha de nacimiento para calcular edad
+    this.mascotaForm.get('masc_nacimiento')?.valueChanges.subscribe(() => {
+      this.actualizarEdad();
+    });
   }
 
   async cargarEspeciesFiltradas() {
@@ -106,6 +113,12 @@ export class AgregarMascotaPage implements OnInit {
 
     if (!razasRes.error) this.razas = razasRes.data || [];
     if (!gruposRes.error) this.gruposSanguineos = gruposRes.data || [];
+
+    // Limpiar valores previos si cambia especie
+    this.mascotaForm.patchValue({
+      id_raza: null,
+      id_grupo_sanguineo: null,
+    });
   }
 
   async cargarEstados() {
@@ -123,6 +136,7 @@ export class AgregarMascotaPage implements OnInit {
       this.mascotaForm.patchValue({ masc_edad: null });
       return;
     }
+
     const nacimiento = new Date(fechaNacimiento);
     const hoy = new Date();
     let edad = hoy.getFullYear() - nacimiento.getFullYear();
@@ -130,6 +144,7 @@ export class AgregarMascotaPage implements OnInit {
     if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
       edad--;
     }
+
     this.mascotaForm.patchValue({ masc_edad: edad });
   }
 
@@ -141,7 +156,6 @@ export class AgregarMascotaPage implements OnInit {
 
     const formData = { ...this.mascotaForm.value };
 
-    // Conversión a número donde corresponde
     formData.masc_num_chip = formData.masc_num_chip
       ? Number(formData.masc_num_chip)
       : null;

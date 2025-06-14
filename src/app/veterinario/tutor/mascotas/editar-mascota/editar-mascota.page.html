@@ -6,8 +6,10 @@
       <ion-list>
 
         <ion-item>
-          <ion-label position="stacked">Nombre de la mascota</ion-label>
-          <ion-input type="text" formControlName="masc_nom" required></ion-input>
+          <ion-label position="stacked">
+            Nombre de la mascota <span style="color: red">*</span>
+          </ion-label>
+          <ion-input type="text" formControlName="masc_nom"></ion-input>
         </ion-item>
 
         <ion-item>
@@ -55,11 +57,12 @@
         </ion-item>
 
         <ion-item>
-          <ion-label position="stacked">Especie</ion-label>
+          <ion-label position="stacked">
+            Especie <span style="color: red">*</span>
+          </ion-label>
           <ion-select
             interface="popover"
             formControlName="id_especie"
-            required
           >
             <ion-select-option
               *ngFor="let especie of especies"
@@ -71,7 +74,9 @@
         </ion-item>
 
         <ion-item>
-          <ion-label position="stacked">Raza</ion-label>
+          <ion-label position="stacked">
+            Raza <span style="color: red">*</span>
+          </ion-label>
           <ion-select interface="popover" formControlName="id_raza">
             <ion-select-option *ngFor="let raza of razas" [value]="raza.id_raza">
               {{ raza.nom_raza }}
@@ -97,8 +102,10 @@
         </ion-item>
 
         <ion-item>
-          <ion-label position="stacked">Estado</ion-label>
-          <ion-select interface="popover" formControlName="id_estado" required>
+          <ion-label position="stacked">
+            Estado <span style="color: red">*</span>
+          </ion-label>
+          <ion-select interface="popover" formControlName="id_estado">
             <ion-select-option *ngFor="let estado of estados" [value]="estado.id_estado">
               {{ estado.estado }}
             </ion-select-option>

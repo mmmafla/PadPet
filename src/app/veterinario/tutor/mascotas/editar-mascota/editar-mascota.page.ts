@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core'; 
+import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
   FormGroup,
@@ -50,7 +50,7 @@ export class EditarMascotaPage implements OnInit {
       masc_esterilizado: [''],
       masc_num_chip: [null],
       id_especie: ['', Validators.required],
-      id_raza: [null],
+      id_raza: [null, Validators.required], // ✅ Requerido ahora
       id_grupo_sanguineo: [null],
       masc_observaciones: [''],
       id_estado: ['', Validators.required],
@@ -59,12 +59,10 @@ export class EditarMascotaPage implements OnInit {
   }
 
   async ngOnInit() {
-    // Obtener parámetros id_masc y run_tutor de la ruta
     this.id_masc = this.route.snapshot.paramMap.get('id_masc') || '';
     this.runTutor = this.route.snapshot.paramMap.get('run_tutor') || '';
     this.mascotaForm.patchValue({ run_tutor: this.runTutor });
 
-    // Obtener usuario logueado
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -77,20 +75,13 @@ export class EditarMascotaPage implements OnInit {
 
     this.id_auth = user.id;
 
-    // Cargar especies filtradas por preferencias
     await this.cargarEspeciesFiltradas();
-
-    // Cargar estados (general, sin filtro)
     await this.cargarEstados();
-
-    // Cargar datos actuales de la mascota a editar
     await this.cargarDatosMascota();
 
-    // Suscribirse a cambios en especie para recargar dependencias
     this.mascotaForm.get('id_especie')?.valueChanges.subscribe(async (idEspecie) => {
       if (idEspecie) {
         await this.cargarDependencias(idEspecie);
-        // Resetear id_raza y id_grupo_sanguineo al cambiar especie para evitar inconsistencias
         this.mascotaForm.patchValue({ id_raza: null, id_grupo_sanguineo: null });
       } else {
         this.razas = [];
@@ -114,7 +105,6 @@ export class EditarMascotaPage implements OnInit {
 
     this.especies = data?.map((pref) => pref.id_especie) || [];
 
-    // Si no hay especies preferidas, mostrar mensaje
     if (this.especies.length === 0) {
       this.presentToast('No tiene especies preferidas asignadas', 'warning');
     }
@@ -128,21 +118,13 @@ export class EditarMascotaPage implements OnInit {
       supabase.from('grupo_sanguineo').select('*').eq('id_especie', idEspecie),
     ]);
 
-    if (!razasRes.error) this.razas = razasRes.data || [];
-    else this.razas = [];
-
-    if (!gruposRes.error) this.gruposSanguineos = gruposRes.data || [];
-    else this.gruposSanguineos = [];
+    this.razas = razasRes.error ? [] : razasRes.data || [];
+    this.gruposSanguineos = gruposRes.error ? [] : gruposRes.data || [];
   }
 
   async cargarEstados() {
     const { data, error } = await supabase.from('estado_mascota').select('*');
-    if (error) {
-      console.error('Error cargando estados:', error);
-      this.estados = [];
-    } else {
-      this.estados = data || [];
-    }
+    this.estados = error ? [] : data || [];
   }
 
   async cargarDatosMascota() {
@@ -164,7 +146,6 @@ export class EditarMascotaPage implements OnInit {
       return;
     }
 
-    // Verificar que la especie esté en las especies preferidas del veterinario
     const especieId = data.id_especie;
     if (!this.especies.find((e) => e.id_especie === especieId)) {
       this.presentToast(
@@ -173,10 +154,8 @@ export class EditarMascotaPage implements OnInit {
       );
     }
 
-    // Cargar dependencias para la especie actual (razas, grupos sanguíneos)
     await this.cargarDependencias(especieId);
 
-    // Patch form con datos de la mascota (ajustar si es necesario la estructura)
     this.mascotaForm.patchValue({
       masc_nom: data.masc_nom,
       masc_nacimiento: data.masc_nacimiento,
@@ -202,6 +181,7 @@ export class EditarMascotaPage implements OnInit {
       this.mascotaForm.patchValue({ masc_edad: null });
       return;
     }
+
     const nacimiento = new Date(fechaNacimiento);
     const hoy = new Date();
     let edad = hoy.getFullYear() - nacimiento.getFullYear();
@@ -209,6 +189,7 @@ export class EditarMascotaPage implements OnInit {
     if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
       edad--;
     }
+
     this.mascotaForm.patchValue({ masc_edad: edad });
   }
 
@@ -219,19 +200,13 @@ export class EditarMascotaPage implements OnInit {
     }
 
     const formData = { ...this.mascotaForm.value };
-
-    formData.masc_num_chip = formData.masc_num_chip
-      ? Number(formData.masc_num_chip)
-      : null;
+    formData.masc_num_chip = formData.masc_num_chip ? Number(formData.masc_num_chip) : null;
     formData.masc_edad = formData.masc_edad ? Number(formData.masc_edad) : null;
     formData.id_especie = Number(formData.id_especie);
     formData.id_raza = formData.id_raza ? Number(formData.id_raza) : null;
-    formData.id_grupo_sanguineo = formData.id_grupo_sanguineo
-      ? Number(formData.id_grupo_sanguineo)
-      : null;
+    formData.id_grupo_sanguineo = formData.id_grupo_sanguineo ? Number(formData.id_grupo_sanguineo) : null;
     formData.id_estado = Number(formData.id_estado);
 
-    // Actualizar mascota (update)
     const { error } = await supabase
       .from('mascota')
       .update(formData)
