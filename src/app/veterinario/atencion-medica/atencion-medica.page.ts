@@ -104,8 +104,8 @@ async cargarHistorial() {
       this.router.navigate(['/veterinario/atencion-medica/agregar-atencion-medica']);
   }
 
-verDetalle(atencion: any) {
-  this.router.navigate(['/detalle-atencion'], { state: { atencion } });
+verDetalle(id: number) {
+  this.router.navigate(['/detalle-atencion'], { state: { id: id }  });
 }
 
 }
