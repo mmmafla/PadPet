@@ -33,7 +33,7 @@ export class DatosatencionPage implements OnInit {
   muestras: any[] = [];
   muestrasSeleccionadas: string[] = [];
 
-  id_usuario: string = '';
+  id_usuario: string = ''; // auth user id
 
   async ngOnInit() {
     await this.ionViewWillEnter();
@@ -55,7 +55,7 @@ export class DatosatencionPage implements OnInit {
   }
 
   private async cargarEspecies() {
-    const { data, error } = await this.supabase.from('tipo_especie').select('*');
+    const { data, error } = await this.supabase.from('especie').select('*');
     if (error) return this.mostrarToast('Error al cargar especies', 'danger');
     this.especies = data;
   }
@@ -90,38 +90,15 @@ export class DatosatencionPage implements OnInit {
     this.muestrasSeleccionadas = this.toggleItem(this.muestrasSeleccionadas, id);
   }
 
-  private async obtenerIdPreferencia(): Promise<number> {
-    let { data: preferencia, error } = await this.supabase
-      .from('preferencias_atencion')
-      .select('id_preferencia')
-      .eq('id_auth', this.id_usuario)
-      .single();
-
-    if (error && error.code === 'PGRST116') {
-      const { data: nueva, error: errorInsert } = await this.supabase
-        .from('preferencias_atencion')
-        .insert({ id_auth: this.id_usuario })
-        .select('id_preferencia')
-        .single();
-
-      if (errorInsert) throw errorInsert;
-      preferencia = nueva;
-    }
-
-    return preferencia!.id_preferencia;
-  }
-
   async guardarEspecies() {
     try {
-      const idPreferencia = await this.obtenerIdPreferencia();
-
       await this.supabase
         .from('preferencia_especie')
         .delete()
-        .eq('id_preferencia', idPreferencia);
+        .eq('id_auth', this.id_usuario);
 
       const registros = this.especiesSeleccionadas.map(id => ({
-        id_preferencia: idPreferencia,
+        id_auth: this.id_usuario,
         id_especie: id
       }));
 
@@ -141,15 +118,13 @@ export class DatosatencionPage implements OnInit {
 
   async guardarExamenes() {
     try {
-      const idPreferencia = await this.obtenerIdPreferencia();
-
       await this.supabase
         .from('preferencia_examen')
         .delete()
-        .eq('id_preferencia', idPreferencia);
+        .eq('id_auth', this.id_usuario);
 
       const registros = this.examenesSeleccionados.map(id => ({
-        id_preferencia: idPreferencia,
+        id_auth: this.id_usuario,
         id_examen: id
       }));
 
@@ -169,15 +144,13 @@ export class DatosatencionPage implements OnInit {
 
   async guardarMuestras() {
     try {
-      const idPreferencia = await this.obtenerIdPreferencia();
-
       await this.supabase
         .from('preferencia_muestra')
         .delete()
-        .eq('id_preferencia', idPreferencia);
+        .eq('id_auth', this.id_usuario);
 
       const registros = this.muestrasSeleccionadas.map(id => ({
-        id_preferencia: idPreferencia,
+        id_auth: this.id_usuario,
         id_muestra: id
       }));
 
@@ -196,23 +169,21 @@ export class DatosatencionPage implements OnInit {
   }
 
   private async cargarSeleccionadas() {
-    const idPreferencia = await this.obtenerIdPreferencia();
-
     const [especies, examenes, muestras] = await Promise.all([
       this.supabase
         .from('preferencia_especie')
         .select('id_especie')
-        .eq('id_preferencia', idPreferencia),
+        .eq('id_auth', this.id_usuario),
 
       this.supabase
         .from('preferencia_examen')
         .select('id_examen')
-        .eq('id_preferencia', idPreferencia),
+        .eq('id_auth', this.id_usuario),
 
       this.supabase
         .from('preferencia_muestra')
         .select('id_muestra')
-        .eq('id_preferencia', idPreferencia)
+        .eq('id_auth', this.id_usuario)
     ]);
 
     if (especies.data) {
