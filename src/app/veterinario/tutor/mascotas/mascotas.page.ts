@@ -32,7 +32,8 @@ export class MascotasPage implements OnInit {
     this.runTutor = this.route.snapshot.paramMap.get('run_tutor') || '';
     await this.cargarMascotas();
   }
-    async ionViewWillEnter() {
+
+  async ionViewWillEnter() {
     await this.cargarMascotas();
   }
 
@@ -138,14 +139,8 @@ export class MascotasPage implements OnInit {
     await this.cargarMascotas();
     event.detail.complete();
   }
-
-
-
-  // --------------------------------------------------HISTORIAL CLINICO
-
-verHistorialClinico(idMasc: number) {
-  this.router.navigate([`/veterinario/tutor/mascotas/${this.runTutor}/${idMasc}/historial-clinico`]);
-}
-
-
+  // -------- Navegar a historial clínico ----------
+  verHistorialClinico(idMasc: number) {
+    this.router.navigate([`/veterinario/tutor/mascotas/${this.runTutor}/${idMasc}/historial-clinico`]);
+  }
 }
