@@ -3,7 +3,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { IonicModule, ToastController } from '@ionic/angular';
-import { FormularioComponent } from 'src/app/componentes/formulario/formulario.component';
+
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
 import { SupabaseService } from 'src/app/services/supabase.service';
 
@@ -12,10 +12,15 @@ import { SupabaseService } from 'src/app/services/supabase.service';
   templateUrl: './datosatencion.page.html',
   styleUrls: ['./datosatencion.page.scss'],
   standalone: true,
-  imports: [IonicModule, RouterModule, ReactiveFormsModule, CommonModule, HeaderComponent]
-
+  imports: [
+    IonicModule,
+    RouterModule,
+    ReactiveFormsModule,
+    CommonModule,
+    HeaderComponent
+  ]
 })
-export class DatosatencionPage implements OnInit { 
+export class DatosatencionPage implements OnInit {
   supabase = inject(SupabaseService);
   toastController = inject(ToastController);
 
@@ -28,95 +33,171 @@ export class DatosatencionPage implements OnInit {
   muestras: any[] = [];
   muestrasSeleccionadas: string[] = [];
 
+  id_usuario: string = ''; // auth user id
 
-  ngOnInit() {
-    this.cargarEspecies();
-    this.cargarExamenes();
-    this.cargarMuestras();
+  async ngOnInit() {
+    await this.ionViewWillEnter();
   }
 
-  async cargarEspecies() {
-    const { data, error } = await this.supabase
-      .from('tipo_especie')
-      .select('*');
+  async ionViewWillEnter() {
+    await this.obtenerUsuario();
+    await this.cargarEspecies();
+    await this.cargarExamenes();
+    await this.cargarMuestras();
+    await this.cargarSeleccionadas();
+  }
 
-    if (error) {
-      console.error('Error al cargar especies:', error.message);
-      this.mostrarToast('Error al cargar especies', 'danger');
-      return;
+  private async obtenerUsuario() {
+    const { data } = await this.supabase.auth.getUser();
+    if (data?.user) {
+      this.id_usuario = data.user.id;
     }
+  }
 
+  private async cargarEspecies() {
+    const { data, error } = await this.supabase.from('especie').select('*');
+    if (error) return this.mostrarToast('Error al cargar especies', 'danger');
     this.especies = data;
   }
-  async cargarExamenes() {
-    const { data, error } = await this.supabase
-      .from('tipo_examen')
-      .select('*');
 
-    if (error) {
-      console.error('Error al cargar exámenes:', error.message);
-      this.mostrarToast('Error al cargar exámenes', 'danger');
-      return;
-    }
-
+  private async cargarExamenes() {
+    const { data, error } = await this.supabase.from('tipo_examen').select('*');
+    if (error) return this.mostrarToast('Error al cargar exámenes', 'danger');
     this.examenes = data;
   }
 
-  async cargarMuestras() {
-  const { data, error } = await this.supabase
-    .from('tipo_muestra_medica')
-    .select('*');
-
-  if (error) {
-    console.error('Error al cargar muestras médicas:', error.message);
-    this.mostrarToast('Error al cargar muestras médicas', 'danger');
-    return;
+  private async cargarMuestras() {
+    const { data, error } = await this.supabase.from('tipo_muestra_medica').select('*');
+    if (error) return this.mostrarToast('Error al cargar muestras médicas', 'danger');
+    this.muestras = data;
   }
 
-  this.muestras = data;
-}
+  toggleItem(lista: string[], id: string): string[] {
+    return lista.includes(id)
+      ? lista.filter(i => i !== id)
+      : [...lista, id];
+  }
 
   toggleEspecie(id: string) {
-    if (this.especiesSeleccionadas.includes(id)) {
-      this.especiesSeleccionadas = this.especiesSeleccionadas.filter(e => e !== id);
-    } else {
-      this.especiesSeleccionadas.push(id);
-    }
+    this.especiesSeleccionadas = this.toggleItem(this.especiesSeleccionadas, id);
   }
 
   toggleExamen(id: string) {
-    if (this.examenesSeleccionados.includes(id)) {
-      this.examenesSeleccionados = this.examenesSeleccionados.filter(e => e !== id);
-    } else {
-      this.examenesSeleccionados.push(id);
-    }
+    this.examenesSeleccionados = this.toggleItem(this.examenesSeleccionados, id);
   }
 
   toggleMuestra(id: string) {
-  if (this.muestrasSeleccionadas.includes(id)) {
-    this.muestrasSeleccionadas = this.muestrasSeleccionadas.filter(m => m !== id);
-  } else {
-    this.muestrasSeleccionadas.push(id);
+    this.muestrasSeleccionadas = this.toggleItem(this.muestrasSeleccionadas, id);
   }
-}
-
 
   async guardarEspecies() {
-    console.log('Especies seleccionadas:', this.especiesSeleccionadas);
-    this.mostrarToast('Especies guardadas (simulado)', 'success');
-    // Aquí podrías hacer un insert/update en Supabase
+    try {
+      await this.supabase
+        .from('preferencia_especie')
+        .delete()
+        .eq('id_auth', this.id_usuario);
+
+      const registros = this.especiesSeleccionadas.map(id => ({
+        id_auth: this.id_usuario,
+        id_especie: id
+      }));
+
+      if (registros.length > 0) {
+        const { error } = await this.supabase
+          .from('preferencia_especie')
+          .insert(registros);
+        if (error) throw error;
+      }
+
+      this.mostrarToast('Especies guardadas correctamente');
+    } catch (error: any) {
+      console.error('Error guardarEspecies:', error.message || error);
+      this.mostrarToast('Error al guardar especies: ' + error.message, 'danger');
+    }
   }
 
-    async guardarExamenes() {
-    console.log('Exámenes seleccionados:', this.examenesSeleccionados);
-    this.mostrarToast('Exámenes guardados (simulado)', 'success');
+  async guardarExamenes() {
+    try {
+      await this.supabase
+        .from('preferencia_examen')
+        .delete()
+        .eq('id_auth', this.id_usuario);
+
+      const registros = this.examenesSeleccionados.map(id => ({
+        id_auth: this.id_usuario,
+        id_examen: id
+      }));
+
+      if (registros.length > 0) {
+        const { error } = await this.supabase
+          .from('preferencia_examen')
+          .insert(registros);
+        if (error) throw error;
+      }
+
+      this.mostrarToast('Exámenes guardados correctamente');
+    } catch (error: any) {
+      console.error('Error guardarExamenes:', error.message || error);
+      this.mostrarToast('Error al guardar exámenes: ' + error.message, 'danger');
+    }
   }
 
   async guardarMuestras() {
-  console.log('Muestras seleccionadas:', this.muestrasSeleccionadas);
-  this.mostrarToast('Muestras guardadas (simulado)', 'success');
-}
+    try {
+      await this.supabase
+        .from('preferencia_muestra')
+        .delete()
+        .eq('id_auth', this.id_usuario);
 
+      const registros = this.muestrasSeleccionadas.map(id => ({
+        id_auth: this.id_usuario,
+        id_muestra: id
+      }));
+
+      if (registros.length > 0) {
+        const { error } = await this.supabase
+          .from('preferencia_muestra')
+          .insert(registros);
+        if (error) throw error;
+      }
+
+      this.mostrarToast('Muestras guardadas correctamente');
+    } catch (error: any) {
+      console.error('Error guardarMuestras:', error.message || error);
+      this.mostrarToast('Error al guardar muestras: ' + error.message, 'danger');
+    }
+  }
+
+  private async cargarSeleccionadas() {
+    const [especies, examenes, muestras] = await Promise.all([
+      this.supabase
+        .from('preferencia_especie')
+        .select('id_especie')
+        .eq('id_auth', this.id_usuario),
+
+      this.supabase
+        .from('preferencia_examen')
+        .select('id_examen')
+        .eq('id_auth', this.id_usuario),
+
+      this.supabase
+        .from('preferencia_muestra')
+        .select('id_muestra')
+        .eq('id_auth', this.id_usuario)
+    ]);
+
+    if (especies.data) {
+      this.especiesSeleccionadas = especies.data.map(e => e.id_especie);
+    }
+
+    if (examenes.data) {
+      this.examenesSeleccionados = examenes.data.map(e => e.id_examen);
+    }
+
+    if (muestras.data) {
+      this.muestrasSeleccionadas = muestras.data.map(e => e.id_muestra);
+    }
+  }
 
   private async mostrarToast(mensaje: string, color: string = 'success') {
     const toast = await this.toastController.create({

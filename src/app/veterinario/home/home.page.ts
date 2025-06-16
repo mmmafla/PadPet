@@ -3,7 +3,6 @@ import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { SupabaseService } from '../../services/supabase.service';
 import { ReactiveFormsModule } from '@angular/forms';
-import { FormularioComponent } from 'src/app/componentes/formulario/formulario.component';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
 
@@ -23,6 +22,8 @@ export class HomePage implements OnInit {
   runVet = '';
   fotoVet = ''; // si tienes fotos en la BD
 
+  estadoSolicitud: string | null = null;
+  mostrarMensajeSolicitud = false;
 
   formatRut(rut: string): string {
     // Elimina cualquier caracter que no sea número o K/k
@@ -65,24 +66,22 @@ export class HomePage implements OnInit {
     }
 
     try {
-      // Hacer la consulta a Supabase para obtener los datos del veterinario usando el id_auth
       const { data, error } = await this.supabase
-        .from('veterinario')  // Asegúrate de que el nombre de la tabla sea correcto
-        .select('nombre_vet, apellidos_vet, run_vet')
-        .eq('id_auth', user.id)  // Acceder a user.id correctamente
-        .single(); // Obtener un solo registro
+        .from('veterinario')
+        .select('nombre_vet, apellidos_vet, run_vet, estado_solicitud')
+        .eq('id_auth', user.id)
+        .single();
 
       if (error) {
         console.error('Error al obtener los datos del veterinario:', error);
         return;
       }
 
-      // Asignar los datos obtenidos
       if (data) {
         this.nombreVet = `${data.nombre_vet} ${data.apellidos_vet}`;
         this.runVet = this.formatRut(data?.run_vet || '');
-
-        
+        this.estadoSolicitud = data.estado_solicitud;
+        this.mostrarMensajeSolicitud = true;
       } else {
         console.warn('No se encontraron datos para este veterinario.');
       }
