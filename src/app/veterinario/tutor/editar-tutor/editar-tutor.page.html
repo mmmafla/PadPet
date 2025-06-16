@@ -1,12 +1,12 @@
-<app-header backButton="/home" title="Agregar tutor"></app-header>
+<app-header backButton="/home" title="Editar tutor"></app-header>
 
 <ion-content class="fondo">
   <ion-card class="ion-card">
-    <form [formGroup]="tutorForm" (ngSubmit)="guardarTutor()">
+    <form [formGroup]="tutorForm" (ngSubmit)="guardarCambios()">
       <ion-list>
         <ion-item>
           <ion-label position="stacked">RUN Tutor</ion-label>
-          <ion-input type="text" formControlName="run_tutor"></ion-input>
+          <ion-input type="text" formControlName="run_tutor" readonly></ion-input>
         </ion-item>
         <ion-item>
           <ion-label position="stacked">Nombre</ion-label>
@@ -45,7 +45,8 @@
           </ion-select>
         </ion-item>
       </ion-list>
-      <ion-button expand="full" type="submit" [disabled]="tutorForm.invalid" shape="round">Guardar Tutor</ion-button>
+      <ion-button expand="full" type="submit" [disabled]="tutorForm.invalid" shape="round">Guardar Cambios</ion-button>
+     <ion-button size="small" color="danger" (click)="confirmarEliminarTutor(tutorActual)"> Eliminar tutor</ion-button>
     </form>
   </ion-card>
 </ion-content>

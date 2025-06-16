@@ -30,6 +30,11 @@ export class DatosprofesionalesPage implements OnInit {
   fotoTituloUrl: string | null = null;       // Para mostrar preview
   fotoTituloFileName: string | null = null;  // Nombre de archivo en Storage para eliminar
 
+  // Solicitud
+  estadoSolicitud: string | null = null;
+  mensajeSolicitud: string | null = null;
+  solicitudYaExiste = false;
+
   supabase = inject(SupabaseService);
   toastController = inject(ToastController);
   router = inject(Router);
@@ -48,6 +53,8 @@ export class DatosprofesionalesPage implements OnInit {
 
     this.cargarCatalogos();
     this.obtenerRunVetYDatos();
+
+    this.verificarSolicitudExistente();
 
     // Escucha cambios en país para filtrar universidades
     this.form.get('pais')?.valueChanges.subscribe((idPaisSeleccionado) => {
@@ -107,13 +114,15 @@ export class DatosprofesionalesPage implements OnInit {
 
       if (data) {
         this.form.patchValue({
-          universidad: data.id_uni ?? '',
           pais: data.id_pais ?? '',
           especialidad: data.id_especialidad ?? '',
           anoTitulacion: data.anno_titulacion ?? ''
         });
 
         this.filtrarUniversidadesPorPais(data.id_pais);
+                this.form.patchValue({
+          universidad: data.id_uni ?? ''
+               });
 
         // Cargar foto título si existe
         if (data.foto_titulo) {
@@ -284,6 +293,100 @@ export class DatosprofesionalesPage implements OnInit {
     } catch (error) {
       console.error('Error eliminando certificado:', error);
       this.mostrarToast('Error al eliminar certificado', 'danger');
+    }
+  }
+
+  async enviarInformacion() {
+    if (this.form.invalid) {
+      this.mostrarToast('Completa todos los datos antes de enviar la solicitud.', 'warning');
+      return;
+    }
+
+    try {
+      // Verificar si ya existe una solicitud para este run_vet
+      const { data: solicitudesExistentes, error: errorSolicitud } = await this.supabase
+        .from('solicitud')
+        .select('id_solicitud, estado')
+        .eq('run_vet', this.runVet)
+        .order('fecha_envio', { ascending: false })
+        .limit(1);
+
+      if (errorSolicitud) throw errorSolicitud;
+
+      if (!solicitudesExistentes || solicitudesExistentes.length === 0) {
+        // ✅ Insertar nueva solicitud
+        const { error: insertError } = await this.supabase.from('solicitud').insert({
+          run_vet: this.runVet,
+          estado: 'pendiente',
+          fecha_envio: new Date().toISOString(),
+        });
+
+        if (insertError) throw insertError;
+
+      } else {
+        const solicitud = solicitudesExistentes[0];
+
+        if (solicitud.estado === 'rechazada') {
+          // ✅ Reenviar solicitud cambiando estado a pendiente
+          const { error: updateSolicitudError } = await this.supabase
+            .from('solicitud')
+            .update({
+              estado: 'pendiente',
+              comentario: null,
+              fecha_envio: new Date().toISOString()
+            })
+            .eq('id_solicitud', solicitud.id_solicitud);
+
+          if (updateSolicitudError) throw updateSolicitudError;
+
+        } else {
+          // Ya hay una solicitud pendiente o aceptada
+          this.estadoSolicitud = solicitud.estado;
+          this.mensajeSolicitud = 'Ya existe una solicitud enviada.';
+          this.mostrarToast('Ya existe una solicitud enviada.', 'warning');
+          return;
+        }
+      }
+
+      // ✅ Actualizar estado_solicitud en veterinario
+      const { error: updateError } = await this.supabase
+        .from('veterinario')
+        .update({ estado_solicitud: 'pendiente' })
+        .eq('run_vet', this.runVet);
+
+      if (updateError) {
+        console.error('❌ Error actualizando estado_solicitud:', updateError);
+      }
+
+      this.estadoSolicitud = 'pendiente';
+      this.mensajeSolicitud = 'Su solicitud se encuentra pendiente de aprobación.';
+      this.mostrarToast('Solicitud enviada correctamente');
+
+    } catch (error) {
+      console.error('❌ Error al enviar la solicitud:', error);
+      this.mostrarToast('Hubo un error al enviar la solicitud.', 'danger');
+    }
+  }
+
+
+
+  async verificarSolicitudExistente() {
+    const { data: solicitudExistente, error } = await this.supabase
+      .from('solicitud')
+      .select('estado')
+      .eq('run_vet', this.runVet)
+      .order('fecha_envio', { ascending: false })
+      .limit(1);
+
+    if (error) {
+      console.error('Error verificando solicitud:', error);
+      return;
+    }
+
+    if (solicitudExistente && solicitudExistente.length > 0) {
+      this.estadoSolicitud = solicitudExistente[0].estado;
+      this.mensajeSolicitud = 'Ya has enviado una solicitud.';
+      this.solicitudYaExiste = true;
     }
   }
 }

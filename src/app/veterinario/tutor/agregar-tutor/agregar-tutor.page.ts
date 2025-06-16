@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
 import { createClient } from '@supabase/supabase-js';
+import { ActivatedRoute, Router } from '@angular/router';
 
 // Configuración de Supabase
 const supabaseUrl = 'https://irorlonysbmkbdthvrmt.supabase.co';
@@ -23,7 +24,11 @@ export class AgregarTutorPage implements OnInit {
   ciudades: any[] = [];
   runVet: string = '';
 
-  constructor(private fb: FormBuilder) {}
+  constructor(
+    private fb: FormBuilder,
+    private router: Router,
+    private route: ActivatedRoute,
+  ) {}
 
   async ngOnInit() {
     this.tutorForm = this.fb.group({
@@ -101,5 +106,6 @@ export class AgregarTutorPage implements OnInit {
       console.log('Tutor guardado con éxito');
       this.tutorForm.reset();
     }
+        this.router.navigate(['/tutor']);
   }
 }
