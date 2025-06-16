@@ -1,4 +1,4 @@
-<app-header backButton="/veterinario/tutor" title="Agregar Mascota"></app-header>
+<app-header backButton="/tutor" title="Agregar Mascota"></app-header>
 
 <ion-content class="fondo">
   <ion-card class="ion-card">
@@ -6,17 +6,15 @@
       <ion-list>
 
         <ion-item>
-          <ion-label position="stacked">Nombre de la mascota</ion-label>
-          <ion-input type="text" formControlName="masc_nom" required></ion-input>
+          <ion-label position="stacked">
+            Nombre de la mascota <span style="color: red">*</span>
+          </ion-label>
+          <ion-input type="text" formControlName="masc_nom" autocomplete="off"></ion-input>
         </ion-item>
 
         <ion-item>
           <ion-label position="stacked">Fecha de nacimiento</ion-label>
-          <ion-datetime
-            presentation="date"
-            formControlName="masc_nacimiento"
-            (ionChange)="actualizarEdad()"
-          ></ion-datetime>
+          <ion-datetime presentation="date" formControlName="masc_nacimiento" (ionChange)="actualizarEdad()"></ion-datetime>
         </ion-item>
 
         <ion-item>
@@ -31,22 +29,22 @@
 
         <ion-item>
           <ion-label position="stacked">Color</ion-label>
-          <ion-input type="text" formControlName="masc_color"></ion-input>
+          <ion-input type="text" formControlName="masc_color" autocomplete="off"></ion-input>
         </ion-item>
 
         <ion-item>
           <ion-label position="stacked">Tamaño</ion-label>
-          <ion-input type="text" formControlName="masc_tamano"></ion-input>
+          <ion-input type="text" formControlName="masc_tamano" autocomplete="off"></ion-input>
         </ion-item>
 
         <ion-item>
           <ion-label position="stacked">Pelaje</ion-label>
-          <ion-input type="text" formControlName="masc_pelaje"></ion-input>
+          <ion-input type="text" formControlName="masc_pelaje" autocomplete="off"></ion-input>
         </ion-item>
 
         <ion-item>
           <ion-label position="stacked">¿Esterilizado?</ion-label>
-          <ion-input type="text" formControlName="masc_esterilizado"></ion-input>
+          <ion-input type="text" formControlName="masc_esterilizado" autocomplete="off"></ion-input>
         </ion-item>
 
         <ion-item>
@@ -55,25 +53,21 @@
         </ion-item>
 
         <ion-item>
-          <ion-label position="stacked">Especie</ion-label>
-          <ion-select
-            interface="popover"
-            formControlName="id_especie"
-            (ionChange)="cargarDependencias()"
-            required
-          >
-            <ion-select-option
-              *ngFor="let especie of especies"
-              [value]="especie.id_especie"
-            >
+          <ion-label position="stacked">
+            Especie <span style="color: red">*</span>
+          </ion-label>
+          <ion-select interface="popover" formControlName="id_especie" (ionChange)="cargarDependencias()">
+            <ion-select-option *ngFor="let especie of especies" [value]="especie.id_especie">
               {{ especie.nom_especie }}
             </ion-select-option>
           </ion-select>
         </ion-item>
 
         <ion-item>
-          <ion-label position="stacked">Raza</ion-label>
-          <ion-select interface="popover" formControlName="id_raza">
+          <ion-label position="stacked">
+            Raza <span style="color: red">*</span>
+          </ion-label>
+          <ion-select interface="popover" formControlName="id_raza" [disabled]="!mascotaForm.value.id_especie">
             <ion-select-option *ngFor="let raza of razas" [value]="raza.id_raza">
               {{ raza.nom_raza }}
             </ion-select-option>
@@ -82,11 +76,8 @@
 
         <ion-item>
           <ion-label position="stacked">Grupo Sanguíneo</ion-label>
-          <ion-select interface="popover" formControlName="id_grupo_sanguineo">
-            <ion-select-option
-              *ngFor="let grupo of gruposSanguineos"
-              [value]="grupo.id_grupo_sanguineo"
-            >
+          <ion-select interface="popover" formControlName="id_grupo_sanguineo" [disabled]="!mascotaForm.value.id_especie">
+            <ion-select-option *ngFor="let grupo of gruposSanguineos" [value]="grupo.id_grupo_sanguineo">
               {{ grupo.nom_grupo_sanguineo }}
             </ion-select-option>
           </ion-select>
@@ -98,8 +89,10 @@
         </ion-item>
 
         <ion-item>
-          <ion-label position="stacked">Estado</ion-label>
-          <ion-select interface="popover" formControlName="id_estado" required>
+          <ion-label position="stacked">
+            Estado <span style="color: red">*</span>
+          </ion-label>
+          <ion-select interface="popover" formControlName="id_estado">
             <ion-select-option *ngFor="let estado of estados" [value]="estado.id_estado">
               {{ estado.estado }}
             </ion-select-option>
