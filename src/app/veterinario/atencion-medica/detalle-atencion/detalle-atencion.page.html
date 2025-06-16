@@ -5,6 +5,10 @@
 <ion-card class="card3">
     <h2>Atención de {{ atencion?.mascota?.masc_nom }}</h2>
   <h3 style="text-align: center;">Dueño: {{atencion.mascota?.tutor?.nombre_tutor}} {{atencion.mascota?.tutor?.apellidos_tutor}} </h3>
+    <p><strong>Correo Tutor:</strong> {{ atencion?.mascota?.tutor?.correo_tutor }}</p>
+    <p><strong>Teléfono Tutor:</strong> {{ atencion?.mascota?.tutor?.celular_tutor }}</p>
+
+  
   <p><strong>Fecha:</strong> {{ atencion?.fecha_hora_atencion | date:'medium' }}</p>
   <p><strong>Motivo:</strong> {{ atencion?.motivo_consulta?.motivo }}</p>
   <p><strong>Anamnesis:</strong> {{atencion?.anamnesis}}</p>

@@ -14,6 +14,10 @@ const routes: Routes = [
   {
     path: 'editar-mascota',
     loadChildren: () => import('./editar-mascota/editar-mascota.module').then( m => m.EditarMascotaPageModule)
+  },
+  {
+    path: 'historial-clinico',
+    loadChildren: () => import('./historial-clinico/historial-clinico.module').then( m => m.HistorialClinicoPageModule)
   }
 
 ];

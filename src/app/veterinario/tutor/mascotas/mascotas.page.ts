@@ -138,4 +138,14 @@ export class MascotasPage implements OnInit {
     await this.cargarMascotas();
     event.detail.complete();
   }
+
+
+
+  // --------------------------------------------------HISTORIAL CLINICO
+
+verHistorialClinico(idMasc: number) {
+  this.router.navigate([`/veterinario/tutor/mascotas/${this.runTutor}/${idMasc}/historial-clinico`]);
+}
+
+
 }

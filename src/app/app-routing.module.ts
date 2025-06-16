@@ -101,8 +101,16 @@ const routes: Routes = [
   {
     path: 'editar-atencion',
     loadChildren: () => import('./veterinario/atencion-medica/editar-atencion/editar-atencion.module').then( m => m.EditarAtencionPageModule ),
+     canActivate: [AuthGuard] 
     
-  }
+  },
+{
+  path: 'veterinario/tutor/mascotas/:run_tutor/:id_masc/historial-clinico',
+  loadChildren: () => import("./veterinario/tutor/mascotas/historial-clinico/historial-clinico.module").then(m => m.HistorialClinicoPageModule),
+  canActivate: [AuthGuard] 
+},
+
+
  
 ];
 

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
@@ -8,6 +8,7 @@ import { HeaderComponent } from 'src/app/componentes/header/header.component';
 import { jsPDF } from "jspdf";
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
+import { AlertController } from '@ionic/angular';
 
 const supabaseUrl = 'https://irorlonysbmkbdthvrmt.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyb3Jsb255c2Jta2JkdGh2cm10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYyODgwMDQsImV4cCI6MjA2MTg2NDAwNH0.s-ZEteHxMWX43NCQIuNmTWpbBoEUxseKyg_YaXpi6Ek';
@@ -23,6 +24,8 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 export class DetalleAtencionPage implements OnInit {
   atencionId!: number;
   atencion: any ;
+
+    alertController = inject(AlertController);
 
   constructor(private router: Router) {
     const navigation = this.router.getCurrentNavigation();
@@ -42,8 +45,8 @@ export class DetalleAtencionPage implements OnInit {
       .select(`
         *, 
         mascota (
-          masc_nom, 
-          tutor ( nombre_tutor, apellidos_tutor, run_tutor )
+          *, 
+          tutor ( nombre_tutor, apellidos_tutor, run_tutor, correo_tutor, celular_tutor)
         ),
         motivo_consulta ( motivo ),
         hidratacion ( estado_hidratacion ),
@@ -127,17 +130,73 @@ export class DetalleAtencionPage implements OnInit {
     });
 
     // guardar primero en el dispositivo
+  const fileName = `Atencion_${this.atencion?.mascota?.masc_nom?.replace(/ /g,'_')}_${new Date().toISOString().split('T')[0]}.pdf`;
     const file = await Filesystem.writeFile({ 
-      path: `Atencion_${this.atencion?.mascota?.masc_nom}_${new Date().toLocaleDateString()}.pdf`,
+      path: fileName,
       data: base64,
       directory: Directory.Cache
     });
-
-    // luego compartir
-    await Share.share({ 
-      title: 'Atención Médica',
-      text: 'Aquí están los resultados de la última consulta',
-      url: file.uri
-    });
+  // luego mostrar opciones de envío
+  await this.showSendOptions(file.uri);
   }
+
+
+  // ------------
+async showSendOptions(pdfPath: string) {
+  const email = this.atencion?.mascota?.tutor?.correo_tutor;
+  const phone = this.atencion?.mascota?.tutor?.celular_tutor;
+
+  const alert = await this.alertController.create({ 
+    header:'Enviar PDF',
+    message:'¿Cómo deseas compartir el PDF de la última consulta?',
+    buttons: [
+      {
+        text:'Correo electrónico',
+        handler: () => {
+          if (email) {
+            // Esto no adjunta PDF pero deja redactado el correo
+            window.location.href = `mailto:${email}?subject=Resultado de Consulta&body=Adjunto el PDF de la última consulta. Por favor, revisa el adjunto.`;
+          } else {
+            console.warn('Tutor sin email');
+          }
+        }
+      },
+    {
+  text:'WhatsApp',
+  handler: () => {
+  let phone = this.atencion?.mascota?.tutor?.celular_tutor ?? '';
+  phone = String(phone).trim();
+  phone = phone.replace(/\D/g, '');
+  if (phone.startsWith('0')) {
+    phone = phone.substring(1);
+  }
+  const phoneConPrefijo = `569${phone}`;
+  if (phoneConPrefijo.length === 11) {
+    window.open(`https://wa.me/${phoneConPrefijo}?text=${encodeURIComponent('Aquí están los resultados de la última consulta.')}`, '_blank');
+  } else {
+
+  }
+}
+}
+
+    
+    
+    
+    
+      ,
+      {
+        text:'General',
+        handler: async () => {
+          await Share.share({ 
+            title:'Atención Médica',
+            text:'Resultado de la última consulta',
+            url: pdfPath
+          });
+        }
+      }
+    ]
+  });
+
+  await alert.present();
+}
 }
