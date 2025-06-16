@@ -66,17 +66,52 @@ const routes: Routes = [
     canActivate: [AuthGuard] 
   },
   {
-    path: 'atencion-medica',
-    loadChildren: () => import('./veterinario/atencion-medica/atencion-medica.module').then( m => m.AtencionMedicaPageModule),
-    canActivate: [AuthGuard] 
+    path: 'veterinario/tutor/editar-tutor/:runTutor',
+    loadComponent: () => import('./veterinario/tutor/editar-tutor/editar-tutor.page').then(m => m.EditarTutorPage),
+    canActivate: [AuthGuard]
   },
   {
+    path: 'veterinario/tutor/mascotas/:run_tutor',
+    loadComponent: () => import('./veterinario/tutor/mascotas/mascotas.page').then(m => m.MascotasPage)
+  },
+  {
+    path: 'veterinario/tutor/mascotas/:run_tutor/agregar',
+    loadComponent: () => import('./veterinario/tutor/mascotas/agregar-mascota/agregar-mascota.page').then(m => m.AgregarMascotaPage),
+    canActivate: [AuthGuard]
+  },
+    {
+    path: 'veterinario/tutor/mascotas/editar-mascota/:run_tutor/:id_masc',
+    loadComponent: () => import('./veterinario/tutor/mascotas/editar-mascota/editar-mascota.page').then(m => m.EditarMascotaPage),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'atencion-medica',
+    loadChildren: () => import('./veterinario/atencion-medica/atencion-medica.module').then( m => m.AtencionMedicaPageModule)
+  },
+    {
     path: 'veterinario/atencion-medica/agregar-atencion-medica',
     loadChildren: () => import('./veterinario/atencion-medica/agregar-atencion-medica/agregar-atencion-medica.module').then( m => m.AgregarAtencionMedicaPageModule),
     canActivate: [AuthGuard] 
   },
+    {
+    path: 'detalle-atencion',
+    loadChildren: () => import('./veterinario/atencion-medica/detalle-atencion/detalle-atencion.module').then( m => m.DetalleAtencionPageModule ),
+    canActivate: [AuthGuard] 
+  },
+  {
+    path: 'editar-atencion',
+    loadChildren: () => import('./veterinario/atencion-medica/editar-atencion/editar-atencion.module').then( m => m.EditarAtencionPageModule ),
+     canActivate: [AuthGuard] 
+    
+  },
+{
+  path: 'veterinario/tutor/mascotas/:run_tutor/:id_masc/historial-clinico',
+  loadChildren: () => import("./veterinario/tutor/mascotas/historial-clinico/historial-clinico.module").then(m => m.HistorialClinicoPageModule),
+  canActivate: [AuthGuard] 
+},
 
 
+ 
 ];
 
 @NgModule({
