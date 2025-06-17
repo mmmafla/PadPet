@@ -51,7 +51,7 @@ export class AgregarMascotaPage implements OnInit {
       masc_esterilizado: [''], // texto manual
       masc_num_chip: [null],
       id_especie: ['', Validators.required],
-      id_raza: [null],
+      id_raza: ['', Validators.required],
       id_grupo_sanguineo: [null],
       id_sexo: ['', Validators.required], 
       masc_observaciones: [''],
