@@ -6,15 +6,17 @@
       <ion-list>
 
         <ion-item>
-          <ion-label position="stacked">
-            Nombre de la mascota <span style="color: red">*</span>
-          </ion-label>
-          <ion-input type="text" formControlName="masc_nom" autocomplete="off"></ion-input>
+          <ion-label position="stacked">Nombre de la mascota <span style="color: red">*</span></ion-label>
+          <ion-input type="text" formControlName="masc_nom" required></ion-input>
         </ion-item>
 
         <ion-item>
           <ion-label position="stacked">Fecha de nacimiento</ion-label>
-          <ion-datetime presentation="date" formControlName="masc_nacimiento" (ionChange)="actualizarEdad()"></ion-datetime>
+          <ion-datetime
+            presentation="date"
+            formControlName="masc_nacimiento"
+            (ionChange)="actualizarEdad()"
+          ></ion-datetime>
         </ion-item>
 
         <ion-item>
@@ -25,6 +27,15 @@
         <ion-item>
           <ion-label position="stacked">Peso (kg)</ion-label>
           <ion-input type="number" formControlName="masc_peso"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Sexo <span style="color: red">*</span></ion-label>
+          <ion-select interface="popover" formControlName="id_sexo" required>
+            <ion-select-option *ngFor="let s of sexo" [value]="s.id_sexo">
+              {{ s.masc_sexo }}
+            </ion-select-option>
+          </ion-select>
         </ion-item>
 
         <ion-item>
@@ -53,10 +64,13 @@
         </ion-item>
 
         <ion-item>
-          <ion-label position="stacked">
-            Especie <span style="color: red">*</span>
-          </ion-label>
-          <ion-select interface="popover" formControlName="id_especie" (ionChange)="cargarDependencias()">
+          <ion-label position="stacked">Especie <span style="color: red">*</span></ion-label>
+          <ion-select
+            interface="popover"
+            formControlName="id_especie"
+            (ionChange)="cargarDependencias()"
+            required
+          >
             <ion-select-option *ngFor="let especie of especies" [value]="especie.id_especie">
               {{ especie.nom_especie }}
             </ion-select-option>
@@ -64,9 +78,7 @@
         </ion-item>
 
         <ion-item>
-          <ion-label position="stacked">
-            Raza <span style="color: red">*</span>
-          </ion-label>
+          <ion-label position="stacked">Raza <span style="color: red">*</span></ion-label>
           <ion-select interface="popover" formControlName="id_raza" [disabled]="!mascotaForm.value.id_especie">
             <ion-select-option *ngFor="let raza of razas" [value]="raza.id_raza">
               {{ raza.nom_raza }}
@@ -89,10 +101,8 @@
         </ion-item>
 
         <ion-item>
-          <ion-label position="stacked">
-            Estado <span style="color: red">*</span>
-          </ion-label>
-          <ion-select interface="popover" formControlName="id_estado">
+          <ion-label position="stacked">Estado <span style="color: red">*</span></ion-label>
+          <ion-select interface="popover" formControlName="id_estado" required>
             <ion-select-option *ngFor="let estado of estados" [value]="estado.id_estado">
               {{ estado.estado }}
             </ion-select-option>

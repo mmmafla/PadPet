@@ -71,7 +71,8 @@ async cargarHistorial() {
       tutor (
         nombre_tutor,
         apellidos_tutor
-      )
+      ),
+      sexo_mascota (masc_sexo)
     ),
     motivo_consulta (
       motivo

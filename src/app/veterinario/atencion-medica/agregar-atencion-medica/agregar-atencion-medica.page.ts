@@ -5,6 +5,8 @@ import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 import { createClient } from '@supabase/supabase-js';
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
 import { ModalFechaComponent } from 'src/app/modal-fecha/modal-fecha.component';
+import { CalendarService } from 'src/app/services/calendar.service';
+import { AuthService } from 'src/app/services/auth.service';
 
 const supabaseUrl = 'https://irorlonysbmkbdthvrmt.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyb3Jsb255c2Jta2JkdGh2cm10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYyODgwMDQsImV4cCI6MjA2MTg2NDAwNH0.s-ZEteHxMWX43NCQIuNmTWpbBoEUxseKyg_YaXpi6Ek';
@@ -29,6 +31,8 @@ export class AgregarAtencionMedicaPage implements OnInit {
 
   motivosConsulta: any[] = [];
 
+  proximoControl: string | null = null;
+
 atencion = {
   motivo: null,
   anamnesis: '',
@@ -50,6 +54,8 @@ atencion = {
 
   constructor(
     private modalCtrl: ModalController,
+    private authService: AuthService,
+    private calendarService: CalendarService,
     private toastController: ToastController
   ) {}
 
@@ -202,7 +208,8 @@ async guardarAtencion() {
     this.mostrarToast('Completa los campos obligatorios: fecha, hora y motivo.');
     return;
   }
-    const runVet = await this.obtenerRunVet();
+
+  const runVet = await this.obtenerRunVet();
   if (!runVet) {
     this.mostrarToast('No se pudo identificar al veterinario.');
     return;
@@ -226,6 +233,7 @@ async guardarAtencion() {
     id_masc: this.mascotaSeleccionada.id_masc,
     fecha_hora_atencion: fechaHoraAtencion.toISOString(),
     run_vet: runVet,
+    proximo_control: this.proximoControl ? new Date(this.proximoControl).toISOString() : null,
   }]);
 
   if (error) {
@@ -234,26 +242,59 @@ async guardarAtencion() {
   } else {
     this.mostrarToast('Atención médica guardada exitosamente.');
 
+    // -------- GOOGLE CALENDAR: agregar evento si hay fecha de próximo control -------
+    if (this.proximoControl) {
+      try {
+        const accessToken = await this.authService.loginWithGoogle();
+        const fechaInicio = new Date(this.proximoControl);
+        const fechaFin = new Date(fechaInicio.getTime() + 30 * 60 * 1000); // +30 minutos
+
+        await this.calendarService.createEvent(accessToken, {
+          summary: 'Próximo control médico para mascota',
+          description: `Control de ${this.mascotaSeleccionada.masc_nom}`,
+          start: {
+            dateTime: fechaInicio.toISOString(),
+            timeZone: 'America/Santiago',
+          },
+          end: {
+            dateTime: fechaFin.toISOString(),
+            timeZone: 'America/Santiago',
+          },
+          reminders: {
+            useDefault: false,
+            overrides: [{ method: 'popup', minutes: 10 }],
+          },
+        });
+
+        console.log('Evento creado en Google Calendar');
+      } catch (calendarError) {
+        console.error('Error al crear evento en Google Calendar:', calendarError);
+      }
+    }
+
+    // ------------------------------------------------------------------------
+
     console.log('Valores a insertar:', {
-  motivo_id: this.atencion.motivo,
-  anamnesis: this.atencion.anamnesis,
-  diagnostico: this.atencion.diagnostico,
-  tratamiento: this.atencion.tratamiento,
-  observaciones: this.atencion.observaciones,
-  mucosa: this.atencion.mucosa,
-  temperatura: this.atencion.temperatura,
-  peso: this.atencion.peso,
-  condicion_corporal: this.atencion.condicion_corporal,
-  observacion_examen: this.atencion.observacion,
-  estado_sensorial_id: this.atencion.estado_sensorial_id,
-  hidratacion_id: this.atencion.hidratacion_id,
-  id_masc: this.mascotaSeleccionada.id_masc,
-  fecha_hora_atencion: fechaHoraAtencion.toISOString()
-});
+      motivo_id: this.atencion.motivo,
+      anamnesis: this.atencion.anamnesis,
+      diagnostico: this.atencion.diagnostico,
+      tratamiento: this.atencion.tratamiento,
+      observaciones: this.atencion.observaciones,
+      mucosa: this.atencion.mucosa,
+      temperatura: this.atencion.temperatura,
+      peso: this.atencion.peso,
+      condicion_corporal: this.atencion.condicion_corporal,
+      observacion_examen: this.atencion.observacion,
+      estado_sensorial_id: this.atencion.estado_sensorial_id,
+      hidratacion_id: this.atencion.hidratacion_id,
+      id_masc: this.mascotaSeleccionada.id_masc,
+      fecha_hora_atencion: fechaHoraAtencion.toISOString()
+    });
 
     this.reiniciarFormulario();
   }
 }
+
 
 reiniciarFormulario() {
   this.atencion = {

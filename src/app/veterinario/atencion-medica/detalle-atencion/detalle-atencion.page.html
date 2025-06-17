@@ -30,7 +30,18 @@
 
         <h4 style="text-align: center;"> Alimentación</h4>
         <h4 style="text-align: center;"> Productos aplicados</h4>
-        <h4 style="text-align: center;"> Próximo control</h4>
+
+
+
+
+        <h4 style="text-align: center;">Próximo control</h4>
+        <p *ngIf="atencion?.proximo_control">
+          <strong>Fecha y hora:</strong> {{ atencion.proximo_control | date: 'medium' }}
+        </p>
+        <p *ngIf="!atencion?.proximo_control">
+          <em>No se ha definido un próximo control.</em>
+        </p>
+
 
 
     <ion-button expand="block" (click)="modificarConsulta()">Modificar consulta</ion-button>

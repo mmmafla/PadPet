@@ -157,9 +157,29 @@
           <ion-textarea [(ngModel)]="atencion.observaciones" name="Observaciones" placeholder="Observaciones..."></ion-textarea>
         </ion-item>
 
+
+
+
+
         <ion-item>
           <ion-label>Proximo control</ion-label>
         </ion-item>
+
+        <ion-item>
+          <ion-label position="stacked">Próximo control (opcional)</ion-label>
+          <ion-datetime
+            [(ngModel)]="proximoControl"
+            name="proximoControl"
+            placeholder="Selecciona fecha y hora"
+            presentation="date-time">
+          </ion-datetime>
+        </ion-item>
+
+
+
+
+
+
 
         <ion-button (click)="guardarAtencion()" class="boton-guardar-generico">
           <ion-icon name="save-outline" slot="start"></ion-icon>

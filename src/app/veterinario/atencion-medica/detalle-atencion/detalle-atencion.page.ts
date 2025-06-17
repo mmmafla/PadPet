@@ -60,6 +60,8 @@ export class DetalleAtencionPage implements OnInit {
     } else {
       this.atencion = data;
     }
+    console.log('Datos de atención cargados:', data);
+
   }
 
 // ------------------------------------------------------------- MODIFICAR ATENCIÓN
