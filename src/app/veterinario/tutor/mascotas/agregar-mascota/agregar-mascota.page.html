@@ -30,6 +30,15 @@
         </ion-item>
 
         <ion-item>
+          <ion-label position="stacked">Sexo</ion-label>
+          <ion-select interface="popover" formControlName="id_sexo">
+            <ion-select-option *ngFor="let s of sexo" [value]="s.id_sexo">
+              {{ s.masc_sexo }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item>
           <ion-label position="stacked">Color</ion-label>
           <ion-input type="text" formControlName="masc_color"></ion-input>
         </ion-item>

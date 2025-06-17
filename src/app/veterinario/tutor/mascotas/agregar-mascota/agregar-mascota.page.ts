@@ -28,6 +28,7 @@ export class AgregarMascotaPage implements OnInit {
   razas: any[] = [];
   gruposSanguineos: any[] = [];
   estados: any[] = [];
+  sexo: any[] = [];
   runTutor!: string;
 
   constructor(
@@ -52,6 +53,7 @@ export class AgregarMascotaPage implements OnInit {
       id_especie: ['', Validators.required],
       id_raza: [null],
       id_grupo_sanguineo: [null],
+      id_sexo: ['', Validators.required], 
       masc_observaciones: [''],
       id_estado: ['', Validators.required],
       run_tutor: [this.runTutor],
@@ -59,6 +61,7 @@ export class AgregarMascotaPage implements OnInit {
 
     await this.cargarEspecies();
     await this.cargarEstados();
+    await this.cargarSexos();
   }
 
   async cargarEspecies() {
@@ -91,6 +94,16 @@ export class AgregarMascotaPage implements OnInit {
       this.estados = data || [];
     }
   }
+async cargarSexos() {
+  const { data, error } = await supabase.from('sexo_mascota').select('*');
+  if (error) {
+    console.error('Error cargando sexos de mascota', error);
+  } else {
+    this.sexo = data || []; 
+        console.log('Sexos cargados!', this.sexo);
+  }
+}
+
 
   actualizarEdad() {
     const fechaNacimiento = this.mascotaForm.value.masc_nacimiento;
@@ -118,6 +131,7 @@ export class AgregarMascotaPage implements OnInit {
     formData.id_raza = formData.id_raza ? Number(formData.id_raza) : null;
     formData.id_grupo_sanguineo = formData.id_grupo_sanguineo ? Number(formData.id_grupo_sanguineo) : null;
     formData.id_estado = Number(formData.id_estado);
+    formData.id_sexo = Number(formData.id_sexo);
 
     const { error } = await supabase.from('mascota').insert([formData]);
 

@@ -27,6 +27,11 @@ export class AgregarAtencionMedicaPage implements OnInit {
   estadoSensorial: any[] = [];
   nivelesHidratacion: any[] = [];
 
+// Examen objetivo particular 
+  pielOpciones: any[] = [];
+  ojosOpciones: any[] = []; 
+  oidosOpciones: any[] = [];
+  dentaduraOpciones: any[] = [];
   motivosConsulta: any[] = [];
 
 atencion = {
@@ -43,7 +48,12 @@ atencion = {
   estado_sensorial_id: null,
   hidratacion_id: null,
   fecha: '',
-  hora: ''
+  hora: '',
+
+    id_piel: null,
+    id_ojos: null,
+    id_oidos: null,
+    id_dentadura: null
 };
 
 
@@ -58,6 +68,16 @@ atencion = {
     this.cargarMotivosConsulta();
     this.cargarEstadosSensoriales();
     this.cargarNivelesHidratacion();
+
+      // Carga de examen particular
+  this.cargarPielOpciones();
+  this.cargarOjosOpciones();
+  this.cargarOidosOpciones();
+  this.cargarDentaduraOpciones();
+
+
+    
+
   }
 
   async cargarTutores() {
@@ -142,6 +162,42 @@ async cargarNivelesHidratacion() {
   }
 }
 // ----
+async cargarPielOpciones() {
+  const { data, error } = await supabase.from('piel_obp').select('*');
+  if (error) {
+    console.error('Error al cargar Piel', error);
+  } else {
+    this.pielOpciones = data;
+  }
+}
+
+async cargarOjosOpciones() {
+  const { data, error } = await supabase.from('ojos_obp').select('*');
+  if (error) {
+    console.error('Error al cargar Ojos', error);
+  } else {
+    this.ojosOpciones = data;
+  }
+}
+
+async cargarOidosOpciones() {
+  const { data, error } = await supabase.from('oidos_obp').select('*');
+  if (error) {
+    console.error('Error al cargar Oidos', error);
+  } else {
+    this.oidosOpciones = data;
+  }
+}
+
+async cargarDentaduraOpciones() {
+  const { data, error } = await supabase.from('dentadura_obp').select('*');
+  if (error) {
+    console.error('Error al cargar Dentadura', error);
+  } else {
+    this.dentaduraOpciones = data;
+  }
+}
+
    
 //----------------------------------FECHA Y HORA DE ATENCION-----------------------------
 mostrarSelectorFecha = false;
@@ -226,6 +282,10 @@ async guardarAtencion() {
     id_masc: this.mascotaSeleccionada.id_masc,
     fecha_hora_atencion: fechaHoraAtencion.toISOString(),
     run_vet: runVet,
+    id_piel: this.atencion.id_piel,
+    id_ojos: this.atencion.id_ojos,
+    id_oidos: this.atencion.id_oidos,
+    id_dentadura: this.atencion.id_dentadura,
   }]);
 
   if (error) {
@@ -270,7 +330,11 @@ reiniciarFormulario() {
     estado_sensorial_id: null,
     hidratacion_id: null,
     fecha: '',
-    hora: ''
+    hora: '',
+    id_piel: null,
+    id_ojos: null,
+    id_oidos: null,
+    id_dentadura: null
   };
   this.tutorSeleccionado = null;
   this.mascotaSeleccionada = null;

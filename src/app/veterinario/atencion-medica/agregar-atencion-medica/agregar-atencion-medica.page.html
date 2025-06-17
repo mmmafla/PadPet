@@ -139,8 +139,62 @@
     </div>
   </ion-accordion>
 </ion-accordion-group>
-
 <!---------------------------EXAMEN OBJETIVO GENERAL---------------------------------------->
+<!---------------------------EXAMEN OBJETIVO PARTICULAR---------------------------------------->
+
+<ion-accordion-group expand="inset">
+  <ion-accordion  >
+    <ion-item slot="header" class="acordeon-consulta">
+      <ion-label><strong>Examen Objetivo Particular</strong></ion-label>
+    </ion-item>
+    <div slot="content">
+
+            <!-- Piel -->
+      <ion-item>
+        <ion-label>Piel</ion-label>
+        <ion-select [(ngModel)]="atencion.id_piel" name="piel_id" interface="popover" slot="end">
+          <ion-select-option *ngFor="let p of pielOpciones" [value]="p.id_piel">
+            {{ p.estado_piel }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- Ojos -->
+      <ion-item>
+        <ion-label>Ojos</ion-label>
+        <ion-select [(ngModel)]="atencion.id_ojos" name="id_ojos" interface="popover" slot="end">
+          <ion-select-option *ngFor="let o of ojosOpciones" [value]="o.id_ojos">
+            {{ o.estado_ojos }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- Oidos -->
+      <ion-item>
+        <ion-label>Oidos</ion-label>
+        <ion-select [(ngModel)]="atencion.id_oidos" name="id_oido" interface="popover" slot="end">
+          <ion-select-option *ngFor="let o of oidosOpciones" [value]="o.id_oidos">
+            {{ o.estado_oidos }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- Dentadura -->
+      <ion-item>
+        <ion-label>Dentadura</ion-label>
+        <ion-select [(ngModel)]="atencion.id_dentadura" name="id_dentadura" interface="popover" slot="end">
+          <ion-select-option *ngFor="let d of dentaduraOpciones" [value]="d.id_dentadura">
+            {{ d.estado_dentadura }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+
+    </div>
+  </ion-accordion>
+</ion-accordion-group>
+
+<!---------------------------EXAMEN OBJETIVO PARTICULAR---------------------------------------->
 <!---------------------------------DIAGNOSTICO---------------------------------->
         <ion-item class="consulta-item">
           <ion-label position="stacked">Diagnóstico</ion-label>

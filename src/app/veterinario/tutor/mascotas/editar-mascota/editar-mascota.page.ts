@@ -25,6 +25,8 @@ export class EditarMascotaPage implements OnInit {
   estados: any[] = [];
   runTutor!: string;
   idMasc!: number;
+  sexos: any[] = []; 
+
 
   constructor(
     private fb: FormBuilder,
@@ -53,11 +55,13 @@ export class EditarMascotaPage implements OnInit {
       masc_observaciones: [''],
       id_estado: ['', Validators.required],
       run_tutor: [this.runTutor],
+      id_sexo: ['', Validators.required] ,
     });
 
     await this.cargarEspecies();
     await this.cargarEstados();
     await this.cargarMascota();
+    await this.cargarSexos();
   }
 
   async cargarEspecies() {
@@ -117,6 +121,14 @@ export class EditarMascotaPage implements OnInit {
     this.mascotaForm.patchValue({ masc_edad: edad });
   }
 
+  async cargarSexos() {
+  const { data, error } = await supabase.from('sexo_mascota').select('*');
+  if (!error) {
+    this.sexos = data || []; 
+  }
+}
+
+
   async actualizarMascota() {
     const formData = { ...this.mascotaForm.value };
 
@@ -126,6 +138,7 @@ export class EditarMascotaPage implements OnInit {
     formData.id_raza = formData.id_raza ? Number(formData.id_raza) : null;
     formData.id_grupo_sanguineo = formData.id_grupo_sanguineo ? Number(formData.id_grupo_sanguineo) : null;
     formData.id_estado = Number(formData.id_estado);
+    formData.id_sexo = Number(formData.id_sexo);
 
     const { error } = await supabase
       .from('mascota')
