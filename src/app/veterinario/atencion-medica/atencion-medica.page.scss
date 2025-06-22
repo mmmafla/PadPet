@@ -1,0 +1,72 @@
+.boton-agregar {
+  position: fixed;
+  bottom: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 10;
+  padding: 0 16px;
+}
+.agregar-atencion {
+  font-size: 16px;
+  color: #ffffff;
+  --background: #5cb0f9; 
+  --border-radius: 20px;
+}
+
+
+/* Tarjeta que contiene el filtro */
+.filtro-card {
+  margin: 0 auto;
+  max-width: 500px;
+  width: 100%;
+  background: transparent;
+  border-radius: 12px;
+  box-shadow: none;
+  padding: 8px 0;
+}
+
+/* Accordion visual limpio */
+ion-accordion {
+  --border-width: 0;
+  --background: f9f9f9 ;
+  box-shadow: none;
+  margin: 0;
+}
+
+
+.filtro-card .ion-padding {
+  padding: 16px !important;
+}
+
+
+.filtro-card ion-item {
+  --background: #f9f9f9;
+  border-radius: 8px;
+  margin-top: 10px;
+  margin-left: 0;
+  margin-right: 0;
+
+
+}
+
+/* Evita que los ion-item hagan overflow */
+ion-item::part(native) {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Botón limpiar centrado */
+ion-button {
+  margin-top: 16px;
+}
+
+
+.btn-limpiar {
+  --border-radius: 20px; /* esquinas redondeadas */
+  --padding-top: 6px;
+  --padding-bottom: 6px;
+  --padding-start: 10px;
+  --padding-end: 10px;
+  --border-width: 1px;
+  margin: 10px 0; /* margen más fino arriba y abajo */
+}
