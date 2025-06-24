@@ -2,6 +2,20 @@
 
 <ion-content class="fondo">
 
+<ion-card *ngIf="mostrarMensajeSolicitud" color="warning" class="ion-padding position-relative" style="border-radius: 20px;">
+  <!-- Botón para cerrar -->
+  <ion-button fill="clear" size="small" class="cerrar-btn" (click)="cerrarMensajeSolicitud()">
+    <ion-icon name="close-outline"></ion-icon>
+  </ion-button>
+
+  <ion-card-content style="text-align: center;">
+<ion-icon name="information-circle-outline" style="font-size: 25px; vertical-align: middle; margin-right: 4px;"></ion-icon>
+
+    <strong>Solicitud enviada:</strong> {{ estadoSolicitud | titlecase }} <br />
+  </ion-card-content>
+</ion-card>
+
+
 <ion-grid>
   <!----perfil-->
   <ion-card class="perfil-card" [routerLink]="['/perfil']">
@@ -25,7 +39,10 @@
 <ion-row>
   <!---TUTORES--->
   <ion-col size="6">
-    <ion-card  class="ion-card-importantes" [routerLink]="['/tutor']">
+    <ion-card 
+      class="ion-card-importantes" 
+      [routerLink]="estadoSolicitud === 'aceptada' ? ['/tutor'] : null" 
+      [class.disabled]="estadoSolicitud !== 'aceptada'">
       <ion-card-header>
         <div>
           <ion-icon name="paw-outline" class="icono2"></ion-icon>
@@ -37,37 +54,41 @@
       </ion-card-content>
     </ion-card>
   </ion-col>
-  <!---TUTORES--->
-  <!--- API--->
-        <ion-col size="6">
-          <ion-card class="ion-card-importantes" [routerLink]="['/agenda']">
-            <ion-card-header>
-              <div>
-                <ion-icon name="search-outline" class="icono2"></ion-icon>
-                <ion-card-title>Agenda</ion-card-title>
-              </div>
-            </ion-card-header>
-            <ion-card-content class="texto">
-              Sincronizado con Google Calendar
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-  <!--- API--->
 
-      <!---CONFIGURACION--->
-      <ion-col size="12">
-        <ion-card  class="ion-card-otros" [routerLink]="['/atencion-medica']">
-          <ion-card-header>
-            <div>
-              <ion-card-title>CITA MÉDICA</ion-card-title>
-            </div>
-          </ion-card-header>
-          <ion-card-content class="texto">
-            Agrega una nueva consulta médica
-          </ion-card-content>
-        </ion-card>
-      </ion-col>
-      <!---CONFIGURACION--->
+  <!---AGENDA--->
+  <ion-col size="6">
+    <ion-card 
+      class="ion-card-importantes" 
+      [routerLink]="estadoSolicitud === 'aceptada' ? ['/agenda'] : null" 
+      [class.disabled]="estadoSolicitud !== 'aceptada'">
+      <ion-card-header>
+        <div>
+          <ion-icon name="search-outline" class="icono2"></ion-icon>
+          <ion-card-title>Agenda</ion-card-title>
+        </div>
+      </ion-card-header>
+      <ion-card-content class="texto">
+        Sincronizado con Google Calendar
+      </ion-card-content>
+    </ion-card>
+  </ion-col>
+
+  <!---CONSULTA MÉDICA--->
+  <ion-col size="12">
+    <ion-card 
+      class="ion-card-otros" 
+      [routerLink]="estadoSolicitud === 'aceptada' ? ['/atencion-medica'] : null" 
+      [class.disabled]="estadoSolicitud !== 'aceptada'">
+      <ion-card-header>
+        <div>
+          <ion-card-title>CITA MÉDICA</ion-card-title>
+        </div>
+      </ion-card-header>
+      <ion-card-content class="texto">
+        Agrega una nueva consulta médica
+      </ion-card-content>
+    </ion-card>
+  </ion-col>
 </ion-row>
 
 

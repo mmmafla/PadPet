@@ -11,8 +11,7 @@
 
       <!-- PAÍS -->
       <ion-item>
-        <ion-label position="floating">País</ion-label>
-        <ion-select formControlName="pais" interface="popover" placeholder="Selecciona un país">
+        <ion-select label="País" formControlName="pais" interface="popover" placeholder="Selecciona un país"     [disabled]="estadoSolicitud === 'aceptada'">
           <ion-select-option *ngFor="let pais of paises" [value]="pais.id_pais">
             {{ pais.nom_pais }}
           </ion-select-option>
@@ -21,8 +20,7 @@
 
       <!-- UNIVERSIDAD (filtrada por país) -->
       <ion-item>
-        <ion-label position="floating">Universidad de Egreso</ion-label>
-        <ion-select formControlName="universidad" interface="popover" placeholder="Selecciona una universidad">
+        <ion-select label="Universidad" formControlName="universidad" interface="popover" placeholder="Selecciona una universidad"     [disabled]="estadoSolicitud === 'aceptada'">
           <ion-select-option *ngFor="let uni of universidadesFiltradas" [value]="uni.id_uni">
             {{ uni.nom_uni }}
           </ion-select-option>
@@ -31,9 +29,8 @@
 
       <!-- ESPECIALIDAD -->
       <ion-item>
-        <ion-label position="floating">Especialidad</ion-label>
-        <ion-select formControlName="especialidad" interface="popover" placeholder="Selecciona una especialidad">
-          <ion-select-option *ngFor="let esp of especialidades" [value]="esp.id_especialidad">
+        <ion-select label="Especialidad" formControlName="especialidad" interface="popover" placeholder="Selecciona una especialidad"     [disabled]="estadoSolicitud === 'aceptada'">
+          <ion-select-option *ngFor="let esp of especialidades" [value]="esp.id_especialidad" >
             {{ esp.nom_especialidad }}
           </ion-select-option>
         </ion-select>
@@ -41,8 +38,7 @@
 
       <!-- AÑO TITULACIÓN -->
       <ion-item>
-        <ion-label position="floating">Año de Titulación</ion-label>
-        <ion-input type="number" formControlName="anoTitulacion"></ion-input>
+        <ion-input label="Año de Titulación"type="number" formControlName="anoTitulacion"     [disabled]="estadoSolicitud === 'aceptada'"></ion-input>
       </ion-item>
 
       <!-- FOTO TÍTULO PROFESIONAL -->
@@ -50,22 +46,59 @@
         <ion-label>Imagen Título Profesional</ion-label>
       </ion-item>
 
-      <ion-item lines="none">
-        <input type="file" (change)="subirImagenCertificado($event)" accept="image/*,.pdf" />
-      </ion-item>
+<ion-item lines="none">
+  <input 
+    type="file"
+    (change)="subirImagenCertificado($event)"
+    accept="image/*,.pdf"
+    [disabled]="estadoSolicitud === 'aceptada'"
+  />
+</ion-item>
+
+<ion-text
+  *ngIf="estadoSolicitud === 'aceptada'"
+  color="medium"
+  class="ion-margin-top ion-text-center"
+>
+  Tu solicitud ha sido aceptada. Ya no puedes modificar el certificado.
+</ion-text>
+
+
 
       <ion-item *ngIf="fotoTituloUrl" lines="none" class="ion-padding-top">
         <img [src]="fotoTituloUrl" alt="Foto Título" style="max-width: 100%; border-radius: 12px;" />
       </ion-item>
 
-      <ion-button *ngIf="fotoTituloUrl" color="danger" expand="full" shape="round" (click)="eliminarImagenCertificado()">
-        Eliminar imagen
-      </ion-button>
+<ion-button
+  *ngIf="fotoTituloUrl && estadoSolicitud !== 'aceptada'" color="danger" expand="full" shape="round"
+  (click)="confirmarEliminacionImagen()"
+>
+  Eliminar imagen
+</ion-button>
+
 
       <!-- BOTÓN GUARDAR -->
-      <ion-button expand="full" type="submit" [disabled]="!form.valid" shape="round">
-        Enviar información
-      </ion-button>
+<ion-button
+  expand="block" class="boton-editar" (click)="enviarInformacion()"
+  *ngIf="estadoSolicitud !== 'pendiente' && estadoSolicitud !== 'aceptada'"
+  [disabled]="!form.valid" >
+  Enviar información
+</ion-button>
+
+
+<!-- Mensajes según estado de solicitud -->
+<ion-text *ngIf="estadoSolicitud === 'pendiente'" color="warning" class="ion-margin-top">
+  Tu solicitud ya fue enviada y está pendiente de aprobación.
+</ion-text>
+
+<ion-text *ngIf="estadoSolicitud === 'aceptada'" color="success" class="ion-margin-top">
+  ✅ Tu solicitud ha sido aceptada. Ya puedes usar todas las funciones de la aplicación.
+</ion-text>
+
+<ion-text *ngIf="estadoSolicitud === 'rechazada'" color="danger" class="ion-margin-top">
+  Tu solicitud fue rechazada. Puedes revisar los datos y reenviar.
+</ion-text>
+
 
     </form>
   </ion-card>

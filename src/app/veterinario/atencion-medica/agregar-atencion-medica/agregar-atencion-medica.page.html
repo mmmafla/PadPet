@@ -7,7 +7,7 @@
 
   <ion-card-content>
 <!------------------------- Buscador tutor ----------------------->
-    <ion-item class="buscador">
+    <ion-item class="buscador" lines="none">
       <ion-icon name="search-outline" slot="start"></ion-icon>
       <ion-input
         [(ngModel)]="busquedaTutor" (ionInput)="filtrarTutores()" placeholder="Ingrese nombre del tutor">
@@ -15,7 +15,7 @@
     </ion-item>
 <!------------- Lista de tutores filtrados ----------------->
     <ion-list *ngIf="tutoresFiltrados.length > 0">
-      <ion-item button detail  *ngFor="let tutor of tutoresFiltrados" (click)="seleccionarTutor(tutor)">
+      <ion-item button detail  *ngFor="let tutor of tutoresFiltrados" (click)="seleccionarTutor(tutor)" lines="none">
         <ion-label>
           {{ tutor.nombre_tutor }} {{ tutor.apellidos_tutor }}
         </ion-label>
@@ -25,10 +25,9 @@
 <!--------------------buscador mascota---------------------------------->
     <div *ngIf="tutorSeleccionado">
       <h3 style="text-align: center;">Mascotas de {{ tutorSeleccionado.nombre_tutor }}</h3>
-      <ion-item class="buscador">
-        <ion-label>Mascota</ion-label>
-        <ion-select [(ngModel)]="mascotaSeleccionada" interface="popover" slot="end">
-          <ion-select-option *ngFor="let mascota of tutorSeleccionado.mascota" [value]="mascota" >
+      <ion-item class="buscador" lines="none">
+        <ion-select label="Mascota" [(ngModel)]="mascotaSeleccionada" interface="popover" >
+          <ion-select-option *ngFor="let mascota of tutorSeleccionado.mascota" [value]="mascota" slot="end">
             {{ mascota.masc_nom }}
           </ion-select-option>
         </ion-select>
@@ -56,7 +55,7 @@
     <ion-card-content>
       <form>
 <!---------------------------------FECHA Y HORA DE ATENCION ---------------------------------->
-<ion-item>
+<ion-item lines="none">
   <ion-label>Fecha de atención</ion-label>
   <ion-button expand="block" (click)="abrirSelectorFecha()" class="btn-accion btn-editar">
     {{ atencion.fecha && atencion.hora ? (atencion.fecha + ' - ' + atencion.hora) : 'Seleccionar fecha y hora' }}
@@ -64,7 +63,7 @@
 </ion-item>
 <!---------------------------------FECHA Y HORA DE ATENCION ---------------------------------->
 <!---------------------------------MOTIVO DE CONSULTA ---------------------------------->
-        <ion-item class="consulta-item" lines="full">
+        <ion-item class="consulta-item" lines="none">
           <ion-label position="stacked">Motivo de consulta</ion-label>
           <ion-select [(ngModel)]="atencion.motivo" name="motivo" 
               placeholder="Selecciona motivo"
@@ -78,7 +77,7 @@
         </ion-item>
 <!---------------------------------MOTIVO DE CONSULTA ---------------------------------->
 <!---------------------------------ANAMNESIS---------------------------------->
-        <ion-item class="consulta-item">
+        <ion-item class="consulta-item" lines="none">
           <ion-label position="stacked">Anamnesis</ion-label>
           <ion-textarea [(ngModel)]="atencion.anamnesis" name="anamnesis" placeholder="Anamnesis..."></ion-textarea>
         </ion-item>
@@ -87,34 +86,29 @@
 
 <ion-accordion-group expand="inset">
   <ion-accordion  >
-    <ion-item slot="header" class="acordeon-consulta">
+    <ion-item slot="header" class="acordeon-consulta" lines="none">
       <ion-label><strong>Examen Objetivo General</strong></ion-label>
     </ion-item>
     <div slot="content">
 
       <ion-item>
-        <ion-label position="stacked">Mucosa</ion-label>
-        <ion-textarea [(ngModel)]="atencion.mucosa" name="mucosa"></ion-textarea>
+        <ion-textarea label="Musosa" [(ngModel)]="atencion.mucosa" name="mucosa"></ion-textarea>
       </ion-item>
 
       <ion-item>
-        <ion-label position="stacked">Temperatura (°C)</ion-label>
-        <ion-input type="number" [(ngModel)]="atencion.temperatura" name="temperatura"></ion-input>
+        <ion-input label="Temperatura (°C)" type="number" [(ngModel)]="atencion.temperatura" name="temperatura"></ion-input>
       </ion-item>
 
       <ion-item>
-        <ion-label position="stacked">Peso (Kg)</ion-label>
-        <ion-input type="number" [(ngModel)]="atencion.peso" name="peso"></ion-input>
+        <ion-input label="Peso (Kg)" type="number" [(ngModel)]="atencion.peso" name="peso"></ion-input>
       </ion-item>
 
       <ion-item>
-        <ion-label position="stacked">Condición corporal</ion-label>
-        <ion-textarea [(ngModel)]="atencion.condicion_corporal" name="condicion_corporal"></ion-textarea>
+        <ion-textarea label="Condición corporal" [(ngModel)]="atencion.condicion_corporal" name="condicion_corporal"></ion-textarea>
       </ion-item>
 
-<ion-item>
-  <ion-label>Estado sensorial</ion-label>
-  <ion-select [(ngModel)]="atencion.estado_sensorial_id" name="estado_sensorial_id" interface="popover" slot="end">
+<ion-item >
+  <ion-select label="Estado sensorial" [(ngModel)]="atencion.estado_sensorial_id" name="estado_sensorial_id" interface="popover" >
     <ion-select-option *ngFor="let estado of estadoSensorial" [value]="estado.id_estado_sensorial">
       {{ estado.estado_sensorial }}
     </ion-select-option>
@@ -122,8 +116,7 @@
 </ion-item>
 
 <ion-item>
-  <ion-label>Hidratación</ion-label>
-  <ion-select [(ngModel)]="atencion.hidratacion_id" name="hidratacion_id" interface="popover" slot="end">
+  <ion-select label="Hidratación" [(ngModel)]="atencion.hidratacion_id" name="hidratacion_id" interface="popover" >
     <ion-select-option *ngFor="let h of nivelesHidratacion" [value]="h.hidratacion_id">
       {{ h.estado_hidratacion }}
     </ion-select-option>
@@ -132,32 +125,97 @@
 
 
       <ion-item>
-        <ion-label position="stacked">Observaciones</ion-label>
-        <ion-textarea [(ngModel)]="atencion.observacion" name="observacion"></ion-textarea>
+        <ion-textarea label="Observaciones" [(ngModel)]="atencion.observacion" name="observacion"></ion-textarea>
       </ion-item>
 
     </div>
   </ion-accordion>
 </ion-accordion-group>
-
 <!---------------------------EXAMEN OBJETIVO GENERAL---------------------------------------->
+<!---------------------------EXAMEN OBJETIVO PARTICULAR---------------------------------------->
+
+<ion-accordion-group expand="inset">
+  <ion-accordion  >
+    <ion-item slot="header" class="acordeon-consulta" lines="none">
+      <ion-label><strong>Examen Objetivo Particular</strong></ion-label>
+    </ion-item>
+    <div slot="content">
+
+            <!-- Piel -->
+      <ion-item>
+        <ion-select label="Piel" [(ngModel)]="atencion.id_piel" name="piel_id" interface="popover" (ionChange)="verificarObservacionPiel()">
+          <ion-select-option *ngFor="let p of pielOpciones" [value]="p.id_piel">
+            {{ p.estado_piel }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+          <!-- Observación si se requiere -->
+                <ion-item *ngIf="mostrarObservacionPiel">
+                  <ion-input label="Observación de la piel"  type="text" [(ngModel)]="atencion.piel_observacion" placeholder="Describe observaciones...">  </ion-input>
+                </ion-item>
+
+
+
+      <!-- Ojos -->
+      <ion-item>
+        <ion-select label="Ojos" [(ngModel)]="atencion.id_ojos" name="id_ojos" interface="popover" (ionChange)="verificarObservacionOjos()">
+          <ion-select-option *ngFor="let o of ojosOpciones" [value]="o.id_ojos">
+            {{ o.estado_ojos }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+                 <!-- Observación si se requiere -->
+                <ion-item *ngIf="mostrarObservacionOjos">
+                  <ion-input label="Observación de ojos"  type="text" [(ngModel)]="atencion.ojos_observacion" placeholder="Describe observaciones...">  </ion-input>
+                </ion-item>
+
+      <!-- Oidos -->
+      <ion-item>
+        <ion-select label="Oídos" [(ngModel)]="atencion.id_oidos" name="id_oido" interface="popover" (ionChange)="verificarObservacionOidos()">
+          <ion-select-option *ngFor="let o of oidosOpciones" [value]="o.id_oidos">
+            {{ o.estado_oidos }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+           <!-- Observación si se requiere -->
+                <ion-item *ngIf="mostrarObservacionOidos">
+                  <ion-input label="Observación de oidos"  type="text" [(ngModel)]="atencion.oidos_observacion" placeholder="Describe observaciones...">  </ion-input>
+                </ion-item>
+
+<!----- Dentadura -------------------------------->
+      <ion-item>
+        <ion-select label="Dentadura" [(ngModel)]="atencion.id_dentadura" name="id_dentadura" interface="popover"  (ionChange)="verificarObservacionDentadura()">
+          <ion-select-option *ngFor="let d of dentaduraOpciones" [value]="d.id_dentadura">  {{ d.estado_dentadura }} </ion-select-option>
+        </ion-select>
+      </ion-item>
+     <!-- Observación si se requiere -->
+                <ion-item *ngIf="mostrarObservacionDentadura">
+                  <ion-input label="Observación de dentadura"  type="text" [(ngModel)]="atencion.dentadura_observacion" placeholder="Describe observaciones...">  </ion-input>
+                </ion-item>
+
+
+    </div>
+  </ion-accordion>
+</ion-accordion-group>
+
+<!---------------------------EXAMEN OBJETIVO PARTICULAR---------------------------------------->
 <!---------------------------------DIAGNOSTICO---------------------------------->
-        <ion-item class="consulta-item">
+        <ion-item class="consulta-item" lines="none">
           <ion-label position="stacked">Diagnóstico</ion-label>
           <ion-textarea [(ngModel)]="atencion.diagnostico" name="diagnostico" placeholder="Diagnóstico..."></ion-textarea>
         </ion-item>
 <!---------------------------------DIAGNOSTICO---------------------------------->
-        <ion-item>
+        <ion-item class="consulta-item" lines="none">
           <ion-label position="stacked">Tratamiento/Indicaciones</ion-label>
           <ion-textarea [(ngModel)]="atencion.tratamiento" name="tratamiento" placeholder="Indica el tratamiento..."></ion-textarea>
         </ion-item>
 
-        <ion-item class="consulta-item">
+        <ion-item class="consulta-item" lines="none">
           <ion-label position="stacked">Observaciones</ion-label>
           <ion-textarea [(ngModel)]="atencion.observaciones" name="Observaciones" placeholder="Observaciones..."></ion-textarea>
         </ion-item>
 
-        <ion-item>
+        <ion-item lines="none">
           <ion-label>Proximo control</ion-label>
         </ion-item>
 

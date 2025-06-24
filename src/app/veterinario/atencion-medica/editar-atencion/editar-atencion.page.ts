@@ -10,62 +10,66 @@ const supabaseUrl = 'https://irorlonysbmkbdthvrmt.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyb3Jsb255c2Jta2JkdGh2cm10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYyODgwMDQsImV4cCI6MjA2MTg2NDAwNH0.s-ZEteHxMWX43NCQIuNmTWpbBoEUxseKyg_YaXpi6Ek';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-
 @Component({
   selector: 'app-editar-atencion',
   templateUrl: './editar-atencion.page.html',
   styleUrls: ['./editar-atencion.page.scss'],
-      standalone: true,
-    imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule, HeaderComponent] 
+  standalone: true,
+  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule, HeaderComponent]
 })
 export class EditarAtencionPage implements OnInit {
 
-atencion: any;
+  atencion: any;
   estadoSensorial: any[] = [];
   nivelesHidratacion: any[] = [];
 
+  constructor(private router: Router) {
+    const nav = this.router.getCurrentNavigation();
+    this.atencion = nav?.extras?.state?.['atencion'];
+  }
 
-constructor(private router: Router) {
-  const nav = this.router.getCurrentNavigation();
-  this.atencion = nav?.extras?.state?.['atencion'];
-}
+  async ngOnInit() {
+    // Convertir run_vet y run_tutor a string si existen para evitar problemas de tipo
+    if (this.atencion) {
+      if (this.atencion.veterinario?.run_vet != null) {
+        this.atencion.veterinario.run_vet = this.atencion.veterinario.run_vet.toString();
+      }
+      if (this.atencion.mascota?.tutor?.run_tutor != null) {
+        this.atencion.mascota.tutor.run_tutor = this.atencion.mascota.tutor.run_tutor.toString();
+      }
+    }
 
+    await this.cargarNivelesHidratacion();
+    await this.cargarestadoSensorial();
+  }
 
-async ngOnInit() {
-  await this.cargarNivelesHidratacion();
-  await this.cargarestadoSensorial();
-}
-
-async cargarestadoSensorial(){
+  async cargarestadoSensorial() {
     const { data, error } = await supabase
-    .from('estado_sensorial')
-    .select('*')
-    .order('estado_sensorial', { ascending: true });
+      .from('estado_sensorial')
+      .select('*')
+      .order('estado_sensorial', { ascending: true });
 
-  if (error) {
-    console.error('Error cargando estado sensorial :', error.message);
-  } else {
-    this.estadoSensorial = data;
+    if (error) {
+      console.error('Error cargando estado sensorial :', error.message);
+    } else {
+      this.estadoSensorial = data;
+    }
   }
 
-}
+  async cargarNivelesHidratacion() {
+    const { data, error } = await supabase
+      .from('hidratacion')
+      .select('*')
+      .order('estado_hidratacion', { ascending: true });
 
-async cargarNivelesHidratacion() {
-  const { data, error } = await supabase
-    .from('hidratacion')
-    .select('*')
-    .order('estado_hidratacion', { ascending: true });
-
-  if (error) {
-    console.error('Error cargando niveles de hidratación:', error.message);
-  } else {
-    this.nivelesHidratacion = data;
+    if (error) {
+      console.error('Error cargando niveles de hidratación:', error.message);
+    } else {
+      this.nivelesHidratacion = data;
+    }
   }
-}
-
 
   async guardarCambios() {
-
-}
-
+    // Aquí puedes agregar la lógica para guardar los cambios del formulario
+  }
 }
