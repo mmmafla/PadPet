@@ -11,18 +11,20 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormularioComponent } from './componentes/formulario/formulario.component';
 import { HeaderComponent } from './componentes/header/header.component';
+import { HttpClientModule } from '@angular/common/http'; // ✅ Importación agregada
 
 @NgModule({
-  declarations: [AppComponent,
-              ],
-  imports: [  BrowserModule, 
-              IonicModule.forRoot({mode:'md'}),
-              AppRoutingModule,
-              ReactiveFormsModule,
-              CommonModule,
-              FormularioComponent,
-              HeaderComponent
-            ],
+  declarations: [AppComponent],
+  imports: [
+    BrowserModule,
+    IonicModule.forRoot({ mode: 'md' }),
+    AppRoutingModule,
+    ReactiveFormsModule,
+    CommonModule,
+    FormularioComponent,
+    HeaderComponent,
+    HttpClientModule // ✅ Módulo agregado a imports
+  ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
 })
