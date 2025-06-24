@@ -1,0 +1,19 @@
+<app-header backButton="/veterinario/tutor/mascotas/{{idMasc}}" title="Historial Clínico"></app-header>
+
+<ion-content class="fondo ion-padding">
+  <ion-card *ngIf="atenciones.length > 0">
+    <ion-list>
+      <ion-item *ngFor="let atencion of atenciones">
+        <ion-label>
+          <h3>{{ atencion.fecha_atencion | date:'medium' }}</h3>
+          <p>Diagnóstico: {{ atencion.diagnostico }}</p>
+          <p>Tratamientos: {{ atencion.tratamientos }}</p>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </ion-card>
+
+  <p *ngIf="atenciones.length == 0">
+    La mascota aún no tiene atenciones registradas.
+  </p>
+</ion-content>

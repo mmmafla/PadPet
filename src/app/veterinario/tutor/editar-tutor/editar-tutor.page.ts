@@ -139,53 +139,76 @@ export class EditarTutorPage implements OnInit {
     }
   }
 
-  async confirmarEliminarTutor(tutor: any) {
-    const alert = await this.alertController.create({
-      header: 'Confirmar eliminación',
-      message: `¿Seguro que quieres eliminar a ${tutor.nombre_tutor} ${tutor.apellidos_tutor}?`,
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
+
+
+// --------------------------------------------------eliminar tutor
+async eliminarTutor() {
+  const run_tutor = this.runTutorParam;
+
+  // 1. Verificar si tiene mascotas asociadas
+  const { data: mascotas, error } = await supabase
+    .from('mascota')
+    .select('id_masc')
+    .eq('run_tutor', run_tutor);
+
+  if (error) {
+    this.mostrarToast('No se puede eliminar un tutor con mascotas asignadas', 'danger');
+    return;
+  }
+
+  if (mascotas.length > 0) {
+    // 2. Si tiene mascotas → bloquear eliminación
+    this.mostrarToast('No puedes eliminar un tutor con mascotas registradas.', 'warning');
+    return;
+  }
+
+  // 2. Mostrar toast de confirmación
+  const toast = await this.toastController.create({
+    message: '¿Deseas eliminar este tutor? Esta acción no se puede deshacer.',
+    position: 'middle',
+    color: 'danger',
+    duration: 0, // No se cierra automáticamente
+    buttons: [
+      {
+        text: 'Cancelar',
+        role: 'cancel',
+        handler: () => {
+          // No hacer nada
         },
-        {
-          text: 'Eliminar',
-          handler: () => this.eliminarTutor(tutor.run_tutor)
-        }
-      ]
-    });
+      },
+      {
+        text: 'Sí',
+        handler: async () => {
+          // 3. Eliminar tutor si se confirma
+          const { error: deleteError } = await supabase
+            .from('tutor')
+            .delete()
+            .eq('run_tutor', run_tutor);
 
-    await alert.present();
-  }
+          if (deleteError) {
+            this.mostrarToast('Error al eliminar tutor: ' + deleteError.message, 'danger');
+          } else {
+            this.mostrarToast('Tutor eliminado correctamente', 'success');
+            this.router.navigate(['/tutor']);
+          }
+        },
+      },
+    ],
+  });
 
-  async eliminarTutor(runTutor: string) {
-    const { error } = await supabase
-      .from('tutor')
-      .delete()
-      .eq('run_tutor', runTutor);
+  await toast.present();
+}
 
-    if (error) {
-      console.error('Error al eliminar tutor:', error);
-      this.mostrarToast('Error al eliminar tutor', 'danger');
-      return;
-    }
 
-    const toast = await this.toastController.create({
-      message: 'Tutor eliminado correctamente',
-      duration: 2000,
-      color: 'success'
-    });
 
-    await toast.present();
-    this.router.navigate(['/tutor']);
-  }
-
+// -------------------------------------------------- toast
   async mostrarToast(mensaje: string, color: string = 'success') {
     const toast = await this.toastController.create({
       message: mensaje,
       duration: 2000,
       color,
-      position: 'middle'
+      position: 'middle',
+
     });
     toast.present();
   }
