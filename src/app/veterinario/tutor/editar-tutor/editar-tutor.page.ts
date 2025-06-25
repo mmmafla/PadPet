@@ -22,8 +22,8 @@ export class EditarTutorPage implements OnInit {
   tutorForm!: FormGroup;
   regiones: any[] = [];
   ciudades: any[] = [];
-  runTutorParam: string = '';
-  tutorActual: any; // Variable para guardar el tutor cargado
+  idTutorParam: string = '';
+  tutorActual: any;
 
   constructor(
     private fb: FormBuilder,
@@ -40,24 +40,24 @@ export class EditarTutorPage implements OnInit {
       apellidos_tutor: ['', Validators.required],
       direccion_tutor: ['', Validators.required],
       correo_tutor: ['', [Validators.required, Validators.email]],
-      celular_tutor: ['', Validators.required],
+      celular_tutor: ['', [Validators.required, Validators.maxLength(11)]],
       id_region: ['', Validators.required],
       id_ciudad: ['', Validators.required]
     });
 
-    this.runTutorParam = this.route.snapshot.paramMap.get('runTutor') || '';
-    if (this.runTutorParam) {
-      await this.cargarTutor(this.runTutorParam);
+    this.idTutorParam = this.route.snapshot.paramMap.get('idTutor') || '';
+    if (this.idTutorParam) {
+      await this.cargarTutor(this.idTutorParam);
     }
 
     await this.cargarRegiones();
   }
 
-  async cargarTutor(runTutor: string) {
+  async cargarTutor(idTutor: string) {
     const { data, error } = await supabase
       .from('tutor')
       .select('*')
-      .eq('run_tutor', runTutor)
+      .eq('id_tutor', idTutor)
       .single();
 
     if (error) {
@@ -126,7 +126,7 @@ export class EditarTutorPage implements OnInit {
     const { error } = await supabase
       .from('tutor')
       .update(tutorActualizado)
-      .eq('run_tutor', this.runTutorParam);
+      .eq('id_tutor', this.idTutorParam);
 
     if (error) {
       console.error('Error al actualizar tutor:', error);
@@ -139,45 +139,54 @@ export class EditarTutorPage implements OnInit {
     }
   }
 
-  async confirmarEliminarTutor(tutor: any) {
-    const alert = await this.alertController.create({
-      header: 'Confirmar eliminación',
-      message: `¿Seguro que quieres eliminar a ${tutor.nombre_tutor} ${tutor.apellidos_tutor}?`,
-      buttons: [
-        {
-          text: 'Cancelar',
-          role: 'cancel'
-        },
-        {
-          text: 'Eliminar',
-          handler: () => this.eliminarTutor(tutor.run_tutor)
-        }
-      ]
-    });
+  async eliminarTutor() {
+    const id_tutor = this.idTutorParam;
 
-    await alert.present();
-  }
-
-  async eliminarTutor(runTutor: string) {
-    const { error } = await supabase
-      .from('tutor')
-      .delete()
-      .eq('run_tutor', runTutor);
+    const { data: mascotas, error } = await supabase
+      .from('mascota')
+      .select('id_masc')
+      .eq('id_tutor', id_tutor);
 
     if (error) {
-      console.error('Error al eliminar tutor:', error);
-      this.mostrarToast('Error al eliminar tutor', 'danger');
+      this.mostrarToast('No se puede verificar mascotas asociadas', 'danger');
+      return;
+    }
+
+    if (mascotas.length > 0) {
+      this.mostrarToast('No puedes eliminar un tutor con mascotas registradas.', 'warning');
       return;
     }
 
     const toast = await this.toastController.create({
-      message: 'Tutor eliminado correctamente',
-      duration: 2000,
-      color: 'success'
+      message: '¿Deseas eliminar este tutor? Esta acción no se puede deshacer.',
+      position: 'middle',
+      color: 'danger',
+      duration: 0,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+        },
+        {
+          text: 'Sí',
+          handler: async () => {
+            const { error: deleteError } = await supabase
+              .from('tutor')
+              .delete()
+              .eq('id_tutor', id_tutor);
+
+            if (deleteError) {
+              this.mostrarToast('Error al eliminar tutor: ' + deleteError.message, 'danger');
+            } else {
+              this.mostrarToast('Tutor eliminado correctamente', 'success');
+              this.router.navigate(['/tutor']);
+            }
+          },
+        },
+      ],
     });
 
     await toast.present();
-    this.router.navigate(['/tutor']);
   }
 
   async mostrarToast(mensaje: string, color: string = 'success') {
@@ -185,7 +194,7 @@ export class EditarTutorPage implements OnInit {
       message: mensaje,
       duration: 2000,
       color,
-      position: 'middle'
+      position: 'middle',
     });
     toast.present();
   }

@@ -37,7 +37,7 @@ export class AgregarTutorPage implements OnInit {
       apellidos_tutor: ['', Validators.required],
       direccion_tutor: ['', Validators.required],
       correo_tutor: ['', [Validators.required, Validators.email]],
-      celular_tutor: ['', Validators.required],
+      celular_tutor: ['', [Validators.required, Validators.maxLength(11)]],
       id_region: ['', Validators.required],
       id_ciudad: ['', Validators.required]
     });

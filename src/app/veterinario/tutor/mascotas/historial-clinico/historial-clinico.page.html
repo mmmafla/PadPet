@@ -1,4 +1,4 @@
-<app-header backButton="/veterinario/tutor/mascotas/{{idMasc}}" title="Historial Clínico"></app-header>
+<app-header [backButton]="'/veterinario/tutor/mascotas/' + idMasc" title="Historial Clínico"></app-header>
 
 <ion-content class="fondo ion-padding">
   <ion-card *ngIf="atenciones.length > 0">

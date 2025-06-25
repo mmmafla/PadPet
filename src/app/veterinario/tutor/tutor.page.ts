@@ -1,6 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { IonicModule, RefresherCustomEvent, AlertController, ToastController, LoadingController } from '@ionic/angular';
+import {
+  IonicModule,
+  RefresherCustomEvent,
+  AlertController,
+  ToastController,
+  LoadingController
+} from '@ionic/angular';
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
 import { createClient } from '@supabase/supabase-js';
 import { CommonModule } from '@angular/common';
@@ -30,81 +36,75 @@ export class TutorPage implements OnInit {
   ) {}
 
   async ngOnInit() {
-    await this.cargarTutores(); // Se ejecuta solo una vez
+    await this.cargarTutores();
   }
 
-  // Se ejecuta cada vez que vuelves a esta vista
   async ionViewWillEnter() {
     await this.cargarTutores();
   }
-//-------------------------
-async cargarTutores() {
-  const loading = await this.loadingController.create({
-    spinner: 'circles'
-  });
 
-  await loading.present();
+  async cargarTutores() {
+    const loading = await this.loadingController.create({
+      spinner: 'circles'
+    });
 
-  const { data: user, error: userError } = await supabase.auth.getUser();
-  if (userError || !user.user) {
-    console.error('Usuario no autenticado');
+    await loading.present();
+
+    const { data: user, error: userError } = await supabase.auth.getUser();
+    if (userError || !user.user) {
+      console.error('Usuario no autenticado');
+      await loading.dismiss();
+      return;
+    }
+
+    const { data: vet, error: vetError } = await supabase
+      .from('veterinario')
+      .select('run_vet')
+      .eq('id_auth', user.user.id)
+      .single();
+
+    if (vetError || !vet) {
+      console.error('No se encontró el veterinario', vetError);
+      await loading.dismiss();
+      return;
+    }
+
+    const { data: tutores, error: tutoresError } = await supabase
+      .from('tutor')
+      .select(`*, mascota(*)`)
+      .eq('run_vet', vet.run_vet);
+
+    if (tutoresError) {
+      console.error('Error al cargar tutores', tutoresError);
+    } else {
+      this.tutores = tutores;
+      this.tutoresFiltrados = tutores;
+    }
+
     await loading.dismiss();
-    return;
   }
-
-  const { data: vet, error: vetError } = await supabase
-    .from('veterinario')
-    .select('run_vet')
-    .eq('id_auth', user.user.id)
-    .single();
-
-  if (vetError || !vet) {
-    console.error('No se encontró el veterinario', vetError);
-    await loading.dismiss();
-    return;
-  }
-
-  const { data: tutores, error: tutoresError } = await supabase
-    .from('tutor')
-    .select(`*, mascota(*)`)
-    .eq('run_vet', vet.run_vet);
-
-  if (tutoresError) {
-    console.error('Error al cargar tutores', tutoresError);
-  } else {
-    this.tutores = tutores;
-    this.tutoresFiltrados = tutores; // 👈 Agrega esta línea para que se vean
-  }
-
-  await loading.dismiss();
-}
-
-
-
 
   filtrarTutores() {
-  const filtro = this.busqueda.trim().toLowerCase();
-  this.tutoresFiltrados = this.tutores.filter(tutor =>
-    (tutor.nombre_tutor + ' ' + (tutor.apellidos_tutor || '')).toLowerCase().includes(filtro)
-  );
-}
+    const filtro = this.busqueda.trim().toLowerCase();
+    this.tutoresFiltrados = this.tutores.filter(tutor =>
+      (tutor.nombre_tutor + ' ' + (tutor.apellidos_tutor || '')).toLowerCase().includes(filtro)
+    );
+  }
 
   irAgregarTutor() {
     this.router.navigate(['/veterinario/tutor/agregar-tutor']);
   }
 
-  irEditarTutor(runTutor: string) {
-    this.router.navigate(['/veterinario/tutor/editar-tutor', runTutor]);
+  irEditarTutor(idTutor: number) {
+    this.router.navigate(['/tutor/editar-tutor', idTutor]);
   }
 
-  irVerMascotas(runTutor: string) {
-    this.router.navigate(['/veterinario/tutor/mascotas', runTutor]);
+  irVerMascotas(idTutor: number) {
+    this.router.navigate(['/veterinario/tutor/mascotas', idTutor]);
   }
 
   async handleRefresh(event: RefresherCustomEvent) {
     await this.cargarTutores();
     event.detail.complete();
   }
-
-
 }

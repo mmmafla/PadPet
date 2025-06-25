@@ -1,4 +1,4 @@
-<app-header backButton="/veterinario/tutor" title="Mascotas"></app-header>
+<app-header backButton="/tutor" title="Editar Mascota"></app-header>
 
 <ion-content class="fondo ion-padding">
 
@@ -6,11 +6,6 @@
     <ion-refresher-content></ion-refresher-content>
   </ion-refresher>
 
-  <ion-fab vertical="bottom" horizontal="center" slot="fixed" (click)="irAgregarMascota()">
-    <ion-fab-button>
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-  </ion-fab>
 
   <ion-card class="ion-card">
     <ion-card-title>
@@ -29,8 +24,10 @@
   </ion-item>
 
   <ion-item-options side="end">
-    <ion-item-option color="primary" (click)="irEditarMascota(mascota.id_masc)">Editar</ion-item-option>
-    <ion-item-option color="secondary" (click)="verHistorialClinico(mascota.id_masc)">Ver Historial Clínico</ion-item-option>
+    <ion-item-option style="background-color: #8acabd;" (click)="irEditarMascota(mascota.id_masc)">
+                      <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+                    </ion-item-option>
+    <ion-item-option style="background-color: #8a9aca;" (click)="verHistorialClinico(mascota.id_masc)">Ver Historial</ion-item-option>
   </ion-item-options>
 </ion-item-sliding>
 
@@ -44,5 +41,13 @@
       </ng-template>
     </ion-card-content>
   </ion-card>
+
+
+    <!-- Botón agregar mascota -->
+  <div class="boton-agregar">
+    <ion-button class="agregar-mascota" expand="block" (click)="irAgregarMascota()">
+      <ion-icon name="add" slot="start"></ion-icon> Agregar mascota
+    </ion-button>
+  </div>
 
 </ion-content>
