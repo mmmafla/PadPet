@@ -1,56 +1,54 @@
-<app-header  backButton="/home" title="Detalle de Atención"></app-header>
+<app-header backButton="/home" title="Detalle de Atención"></app-header>
 
 <ion-content class="fondo">
 
-<ion-card class="card3">
-    <h2>Atención de {{ atencion?.mascota?.masc_nom }}</h2>
-  <h3 style="text-align: center;">Dueño: {{atencion.mascota?.tutor?.nombre_tutor}} {{atencion.mascota?.tutor?.apellidos_tutor}} </h3>
-    <p><strong>Correo Tutor:</strong> {{ atencion?.mascota?.tutor?.correo_tutor }}</p>
-    <p><strong>Teléfono Tutor:</strong> {{ atencion?.mascota?.tutor?.celular_tutor }}</p>
+  <!-- Spinner opcional durante carga -->
+  <ion-spinner *ngIf="!atencion" name="crescent" style="display: block; margin: 2rem auto;"></ion-spinner>
 
-  
-  <p><strong>Fecha:</strong> {{ atencion?.fecha_hora_atencion | date:'medium' }}</p>
-  <p><strong>Motivo:</strong> {{ atencion?.motivo_consulta?.motivo }}</p>
-  <p><strong>Anamnesis:</strong> {{atencion?.anamnesis}}</p>
-  <p><strong>Diagnóstico:</strong> {{ atencion?.diagnostico }}</p>
-  <p><strong>Observaciones:</strong> {{atencion?.observaciones}}</p>
-  <p><strong>Tratamiento/Indicaciones:</strong> {{ atencion?.tratamiento }}</p>
+  <!-- Solo muestra la tarjeta si la data ya está cargada -->
+  <ion-card class="card3" *ngIf="atencion">
+    <h2>Atención de {{ atencion.mascota?.masc_nom }}</h2>
+    <h3 style="text-align: center;">
+      Dueño: {{ atencion.mascota?.tutor?.nombre_tutor }} {{ atencion.mascota?.tutor?.apellidos_tutor }}
+    </h3>
+    <p><strong>Correo Tutor:</strong> {{ atencion.mascota?.tutor?.correo_tutor }}</p>
+    <p><strong>Teléfono Tutor:</strong> {{ atencion.mascota?.tutor?.celular_tutor }}</p>
 
-     <h4 style="text-align: center;">Examen objetivo general</h4>
+    <p><strong>Fecha:</strong> {{ atencion.fecha_hora_atencion | date:'medium' }}</p>
+    <p><strong>Motivo:</strong> {{ atencion.motivo_consulta?.motivo }}</p>
+    <p><strong>Anamnesis:</strong> {{ atencion.anamnesis }}</p>
+    <p><strong>Diagnóstico:</strong> {{ atencion.diagnostico }}</p>
+    <p><strong>Observaciones:</strong> {{ atencion.observaciones }}</p>
+    <p><strong>Tratamiento/Indicaciones:</strong> {{ atencion.tratamiento }}</p>
 
-      <p><strong>Mucosas:</strong> {{atencion?.mucosa}}</p>
-      <p><strong>Temperatura:</strong> {{atencion?.temperatura}} C°</p>
-      <p><strong>Peso:</strong> {{atencion?.peso}} Kg</p>
-      <p><strong>Condicion corporal:</strong> {{atencion?.condicion_corporal}}</p>
-      <p><strong>Estado sensorial:</strong> {{atencion?.estado_sensorial?.estado_sensorial}}</p>
-      <p><strong>Hidratación:</strong> {{atencion?.hidratacion?.estado_hidratacion}}</p>
-      <p><strong>Observación:</strong> {{atencion?.observacion_examen}}</p>
-       
-        <h4 style="text-align: center;"> Examamen objetivo particular</h4>
+    <h4 style="text-align: center;">Examen objetivo general</h4>
 
-        <h4 style="text-align: center;"> Alimentación</h4>
-        <h4 style="text-align: center;"> Productos aplicados</h4>
+    <p><strong>Mucosas: </strong> {{ atencion.mucosa }}</p>
+    <p><strong>Temperatura :</strong> {{ atencion.temperatura }} C°</p>
+    <p><strong>Peso: </strong> {{ atencion.peso }} Kg</p>
+    <p><strong>Condicion corporal: </strong> {{ atencion.condicion_corporal }}</p>
+    <p><strong>Estado sensorial: </strong> {{ atencion.estado_sensorial?.estado_sensorial }}</p>
+    <p><strong>Hidratación: </strong> {{ atencion.hidratacion?.estado_hidratacion }}</p>
+    <p><strong>Observación: </strong> {{ atencion.observacion_examen }}</p>
 
+    <h4 style="text-align: center;">Examen objetivo particular</h4>
 
+    <p><strong>Piel y Pelaje: </strong> {{ atencion.piel_obp?.estado_piel }}</p>
+    <p><strong>Ojos: </strong> {{ atencion.ojos_obp?.estado_ojos }}</p>
+    <p><strong>Oidos: </strong> {{ atencion.oidos_obp?.estado_oidos }}</p>
+    <p><strong>Dentadura: </strong> {{ atencion.dentadura_obp?.estado_dentadura }}</p>
 
-
-        <h4 style="text-align: center;">Próximo control</h4>
-        <p *ngIf="atencion?.proximo_control">
-          <strong>Fecha y hora:</strong> {{ atencion.proximo_control | date: 'medium' }}
-        </p>
-        <p *ngIf="!atencion?.proximo_control">
-          <em>No se ha definido un próximo control.</em>
-        </p>
-
-
+    <h4 style="text-align: center;">Alimentación</h4>
+    <h4 style="text-align: center;">Productos aplicados</h4>
+    <h4 style="text-align: center;">Próximo control</h4>
 
     <ion-button expand="block" (click)="modificarConsulta()">Modificar consulta</ion-button>
+    <ion-button expand="block" (click)="exportarPdf()">Descargar atención</ion-button>
 
-    <ion-button expand="block" (click)="exportarPdf()"> Descargar atención</ion-button>
 
     <ion-button expand="block" (click)="enviarPdf()">Enviar consulta</ion-button>
 
-    
+
   </ion-card>
- 
+
 </ion-content>

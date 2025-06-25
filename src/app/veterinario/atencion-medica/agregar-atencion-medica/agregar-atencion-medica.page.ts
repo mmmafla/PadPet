@@ -5,8 +5,6 @@ import { IonicModule, ModalController, ToastController } from '@ionic/angular';
 import { createClient } from '@supabase/supabase-js';
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
 import { ModalFechaComponent } from 'src/app/modal-fecha/modal-fecha.component';
-import { CalendarService } from 'src/app/services/calendar.service';
-import { AuthService } from 'src/app/services/auth.service';
 
 const supabaseUrl = 'https://irorlonysbmkbdthvrmt.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyb3Jsb255c2Jta2JkdGh2cm10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYyODgwMDQsImV4cCI6MjA2MTg2NDAwNH0.s-ZEteHxMWX43NCQIuNmTWpbBoEUxseKyg_YaXpi6Ek';
@@ -29,33 +27,51 @@ export class AgregarAtencionMedicaPage implements OnInit {
   estadoSensorial: any[] = [];
   nivelesHidratacion: any[] = [];
 
+  tratamientoList: any[] = [];
+
+  // Examen objetivo particular
+  pielOpciones: any[] = [];
+  mostrarObservacionPiel = false;
+  ojosOpciones: any[] = [];
+  mostrarObservacionOjos = false;
+  oidosOpciones: any[] = [];
+  mostrarObservacionOidos = false;
+  dentaduraOpciones: any[] = [];
+  mostrarObservacionDentadura = false;
+
   motivosConsulta: any[] = [];
 
-  proximoControl: string | null = null;
+  mostrarSelectorFecha = false;
+  mostrarSelectorHora = false;
 
-atencion = {
-  motivo: null,
-  anamnesis: '',
-  diagnostico: '',
-  tratamiento: '',
-  observaciones: '',
-  mucosa: '',
-  temperatura: null,
-  peso: null,
-  condicion_corporal: '',
-  observacion: '',
-  estado_sensorial_id: null,
-  hidratacion_id: null,
-  fecha: '',
-  hora: ''
-};
-
-
+  atencion = {
+    motivo: null,
+    anamnesis: '',
+    diagnostico: '',
+    tratamiento: '',
+    tratamiento_indicaciones: '',
+    observaciones: '',
+    mucosa: '',
+    temperatura: null,
+    peso: null,
+    condicion_corporal: '',
+    observacion: '',
+    estado_sensorial_id: null,
+    hidratacion_id: null,
+    fecha: '',
+    hora: '',
+    id_piel: null,
+    piel_observacion: '',
+    id_ojos: null,
+    ojos_observacion: '',
+    id_oidos: null,
+    oidos_observacion: '',
+    id_dentadura: null,
+    dentadura_observacion: '',
+  };
 
   constructor(
     private modalCtrl: ModalController,
-    private authService: AuthService,
-    private calendarService: CalendarService,
     private toastController: ToastController
   ) {}
 
@@ -64,14 +80,16 @@ atencion = {
     this.cargarMotivosConsulta();
     this.cargarEstadosSensoriales();
     this.cargarNivelesHidratacion();
+    this.cargarPielOpciones();
+    this.cargarOjosOpciones();
+    this.cargarOidosOpciones();
+    this.cargarDentaduraOpciones();
   }
 
+  // ------------------------- Carga de datos -------------------------
   async cargarTutores() {
     const { data: user, error: userError } = await supabase.auth.getUser();
-    if (userError || !user.user) {
-      console.error('Usuario no autenticado');
-      return;
-    }
+    if (userError || !user.user) return console.error('Usuario no autenticado');
 
     const { data: vet, error: vetError } = await supabase
       .from('veterinario')
@@ -79,35 +97,84 @@ atencion = {
       .eq('id_auth', user.user.id)
       .single();
 
-    if (vetError || !vet) {
-      console.error('Veterinario no encontrado');
-      return;
-    }
+    if (vetError || !vet) return console.error('Veterinario no encontrado');
 
     const { data: tutores, error: tutoresError } = await supabase
       .from('tutor')
       .select(`*, mascota(*)`)
       .eq('run_vet', vet.run_vet);
 
-    if (tutoresError) {
-      console.error('Error al cargar tutores:', tutoresError);
-    } else {
-      this.tutores = tutores;
-    }
+    if (tutoresError) return console.error('Error al cargar tutores:', tutoresError);
+    this.tutores = tutores;
   }
 
   async cargarMotivosConsulta() {
-    const { data, error } = await supabase
-      .from('motivo_consulta')
-      .select('*');
-
-    if (error) {
-      console.error('Error al cargar motivos:', error);
-    } else {
-      this.motivosConsulta = data;
-    }
+    const { data, error } = await supabase.from('motivo_consulta').select('*');
+    if (error) return console.error('Error al cargar motivos:', error);
+    this.motivosConsulta = data;
   }
 
+  async cargarEstadosSensoriales() {
+    const { data, error } = await supabase.from('estado_sensorial').select('id_estado_sensorial, estado_sensorial');
+    if (error) return console.error('Error al cargar estados sensoriales:', error);
+    this.estadoSensorial = data;
+  }
+
+  async cargarNivelesHidratacion() {
+    const { data, error } = await supabase.from('hidratacion').select('hidratacion_id, estado_hidratacion');
+    if (error) return console.error('Error al cargar niveles de hidratación:', error);
+    this.nivelesHidratacion = data;
+  }
+
+  async cargarPielOpciones() {
+    const { data, error } = await supabase.from('piel_obp').select('*');
+    if (error) return console.error('Error al cargar Piel', error);
+    this.pielOpciones = data;
+    this.verificarObservacionPiel();
+  }
+
+  verificarObservacionPiel() {
+    const seleccionada = this.pielOpciones.find(d => d.id_piel === this.atencion.id_piel);
+    this.mostrarObservacionPiel = seleccionada?.requiere_observacion === true;
+  }
+
+  async cargarOjosOpciones() {
+    const { data, error } = await supabase.from('ojos_obp').select('*');
+    if (error) return console.error('Error al cargar Ojos', error);
+    this.ojosOpciones = data;
+    this.verificarObservacionOjos();
+  }
+
+  verificarObservacionOjos() {
+    const seleccionada = this.ojosOpciones.find(d => d.id_ojos === this.atencion.id_ojos);
+    this.mostrarObservacionOjos = seleccionada?.requiere_observacion === true;
+  }
+
+  async cargarOidosOpciones() {
+    const { data, error } = await supabase.from('oidos_obp').select('*');
+    if (error) return console.error('Error al cargar Oidos', error);
+    this.oidosOpciones = data;
+    this.verificarObservacionOidos();
+  }
+
+  verificarObservacionOidos() {
+    const seleccionada = this.oidosOpciones.find(d => d.id_oidos === this.atencion.id_oidos);
+    this.mostrarObservacionOidos = seleccionada?.requiere_observacion === true;
+  }
+
+  async cargarDentaduraOpciones() {
+    const { data, error } = await supabase.from('dentadura_obp').select('*');
+    if (error) return console.error('Error al cargar Dentadura', error);
+    this.dentaduraOpciones = data;
+    this.verificarObservacionDentadura();
+  }
+
+  verificarObservacionDentadura() {
+    const seleccionada = this.dentaduraOpciones.find(d => d.id_dentadura === this.atencion.id_dentadura);
+    this.mostrarObservacionDentadura = seleccionada?.requiere_observacion === true;
+  }
+
+  // ------------------------- Tutor y mascota -------------------------
   filtrarTutores() {
     const filtro = this.busquedaTutor.trim().toLowerCase();
     this.tutoresFiltrados = this.tutores.filter(tutor =>
@@ -122,65 +189,45 @@ atencion = {
     this.mascotaSeleccionada = null;
   }
 
-
-  // ----
-  async cargarEstadosSensoriales() {
-  const { data, error } = await supabase
-    .from('estado_sensorial')
-    .select('id_estado_sensorial, estado_sensorial');
-
-  if (error) {
-    console.error('Error al cargar estados sensoriales:', error);
-  } else {
-    this.estadoSensorial = data;
+  // ------------------------- Fecha y hora -------------------------
+  abrirSelectorHora() {
+    this.mostrarSelectorHora = true;
   }
-}
 
-async cargarNivelesHidratacion() {
-  const { data, error } = await supabase
-    .from('hidratacion')
-    .select('hidratacion_id, estado_hidratacion');
-
-  if (error) {
-    console.error('Error al cargar niveles de hidratación:', error);
-  } else {
-    this.nivelesHidratacion = data;
+  seleccionarFecha(event: any) {
+    this.atencion.fecha = event.detail.value.split('T')[0];
   }
-}
-// ----
-   
-//----------------------------------FECHA Y HORA DE ATENCION-----------------------------
-mostrarSelectorFecha = false;
-mostrarSelectorHora = false;
 
-abrirSelectorHora() {
-  this.mostrarSelectorHora = true;
-}
-seleccionarFecha(event: any) {
-  this.atencion.fecha = event.detail.value.split('T')[0]; // solo YYYY-MM-DD
-}
-seleccionarHora(event: any) {
-  this.atencion.hora = event.detail.value.split('T')[1].substring(0, 5); // HH:mm
-}
-async abrirSelectorFecha() {
-  const modal = await this.modalCtrl.create({
-    component: ModalFechaComponent,
-    componentProps: { fecha: this.atencion.fecha }
-  });
-
-  await modal.present();
-
-  const { data } = await modal.onDidDismiss();
-  if (data) {
-    this.atencion.fecha = data.fecha;
-    this.atencion.hora = data.hora;
+  seleccionarHora(event: any) {
+    this.atencion.hora = event.detail.value.split('T')[1].substring(0, 5);
   }
-}
-// ---------------------------------------
-    async obtenerRunVet(): Promise<number | null> {
+
+  async abrirSelectorFecha() {
+    const modal = await this.modalCtrl.create({
+      component: ModalFechaComponent,
+      componentProps: { fecha: this.atencion.fecha }
+    });
+    await modal.present();
+    const { data } = await modal.onDidDismiss();
+    if (data) {
+      this.atencion.fecha = data.fecha;
+      this.atencion.hora = data.hora;
+    }
+  }
+
+  // ------------------------- Tratamiento -------------------------
+  agregarMedicamento() {
+    this.tratamientoList.push({ nombre: '', dosis: '', duracion: '' });
+  }
+
+  eliminarMedicamento(index: number) {
+    this.tratamientoList.splice(index, 1);
+  }
+
+  // ------------------------- Guardar atención -------------------------
+  async obtenerRunVet(): Promise<number | null> {
     const { data: userData } = await supabase.auth.getUser();
     const userId = userData.user?.id;
-
     if (!userId) return null;
 
     const { data, error } = await supabase
@@ -196,89 +243,30 @@ async abrirSelectorFecha() {
 
     return data.run_vet;
   }
-//----------------------------------FECHA Y HORA DE ATENCION-----------------------------
-//----------------------------------GUARDAR ATENCION-----------------------------
-async guardarAtencion() {
-  if (!this.tutorSeleccionado || !this.mascotaSeleccionada) {
-    this.mostrarToast('Debes seleccionar un tutor y una mascota.');
-    return;
-  }
 
-  if (!this.atencion.fecha || !this.atencion.hora || !this.atencion.motivo) {
-    this.mostrarToast('Completa los campos obligatorios: fecha, hora y motivo.');
-    return;
-  }
+  async guardarAtencion() {
 
-  const runVet = await this.obtenerRunVet();
-  if (!runVet) {
-    this.mostrarToast('No se pudo identificar al veterinario.');
-    return;
-  }
+    if (!this.tutorSeleccionado || !this.mascotaSeleccionada) return this.mostrarToast('Debes seleccionar un tutor y una mascota.');
+    if (!this.atencion.fecha || !this.atencion.hora || !this.atencion.motivo) return this.mostrarToast('Completa los campos obligatorios: fecha, hora y motivo.');
 
-  const fechaHoraAtencion = new Date(`${this.atencion.fecha}T${this.atencion.hora}`);
+    const runVet = await this.obtenerRunVet();
+    if (!runVet) return this.mostrarToast('No se pudo identificar al veterinario.');
 
-  const { error } = await supabase.from('atencion_medica').insert([{
-    motivo_id: this.atencion.motivo,
-    anamnesis: this.atencion.anamnesis,
-    diagnostico: this.atencion.diagnostico,
-    tratamiento: this.atencion.tratamiento,
-    observaciones: this.atencion.observaciones,
-    mucosa: this.atencion.mucosa,
-    temperatura: this.atencion.temperatura,
-    peso: this.atencion.peso,
-    condicion_corporal: this.atencion.condicion_corporal,
-    observacion_examen: this.atencion.observacion,
-    estado_sensorial_id: this.atencion.estado_sensorial_id,
-    hidratacion_id: this.atencion.hidratacion_id,
-    id_masc: this.mascotaSeleccionada.id_masc,
-    fecha_hora_atencion: fechaHoraAtencion.toISOString(),
-    run_vet: runVet,
-    proximo_control: this.proximoControl ? new Date(this.proximoControl).toISOString() : null,
-  }]);
+    const fechaHoraAtencion = new Date(`${this.atencion.fecha}T${this.atencion.hora}`);
 
-  if (error) {
-    console.error('Error al guardar la atención:', error);
-    this.mostrarToast('Hubo un error al guardar la atención.');
-  } else {
-    this.mostrarToast('Atención médica guardada exitosamente.');
+    console.log('Observaciones a guardar:', {
+      obs_piel: this.atencion.piel_observacion,
+      obs_ojos: this.atencion.ojos_observacion,
+      obs_oidos: this.atencion.oidos_observacion,
+      obs_dentadura: this.atencion.dentadura_observacion,
+    });
 
-    // -------- GOOGLE CALENDAR: agregar evento si hay fecha de próximo control -------
-    if (this.proximoControl) {
-      try {
-        const accessToken = await this.authService.loginWithGoogle();
-        const fechaInicio = new Date(this.proximoControl);
-        const fechaFin = new Date(fechaInicio.getTime() + 30 * 60 * 1000); // +30 minutos
-
-        await this.calendarService.createEvent(accessToken, {
-          summary: 'Próximo control médico para mascota',
-          description: `Control de ${this.mascotaSeleccionada.masc_nom}`,
-          start: {
-            dateTime: fechaInicio.toISOString(),
-            timeZone: 'America/Santiago',
-          },
-          end: {
-            dateTime: fechaFin.toISOString(),
-            timeZone: 'America/Santiago',
-          },
-          reminders: {
-            useDefault: false,
-            overrides: [{ method: 'popup', minutes: 10 }],
-          },
-        });
-
-        console.log('Evento creado en Google Calendar');
-      } catch (calendarError) {
-        console.error('Error al crear evento en Google Calendar:', calendarError);
-      }
-    }
-
-    // ------------------------------------------------------------------------
-
-    console.log('Valores a insertar:', {
+    const { error } = await supabase.from('atencion_medica').insert([{
       motivo_id: this.atencion.motivo,
       anamnesis: this.atencion.anamnesis,
       diagnostico: this.atencion.diagnostico,
       tratamiento: this.atencion.tratamiento,
+      tratamiento_indicaciones: this.atencion.tratamiento_indicaciones,
       observaciones: this.atencion.observaciones,
       mucosa: this.atencion.mucosa,
       temperatura: this.atencion.temperatura,
@@ -288,38 +276,54 @@ async guardarAtencion() {
       estado_sensorial_id: this.atencion.estado_sensorial_id,
       hidratacion_id: this.atencion.hidratacion_id,
       id_masc: this.mascotaSeleccionada.id_masc,
-      fecha_hora_atencion: fechaHoraAtencion.toISOString()
-    });
+      fecha_hora_atencion: fechaHoraAtencion.toISOString(),
+      run_vet: runVet,
+      id_piel: this.atencion.id_piel,
+      id_ojos: this.atencion.id_ojos,
+      id_oidos: this.atencion.id_oidos,
+      id_dentadura: this.atencion.id_dentadura,
+      obs_piel: this.atencion.piel_observacion,
+      obs_ojos: this.atencion.ojos_observacion,
+      obs_oidos: this.atencion.oidos_observacion,
+      obs_dentadura: this.atencion.dentadura_observacion,
+    }]);
 
+    if (error) return this.mostrarToast('Hubo un error al guardar la atención.');
+    this.mostrarToast('Atención médica guardada exitosamente.');
     this.reiniciarFormulario();
   }
-}
 
+  reiniciarFormulario() {
+    this.atencion = {
+      motivo: null,
+      anamnesis: '',
+      diagnostico: '',
+      tratamiento: '',
+      tratamiento_indicaciones: '',
+      observaciones: '',
+      mucosa: '',
+      temperatura: null,
+      peso: null,
+      condicion_corporal: '',
+      observacion: '',
+      estado_sensorial_id: null,
+      hidratacion_id: null,
+      fecha: '',
+      hora: '',
+      id_piel: null,
+      piel_observacion: '',
+      id_ojos: null,
+      ojos_observacion: '',
+      id_oidos: null,
+      oidos_observacion: '',
+      id_dentadura: null,
+      dentadura_observacion: '',
+    };
+    this.tutorSeleccionado = null;
+    this.mascotaSeleccionada = null;
+  }
 
-reiniciarFormulario() {
-  this.atencion = {
-    motivo: null,
-    anamnesis: '',
-    diagnostico: '',
-    tratamiento: '',
-    observaciones: '',
-    mucosa: '',
-    temperatura: null,
-    peso: null,
-    condicion_corporal: '',
-    observacion: '',
-    estado_sensorial_id: null,
-    hidratacion_id: null,
-    fecha: '',
-    hora: ''
-  };
-  this.tutorSeleccionado = null;
-  this.mascotaSeleccionada = null;
-}
-
-
-
- private async mostrarToast(mensaje: string, color: string = 'success') {
+  private async mostrarToast(mensaje: string, color: string = 'success') {
     const toast = await this.toastController.create({
       message: mensaje,
       duration: 2000,
@@ -328,6 +332,4 @@ reiniciarFormulario() {
     });
     toast.present();
   }
-
-
 }

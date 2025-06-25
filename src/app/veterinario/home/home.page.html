@@ -2,13 +2,19 @@
 
 <ion-content class="fondo">
 
-  <ion-card *ngIf="mostrarMensajeSolicitud" color="warning" class="ion-padding">
-    <ion-card-content>
-      <ion-icon name="information-circle-outline" slot="start"></ion-icon>
-      <strong>Solicitud enviada:</strong> {{ estadoSolicitud | titlecase }} <br />
-      Tu solicitud está siendo revisada por un moderador.
-    </ion-card-content>
-  </ion-card>
+<ion-card *ngIf="mostrarMensajeSolicitud" color="warning" class="ion-padding position-relative" style="border-radius: 20px;">
+  <!-- Botón para cerrar -->
+  <ion-button fill="clear" size="small" class="cerrar-btn" (click)="cerrarMensajeSolicitud()">
+    <ion-icon name="close-outline"></ion-icon>
+  </ion-button>
+
+  <ion-card-content style="text-align: center;">
+<ion-icon name="information-circle-outline" style="font-size: 25px; vertical-align: middle; margin-right: 4px;"></ion-icon>
+
+    <strong>Solicitud enviada:</strong> {{ estadoSolicitud | titlecase }} <br />
+  </ion-card-content>
+</ion-card>
+
 
 <ion-grid>
   <!----perfil-->

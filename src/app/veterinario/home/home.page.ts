@@ -90,4 +90,10 @@ export class HomePage implements OnInit {
     }
   }
 
+
+  cerrarMensajeSolicitud() {
+  this.mostrarMensajeSolicitud = false;
+}
+
+
 }

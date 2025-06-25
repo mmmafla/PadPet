@@ -21,6 +21,10 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 })
 export class AtencionMedicaPage implements OnInit {
   historialAtenciones: any[] = [];
+  filtroMotivo: string = '';
+  filtroFecha: string | null = null;
+  todasLasAtenciones: any[] = []; 
+  motivosDisponibles: any[] = [];
 
 
 
@@ -28,10 +32,13 @@ export class AtencionMedicaPage implements OnInit {
 
   ngOnInit() {
         this.cargarHistorial();
+        this.cargarMotivosConsulta();
+
   }
 
     async ionViewWillEnter() {
-    await this.cargarHistorial()
+    await this.cargarHistorial();
+    await this.cargarMotivosConsulta();
   }
 
 
@@ -93,10 +100,47 @@ async cargarHistorial() {
     return;
   }
 
-  this.historialAtenciones = data;
+  this.todasLasAtenciones = data || [];
+  this.historialAtenciones = [...this.todasLasAtenciones];
 }
 
 
+async cargarMotivosConsulta() {
+  const { data, error } = await supabase
+    .from('motivo_consulta')
+    .select('id, motivo')
+    .order('motivo', { ascending: true });
+
+  if (error) {
+    console.error('Error al cargar motivos:', error);
+    return;
+  }
+
+  this.motivosDisponibles = data || [];
+}
+
+
+
+filtrarAtenciones() {
+  this.historialAtenciones = this.todasLasAtenciones.filter(atencion => {
+    const motivoCoincide = this.filtroMotivo
+      ? atencion.motivo_consulta?.motivo === this.filtroMotivo
+      : true;
+
+    const fechaCoincide = this.filtroFecha
+      ? atencion.fecha_hora_atencion?.startsWith(this.filtroFecha)
+      : true;
+
+    return motivoCoincide && fechaCoincide;
+  });
+}
+
+
+limpiarFiltros() {
+  this.filtroMotivo = '';
+  this.filtroFecha = null;
+  this.historialAtenciones = [...this.todasLasAtenciones];
+}
 
 
 

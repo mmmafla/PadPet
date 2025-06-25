@@ -6,7 +6,6 @@ import { SupabaseService } from 'src/app/services/supabase.service';
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
 import { Router } from '@angular/router';
 import { createClient } from '@supabase/supabase-js';
-
 const supabaseUrl = 'https://irorlonysbmkbdthvrmt.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyb3Jsb255c2Jta2JkdGh2cm10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYyODgwMDQsImV4cCI6MjA2MTg2NDAwNH0.s-ZEteHxMWX43NCQIuNmTWpbBoEUxseKyg_YaXpi6Ek';
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -23,14 +22,12 @@ export class DatosprofesionalesPage implements OnInit {
   paises: any[] = [];
   especialidades: any[] = [];
   universidades: any[] = [];
-  universidadesFiltradas: any[] = []; // ← universidades filtradas por país
+  universidadesFiltradas: any[] = [];
   runVet: string = '';
 
-  // Nueva propiedad para manejar la imagen del certificado
-  fotoTituloUrl: string | null = null;       // Para mostrar preview
-  fotoTituloFileName: string | null = null;  // Nombre de archivo en Storage para eliminar
+  fotoTituloUrl: string | null = null;
+  fotoTituloFileName: string | null = null;
 
-  // Solicitud
   estadoSolicitud: string | null = null;
   mensajeSolicitud: string | null = null;
   solicitudYaExiste = false;
@@ -39,7 +36,9 @@ export class DatosprofesionalesPage implements OnInit {
   toastController = inject(ToastController);
   router = inject(Router);
 
-  ngOnInit() {
+  currentYear = new Date().getFullYear();
+
+  async ngOnInit() {
     this.form = new FormGroup({
       universidad: new FormControl('', Validators.required),
       pais: new FormControl('', Validators.required),
@@ -47,16 +46,14 @@ export class DatosprofesionalesPage implements OnInit {
       anoTitulacion: new FormControl('', [
         Validators.required,
         Validators.min(1980),
-        Validators.max(new Date().getFullYear())
+        Validators.max(this.currentYear)
       ])
     });
 
-    this.cargarCatalogos();
-    this.obtenerRunVetYDatos();
+    await this.cargarCatalogos(); 
+    await this.obtenerRunVetYDatos();
+    await this.verificarSolicitudExistente();
 
-    this.verificarSolicitudExistente();
-
-    // Escucha cambios en país para filtrar universidades
     this.form.get('pais')?.valueChanges.subscribe((idPaisSeleccionado) => {
       this.filtrarUniversidadesPorPais(idPaisSeleccionado);
       this.form.get('universidad')?.setValue('');
@@ -67,9 +64,7 @@ export class DatosprofesionalesPage implements OnInit {
     try {
       const { data: paises } = await this.supabase.from('pais').select('*');
       const { data: especialidades } = await this.supabase.from('especialidad').select('*');
-      const { data: universidades } = await this.supabase
-        .from('universidad')
-        .select('id_uni, nom_uni, id_pais');
+      const { data: universidades } = await this.supabase.from('universidad').select('id_uni, nom_uni, id_pais');
 
       this.paises = paises ?? [];
       this.especialidades = especialidades ?? [];
@@ -82,36 +77,15 @@ export class DatosprofesionalesPage implements OnInit {
   async obtenerRunVetYDatos() {
     try {
       const { data: { user }, error: userError } = await this.supabase.auth.getUser();
-      if (userError || !user) {
-        console.error('Error al obtener usuario:', userError);
-        return;
-      }
+      if (userError || !user) return;
 
       const idAuth = user.id;
-      const { data: veterinario, error: vetError } = await this.supabase
-        .from('veterinario')
-        .select('run_vet')
-        .eq('id_auth', idAuth)
-        .single();
-
-      if (vetError || !veterinario) {
-        console.error('No se encontró veterinario para este usuario:', vetError);
-        return;
-      }
+      const { data: veterinario } = await this.supabase.from('veterinario').select('run_vet').eq('id_auth', idAuth).single();
+      if (!veterinario) return;
 
       this.runVet = veterinario.run_vet;
 
-      const { data, error } = await this.supabase
-        .from('dato_profesional')
-        .select('*')
-        .eq('run_vet', this.runVet)
-        .single();
-
-      if (error && error.code !== 'PGRST116') {
-        console.error('Error al obtener dato_profesional:', error);
-        return;
-      }
-
+      const { data } = await this.supabase.from('dato_profesional').select('*').eq('run_vet', this.runVet).single();
       if (data) {
         this.form.patchValue({
           pais: data.id_pais ?? '',
@@ -120,11 +94,8 @@ export class DatosprofesionalesPage implements OnInit {
         });
 
         this.filtrarUniversidadesPorPais(data.id_pais);
-                this.form.patchValue({
-          universidad: data.id_uni ?? ''
-               });
+        this.form.patchValue({ universidad: data.id_uni ?? '' });
 
-        // Cargar foto título si existe
         if (data.foto_titulo) {
           this.fotoTituloFileName = data.foto_titulo;
           this.fotoTituloUrl = await this.descargarImagenCertificado(data.foto_titulo);
@@ -139,55 +110,94 @@ export class DatosprofesionalesPage implements OnInit {
     this.universidadesFiltradas = this.universidades.filter(u => u.id_pais === idPais);
   }
 
-  async guardarDatos() {
+  async guardarOActualizarDatos(): Promise<boolean> {
     if (this.form.invalid) {
+      this.form.markAllAsTouched();
       this.mostrarToast('Por favor completa todos los campos correctamente', 'danger');
-      return;
+      return false;
     }
 
     const { universidad, pais, especialidad, anoTitulacion } = this.form.value;
 
     try {
-      const { data: existente } = await this.supabase
-        .from('dato_profesional')
-        .select('run_vet')
-        .eq('run_vet', this.runVet)
-        .single();
+      const { data: existente } = await this.supabase.from('dato_profesional').select('run_vet').eq('run_vet', this.runVet).single();
+
+      const payload = {
+        run_vet: this.runVet,
+        id_uni: universidad,
+        id_pais: pais,
+        id_especialidad: especialidad,
+        anno_titulacion: anoTitulacion,
+        foto_titulo: this.fotoTituloFileName
+      };
 
       if (existente) {
-        const { error } = await this.supabase
-          .from('dato_profesional')
-          .update({
-            id_uni: universidad,
-            id_pais: pais,
-            id_especialidad: especialidad,
-            anno_titulacion: anoTitulacion
-            // Nota: foto_titulo se guarda al subir imagen, no aquí
-          })
-          .eq('run_vet', this.runVet);
-
+        const { error } = await this.supabase.from('dato_profesional').update(payload).eq('run_vet', this.runVet);
         if (error) throw error;
-        this.mostrarToast('Datos actualizados correctamente');
       } else {
-        const { error } = await this.supabase
-          .from('dato_profesional')
-          .insert({
-            run_vet: this.runVet,
-            id_uni: universidad,
-            id_pais: pais,
-            id_especialidad: especialidad,
-            anno_titulacion: anoTitulacion,
-            foto_titulo: this.fotoTituloFileName  // si ya hay imagen la insertamos
-          });
-
+        const { error } = await this.supabase.from('dato_profesional').insert(payload);
         if (error) throw error;
-        this.mostrarToast('Datos guardados correctamente');
       }
 
-      this.router.navigate(['/perfil']);
+      return true;
     } catch (error) {
       console.error('Error guardando datos:', error);
       this.mostrarToast('Error al guardar los datos', 'danger');
+      return false;
+    }
+  }
+
+  async guardarDatos() {
+    const guardado = await this.guardarOActualizarDatos();
+    if (guardado) {
+      this.mostrarToast('Datos guardados correctamente');
+      this.router.navigate(['/perfil']);
+    }
+  }
+
+  async enviarInformacion() {
+    const guardado = await this.guardarOActualizarDatos();
+    if (!guardado) return;
+
+    try {
+      const { data: solicitudesExistentes } = await this.supabase
+        .from('solicitud')
+        .select('id_solicitud, estado')
+        .eq('run_vet', this.runVet)
+        .order('fecha_envio', { ascending: false })
+        .limit(1);
+
+      if (!solicitudesExistentes || solicitudesExistentes.length === 0) {
+        await this.supabase.from('solicitud').insert({
+          run_vet: this.runVet,
+          estado: 'pendiente',
+          fecha_envio: new Date().toISOString(),
+        });
+      } else {
+        const solicitud = solicitudesExistentes[0];
+        if (solicitud.estado === 'rechazada') {
+          await this.supabase.from('solicitud').update({
+            estado: 'pendiente',
+            comentario: null,
+            fecha_envio: new Date().toISOString()
+          }).eq('id_solicitud', solicitud.id_solicitud);
+        } else {
+          this.estadoSolicitud = solicitud.estado;
+          this.mensajeSolicitud = 'Ya existe una solicitud enviada.';
+          this.mostrarToast('Ya existe una solicitud enviada.', 'warning');
+          return;
+        }
+      }
+
+      await this.supabase.from('veterinario').update({ estado_solicitud: 'pendiente' }).eq('run_vet', this.runVet);
+
+      this.estadoSolicitud = 'pendiente';
+      this.mensajeSolicitud = 'Su solicitud se encuentra pendiente de aprobación.';
+      this.mostrarToast('Solicitud enviada correctamente');
+
+    } catch (error) {
+      console.error('Error al enviar la solicitud:', error);
+      this.mostrarToast('Hubo un error al enviar la solicitud.', 'danger');
     }
   }
 
@@ -196,49 +206,34 @@ export class DatosprofesionalesPage implements OnInit {
       message: mensaje,
       duration: 2000,
       color,
-      position: 'middle',
+      position: 'middle'
     });
     toast.present();
   }
 
-  // Función para descargar imagen desde bucket image-certificate
   async descargarImagenCertificado(path: string): Promise<string | null> {
     try {
-      const { data, error } = await supabase.storage
-        .from('image-certificate')
-        .download(path);
-      if (error) {
-        console.error('Error descargando imagen certificado:', error);
-        return null;
-      }
+      const { data, error } = await supabase.storage.from('image-certificate').download(path);
+      if (error) return null;
       return URL.createObjectURL(data);
-    } catch (error) {
-      console.error('Error al descargar imagen certificado:', error);
+    } catch {
       return null;
     }
   }
 
-  // Función para subir imagen al bucket image-certificate
   async subirImagenCertificado(event: Event) {
     const element = event.target as HTMLInputElement;
-    if (!element.files || element.files.length === 0) {
-      return;
-    }
+    if (!element.files || element.files.length === 0) return;
     const file = element.files[0];
-    if (!file) return;
-
-    // Crear un nombre único basado en runVet
     const fileExt = file.name.split('.').pop();
     const fileName = `${this.runVet}_certificado.${fileExt}`;
     const filePath = fileName;
 
     try {
-      // Eliminar imagen anterior si existe
       if (this.fotoTituloFileName) {
         await supabase.storage.from('image-certificate').remove([this.fotoTituloFileName]);
       }
 
-      // Subir nueva imagen
       const { error: uploadError } = await supabase.storage
         .from('image-certificate')
         .upload(filePath, file, { upsert: true });
@@ -248,24 +243,18 @@ export class DatosprofesionalesPage implements OnInit {
       this.fotoTituloFileName = filePath;
       this.fotoTituloUrl = await this.descargarImagenCertificado(filePath);
 
-      // Guardar ruta en la tabla dato_profesional
-      const { error: updateError } = await supabase
-        .from('dato_profesional')
-        .upsert({
-          run_vet: this.runVet,
-          foto_titulo: filePath,
-        }, { onConflict: 'run_vet' });
-
-      if (updateError) throw updateError;
+      await supabase.from('dato_profesional').upsert({
+        run_vet: this.runVet,
+        foto_titulo: filePath
+      }, { onConflict: 'run_vet' });
 
       this.mostrarToast('Certificado subido correctamente');
     } catch (error) {
-      console.error('Error al subir imagen certificado:', error);
+      console.error('Error al subir imagen:', error);
       this.mostrarToast('Error al subir certificado', 'danger');
     }
   }
 
-  // Función para eliminar imagen certificado
   async eliminarImagenCertificado() {
     if (!this.fotoTituloFileName) {
       this.mostrarToast('No hay imagen para eliminar', 'warning');
@@ -273,102 +262,33 @@ export class DatosprofesionalesPage implements OnInit {
     }
 
     try {
-      const { error } = await supabase.storage
-        .from('image-certificate')
-        .remove([this.fotoTituloFileName]);
-
-      if (error) throw error;
-
-      // Actualizar la DB removiendo referencia
-      const { error: updateError } = await supabase
-        .from('dato_profesional')
-        .update({ foto_titulo: null })
-        .eq('run_vet', this.runVet);
-
-      if (updateError) throw updateError;
+      await supabase.storage.from('image-certificate').remove([this.fotoTituloFileName]);
+      await supabase.from('dato_profesional').update({ foto_titulo: null }).eq('run_vet', this.runVet);
 
       this.fotoTituloFileName = null;
       this.fotoTituloUrl = null;
       this.mostrarToast('Certificado eliminado');
     } catch (error) {
-      console.error('Error eliminando certificado:', error);
+      console.error('Error eliminando imagen:', error);
       this.mostrarToast('Error al eliminar certificado', 'danger');
     }
   }
 
-  async enviarInformacion() {
-    if (this.form.invalid) {
-      this.mostrarToast('Completa todos los datos antes de enviar la solicitud.', 'warning');
-      return;
-    }
-
-    try {
-      // Verificar si ya existe una solicitud para este run_vet
-      const { data: solicitudesExistentes, error: errorSolicitud } = await this.supabase
-        .from('solicitud')
-        .select('id_solicitud, estado')
-        .eq('run_vet', this.runVet)
-        .order('fecha_envio', { ascending: false })
-        .limit(1);
-
-      if (errorSolicitud) throw errorSolicitud;
-
-      if (!solicitudesExistentes || solicitudesExistentes.length === 0) {
-        // ✅ Insertar nueva solicitud
-        const { error: insertError } = await this.supabase.from('solicitud').insert({
-          run_vet: this.runVet,
-          estado: 'pendiente',
-          fecha_envio: new Date().toISOString(),
-        });
-
-        if (insertError) throw insertError;
-
-      } else {
-        const solicitud = solicitudesExistentes[0];
-
-        if (solicitud.estado === 'rechazada') {
-          // ✅ Reenviar solicitud cambiando estado a pendiente
-          const { error: updateSolicitudError } = await this.supabase
-            .from('solicitud')
-            .update({
-              estado: 'pendiente',
-              comentario: null,
-              fecha_envio: new Date().toISOString()
-            })
-            .eq('id_solicitud', solicitud.id_solicitud);
-
-          if (updateSolicitudError) throw updateSolicitudError;
-
-        } else {
-          // Ya hay una solicitud pendiente o aceptada
-          this.estadoSolicitud = solicitud.estado;
-          this.mensajeSolicitud = 'Ya existe una solicitud enviada.';
-          this.mostrarToast('Ya existe una solicitud enviada.', 'warning');
-          return;
-        }
+  async confirmarEliminacionImagen() {
+    const alert = document.createElement('ion-alert');
+    alert.header = 'Eliminar imagen';
+    alert.message = '¿Estás segura de que deseas eliminar esta imagen?';
+    alert.buttons = [
+      { text: 'Cancelar', role: 'cancel' },
+      {
+        text: 'Eliminar',
+        role: 'destructive',
+        handler: () => this.eliminarImagenCertificado()
       }
-
-      // ✅ Actualizar estado_solicitud en veterinario
-      const { error: updateError } = await this.supabase
-        .from('veterinario')
-        .update({ estado_solicitud: 'pendiente' })
-        .eq('run_vet', this.runVet);
-
-      if (updateError) {
-        console.error('❌ Error actualizando estado_solicitud:', updateError);
-      }
-
-      this.estadoSolicitud = 'pendiente';
-      this.mensajeSolicitud = 'Su solicitud se encuentra pendiente de aprobación.';
-      this.mostrarToast('Solicitud enviada correctamente');
-
-    } catch (error) {
-      console.error('❌ Error al enviar la solicitud:', error);
-      this.mostrarToast('Hubo un error al enviar la solicitud.', 'danger');
-    }
+    ];
+    document.body.appendChild(alert);
+    await alert.present();
   }
-
-
 
   async verificarSolicitudExistente() {
     const { data: solicitudExistente, error } = await this.supabase
@@ -378,15 +298,16 @@ export class DatosprofesionalesPage implements OnInit {
       .order('fecha_envio', { ascending: false })
       .limit(1);
 
-    if (error) {
-      console.error('Error verificando solicitud:', error);
-      return;
-    }
+    if (error) return;
 
     if (solicitudExistente && solicitudExistente.length > 0) {
       this.estadoSolicitud = solicitudExistente[0].estado;
       this.mensajeSolicitud = 'Ya has enviado una solicitud.';
       this.solicitudYaExiste = true;
     }
+  }
+
+  puedeEnviarSolicitud(): boolean {
+    return this.form.valid && this.fotoTituloFileName !== null && this.estadoSolicitud !== 'pendiente' && this.estadoSolicitud !== 'aceptada';
   }
 }
