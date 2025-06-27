@@ -29,15 +29,10 @@ export class AgregarAtencionMedicaPage implements OnInit {
 
   tratamientoList: any[] = [];
 
-  // Examen objetivo particular
   pielOpciones: any[] = [];
-  mostrarObservacionPiel = false;
   ojosOpciones: any[] = [];
-  mostrarObservacionOjos = false;
   oidosOpciones: any[] = [];
-  mostrarObservacionOidos = false;
   dentaduraOpciones: any[] = [];
-  mostrarObservacionDentadura = false;
 
   motivosConsulta: any[] = [];
 
@@ -61,13 +56,13 @@ export class AgregarAtencionMedicaPage implements OnInit {
     fecha: '',
     hora: '',
     id_piel: null,
-    piel_observacion: '',
+    obs_piel: '',
     id_ojos: null,
-    ojos_observacion: '',
+    obs_ojos: '',
     id_oidos: null,
-    oidos_observacion: '',
+    obs_oidos: '',
     id_dentadura: null,
-    dentadura_observacion: '',
+    obs_dentadura: '',
   };
 
   constructor(
@@ -130,48 +125,24 @@ export class AgregarAtencionMedicaPage implements OnInit {
     const { data, error } = await supabase.from('piel_obp').select('*');
     if (error) return console.error('Error al cargar Piel', error);
     this.pielOpciones = data;
-    this.verificarObservacionPiel();
-  }
-
-  verificarObservacionPiel() {
-    const seleccionada = this.pielOpciones.find(d => d.id_piel === this.atencion.id_piel);
-    this.mostrarObservacionPiel = seleccionada?.requiere_observacion === true;
   }
 
   async cargarOjosOpciones() {
     const { data, error } = await supabase.from('ojos_obp').select('*');
     if (error) return console.error('Error al cargar Ojos', error);
     this.ojosOpciones = data;
-    this.verificarObservacionOjos();
-  }
-
-  verificarObservacionOjos() {
-    const seleccionada = this.ojosOpciones.find(d => d.id_ojos === this.atencion.id_ojos);
-    this.mostrarObservacionOjos = seleccionada?.requiere_observacion === true;
   }
 
   async cargarOidosOpciones() {
     const { data, error } = await supabase.from('oidos_obp').select('*');
     if (error) return console.error('Error al cargar Oidos', error);
     this.oidosOpciones = data;
-    this.verificarObservacionOidos();
-  }
-
-  verificarObservacionOidos() {
-    const seleccionada = this.oidosOpciones.find(d => d.id_oidos === this.atencion.id_oidos);
-    this.mostrarObservacionOidos = seleccionada?.requiere_observacion === true;
   }
 
   async cargarDentaduraOpciones() {
     const { data, error } = await supabase.from('dentadura_obp').select('*');
     if (error) return console.error('Error al cargar Dentadura', error);
     this.dentaduraOpciones = data;
-    this.verificarObservacionDentadura();
-  }
-
-  verificarObservacionDentadura() {
-    const seleccionada = this.dentaduraOpciones.find(d => d.id_dentadura === this.atencion.id_dentadura);
-    this.mostrarObservacionDentadura = seleccionada?.requiere_observacion === true;
   }
 
   // ------------------------- Tutor y mascota -------------------------
@@ -245,20 +216,23 @@ export class AgregarAtencionMedicaPage implements OnInit {
   }
 
   async guardarAtencion() {
-
-    if (!this.tutorSeleccionado || !this.mascotaSeleccionada) return this.mostrarToast('Debes seleccionar un tutor y una mascota.');
-    if (!this.atencion.fecha || !this.atencion.hora || !this.atencion.motivo) return this.mostrarToast('Completa los campos obligatorios: fecha, hora y motivo.');
+    if (!this.tutorSeleccionado || !this.mascotaSeleccionada)
+      return this.mostrarToast('Debes seleccionar un tutor y una mascota.');
+    if (!this.atencion.fecha || !this.atencion.hora || !this.atencion.motivo)
+      return this.mostrarToast('Completa los campos obligatorios: fecha, hora y motivo.');
 
     const runVet = await this.obtenerRunVet();
     if (!runVet) return this.mostrarToast('No se pudo identificar al veterinario.');
 
     const fechaHoraAtencion = new Date(`${this.atencion.fecha}T${this.atencion.hora}`);
 
-    console.log('Observaciones a guardar:', {
-      obs_piel: this.atencion.piel_observacion,
-      obs_ojos: this.atencion.ojos_observacion,
-      obs_oidos: this.atencion.oidos_observacion,
-      obs_dentadura: this.atencion.dentadura_observacion,
+    console.log('Atención a guardar:', this.atencion);
+
+    console.log('Valores de observaciones:', {
+      piel: this.atencion.obs_piel,
+      ojos: this.atencion.obs_ojos,
+      oidos: this.atencion.obs_oidos,
+      dentadura: this.atencion.obs_dentadura,
     });
 
     const { error } = await supabase.from('atencion_medica').insert([{
@@ -282,13 +256,17 @@ export class AgregarAtencionMedicaPage implements OnInit {
       id_ojos: this.atencion.id_ojos,
       id_oidos: this.atencion.id_oidos,
       id_dentadura: this.atencion.id_dentadura,
-      obs_piel: this.atencion.piel_observacion,
-      obs_ojos: this.atencion.ojos_observacion,
-      obs_oidos: this.atencion.oidos_observacion,
-      obs_dentadura: this.atencion.dentadura_observacion,
+      obs_piel: this.atencion.obs_piel,
+      obs_ojos: this.atencion.obs_ojos,
+      obs_oidos: this.atencion.obs_oidos,
+      obs_dentadura: this.atencion.obs_dentadura,
     }]);
 
-    if (error) return this.mostrarToast('Hubo un error al guardar la atención.');
+    if (error) {
+      console.error('Error al insertar atención:', error);
+      return this.mostrarToast('Hubo un error al guardar la atención.');
+    }
+
     this.mostrarToast('Atención médica guardada exitosamente.');
     this.reiniciarFormulario();
   }
@@ -311,13 +289,13 @@ export class AgregarAtencionMedicaPage implements OnInit {
       fecha: '',
       hora: '',
       id_piel: null,
-      piel_observacion: '',
+      obs_piel: '',
       id_ojos: null,
-      ojos_observacion: '',
+      obs_ojos: '',
       id_oidos: null,
-      oidos_observacion: '',
+      obs_oidos: '',
       id_dentadura: null,
-      dentadura_observacion: '',
+      obs_dentadura: '',
     };
     this.tutorSeleccionado = null;
     this.mascotaSeleccionada = null;

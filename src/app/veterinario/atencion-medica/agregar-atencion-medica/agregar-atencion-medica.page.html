@@ -135,68 +135,64 @@
 <!---------------------------EXAMEN OBJETIVO PARTICULAR---------------------------------------->
 
 <ion-accordion-group expand="inset">
-  <ion-accordion  >
+  <ion-accordion>
     <ion-item slot="header" class="acordeon-consulta" lines="none">
       <ion-label><strong>Examen Particular</strong></ion-label>
     </ion-item>
     <div slot="content">
 
-            <!-- Piel -->
+      <!-- Piel -->
       <ion-item>
-        <ion-select label="Piel/Pelaje" [(ngModel)]="atencion.id_piel" name="piel_id" interface="popover" (ionChange)="verificarObservacionPiel()">
+        <ion-select label="Piel/Pelaje" [(ngModel)]="atencion.id_piel" name="piel_id" interface="popover">
           <ion-select-option *ngFor="let p of pielOpciones" [value]="p.id_piel">
             {{ p.estado_piel }}
           </ion-select-option>
         </ion-select>
       </ion-item>
-          <!-- Observación si se requiere -->
-                <ion-item *ngIf="mostrarObservacionPiel">
-                  <ion-input label="Observación de la piel"  type="text" [(ngModel)]="atencion.piel_observacion" placeholder="Describe observaciones...">  </ion-input>
-                </ion-item>
-
-
+      <ion-item>
+        <ion-input label="Observación" type="text" [(ngModel)]="atencion.obs_piel" placeholder="Describe observaciones..." name="obs_piel"></ion-input>
+      </ion-item>
 
       <!-- Ojos -->
       <ion-item>
-        <ion-select label="Ojos" [(ngModel)]="atencion.id_ojos" name="id_ojos" interface="popover" (ionChange)="verificarObservacionOjos()">
+        <ion-select label="Ojos" [(ngModel)]="atencion.id_ojos" name="id_ojos" interface="popover">
           <ion-select-option *ngFor="let o of ojosOpciones" [value]="o.id_ojos">
             {{ o.estado_ojos }}
           </ion-select-option>
         </ion-select>
       </ion-item>
-                 <!-- Observación si se requiere -->
-                <ion-item *ngIf="mostrarObservacionOjos">
-                  <ion-input label="Observación de ojos"  type="text" [(ngModel)]="atencion.ojos_observacion" placeholder="Describe observaciones...">  </ion-input>
-                </ion-item>
-
-      <!-- Oidos -->
       <ion-item>
-        <ion-select label="Oídos" [(ngModel)]="atencion.id_oidos" name="id_oido" interface="popover" (ionChange)="verificarObservacionOidos()">
+        <ion-input label="Observación" type="text" [(ngModel)]="atencion.obs_ojos" placeholder="Describe observaciones..." name="obs_ojos"></ion-input>
+      </ion-item>
+
+      <!-- Oídos -->
+      <ion-item>
+        <ion-select label="Oídos" [(ngModel)]="atencion.id_oidos" name="id_oido" interface="popover">
           <ion-select-option *ngFor="let o of oidosOpciones" [value]="o.id_oidos">
             {{ o.estado_oidos }}
           </ion-select-option>
         </ion-select>
       </ion-item>
-           <!-- Observación si se requiere -->
-                <ion-item *ngIf="mostrarObservacionOidos">
-                  <ion-input label="Observación de oidos"  type="text" [(ngModel)]="atencion.oidos_observacion" placeholder="Describe observaciones...">  </ion-input>
-                </ion-item>
-
-<!----- Dentadura -------------------------------->
       <ion-item>
-        <ion-select label="Dentadura" [(ngModel)]="atencion.id_dentadura" name="id_dentadura" interface="popover"  (ionChange)="verificarObservacionDentadura()">
-          <ion-select-option *ngFor="let d of dentaduraOpciones" [value]="d.id_dentadura">  {{ d.estado_dentadura }} </ion-select-option>
+        <ion-input label="Observación" type="text" [(ngModel)]="atencion.obs_oidos" placeholder="Describe observaciones..." name="obs_oidos"></ion-input>
+      </ion-item>
+
+      <!-- Dentadura -->
+      <ion-item>
+        <ion-select label="Dentadura" [(ngModel)]="atencion.id_dentadura" name="id_dentadura" interface="popover">
+          <ion-select-option *ngFor="let d of dentaduraOpciones" [value]="d.id_dentadura">
+            {{ d.estado_dentadura }}
+          </ion-select-option>
         </ion-select>
       </ion-item>
-     <!-- Observación si se requiere -->
-                <ion-item *ngIf="mostrarObservacionDentadura">
-                  <ion-input label="Observación de dentadura"  type="text" [(ngModel)]="atencion.dentadura_observacion" placeholder="Describe observaciones...">  </ion-input>
-                </ion-item>
-
+      <ion-item>
+        <ion-input label="Observación" type="text" [(ngModel)]="atencion.obs_dentadura" placeholder="Describe observaciones..." name="obs_dentadura"></ion-input>
+      </ion-item>
 
     </div>
   </ion-accordion>
 </ion-accordion-group>
+
 
 <!---------------------------EXAMEN OBJETIVO PARTICULAR---------------------------------------->
 <!---------------------------------DIAGNOSTICO---------------------------------->
