@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { AlertController, Platform } from '@ionic/angular';
 import { SupabaseService } from './services/supabase.service';
 
+
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
@@ -14,11 +15,17 @@ export class AppComponent {
 
   alertController = inject(AlertController);
   router = inject(Router);
-  platform = inject(Platform);
   supabaseService = inject(SupabaseService);
 
-constructor() {
 
+constructor(private platform: Platform) {
+  this.platform.ready().then(() => {
+    this.platform.backButton.subscribeWithPriority(10, () => {
+      // Aquí controlas que no vuelva al login
+      // o puedes mostrar un confirm de salida
+      console.log('Botón atrás presionado');
+    });
+  });
 }
 
 
@@ -83,4 +90,7 @@ constructor() {
 
     await alert.present();
   }
+
+
+  
 }

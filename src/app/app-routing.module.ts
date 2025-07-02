@@ -116,9 +116,21 @@ const routes: Routes = [
   },
   {
   path: 'veterinario/recetas/agregar-receta',
-  loadComponent: () => import('./veterinario/recetas/agregar-receta/agregar-receta.page').then(m => m.AgregarRecetaPage),
+  loadChildren: () => import('./veterinario/recetas/agregar-receta/agregar-receta.module').then(m => m.AgregarRecetaPageModule),
   canActivate: [AuthGuard]
-  }
+  },
+  {
+  path: 'veterinario/recetas/detalle-receta',
+  loadChildren: () => import('./veterinario/recetas/detalle-receta/detalle-receta.module').then(m => m.DetalleRecetaPageModule),
+  canActivate: [AuthGuard]
+  },
+    {
+  path: 'veterinario/recetas/modificar-receta',
+  loadChildren: () => import('./veterinario/recetas/modificar-receta/modificar-receta.module').then(m => m.ModificarRecetaPageModule),
+  canActivate: [AuthGuard]
+  },
+
+
 ];
 
 @NgModule({
