@@ -28,12 +28,10 @@ export class LoginPage implements OnInit {
   async submit() {
     if (this.form.invalid) return;
 
-    let run = this.form.value.run ?? '';
-    run = run.toString().replace(/\./g, '').replace('-', '').toUpperCase();  // Limpia y normaliza el RUT
-    const password = this.form.value.password;
+    const { run, password } = this.form.value;
 
     try {
-      // Buscar al veterinario por run_vet (ahora tipo TEXT)
+      // Buscar al veterinario por run_vet
       const { data: vetData, error: vetError } = await this.supabaseService
         .from('veterinario')
         .select('id_auth, nombre_vet, email_vet')
@@ -48,7 +46,7 @@ export class LoginPage implements OnInit {
 
       const email = vetData.email_vet;
 
-      // Iniciar sesión con el email obtenido
+      // Iniciar sesión con el email encontrado
       const { error: loginError } = await this.supabaseService.login(email, password!);
 
       if (loginError) {

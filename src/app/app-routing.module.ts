@@ -24,7 +24,7 @@ const routes: Routes = [
   {
   path: 'nueva-contrasena',
   loadChildren: () => import('./cuenta/olvidopass/nuevacontrasena/nuevacontrasena.module').then(m =>m.NuevacontrasenaPageModule)
-},
+  },
   {
     path: 'home',
     loadChildren: () => import('./veterinario/home/home.module').then( m => m.HomePageModule),
@@ -66,21 +66,21 @@ const routes: Routes = [
     canActivate: [AuthGuard] 
   },
   {
-    path: 'veterinario/tutor/editar-tutor/:runTutor',
+    path: 'veterinario/tutor/editar-tutor/:idTutor',
     loadComponent: () => import('./veterinario/tutor/editar-tutor/editar-tutor.page').then(m => m.EditarTutorPage),
     canActivate: [AuthGuard]
   },
   {
-    path: 'veterinario/tutor/mascotas/:run_tutor',
+    path: 'veterinario/tutor/mascotas/:idTutor',
     loadComponent: () => import('./veterinario/tutor/mascotas/mascotas.page').then(m => m.MascotasPage)
   },
   {
-    path: 'veterinario/tutor/mascotas/:run_tutor/agregar',
+    path: 'veterinario/tutor/mascotas/:idTutor/agregar',
     loadComponent: () => import('./veterinario/tutor/mascotas/agregar-mascota/agregar-mascota.page').then(m => m.AgregarMascotaPage),
     canActivate: [AuthGuard]
   },
     {
-    path: 'veterinario/tutor/mascotas/editar-mascota/:run_tutor/:id_masc',
+    path: 'veterinario/tutor/mascotas/editar-mascota/:idTutor/:id_masc',
     loadComponent: () => import('./veterinario/tutor/mascotas/editar-mascota/editar-mascota.page').then(m => m.EditarMascotaPage),
     canActivate: [AuthGuard]
   },
@@ -104,14 +104,21 @@ const routes: Routes = [
      canActivate: [AuthGuard] 
     
   },
-{
-  path: 'veterinario/tutor/mascotas/:run_tutor/:id_masc/historial-clinico',
-  loadChildren: () => import("./veterinario/tutor/mascotas/historial-clinico/historial-clinico.module").then(m => m.HistorialClinicoPageModule),
-  canActivate: [AuthGuard] 
-},
-
-
- 
+  {
+    path: 'veterinario/tutor/mascotas/:idTutor/:id_masc/historial-clinico',
+    loadChildren: () => import("./veterinario/tutor/mascotas/historial-clinico/historial-clinico.module").then(m => m.HistorialClinicoPageModule),
+    canActivate: [AuthGuard] 
+  },
+  {
+    path: 'recetas',
+    loadChildren: () => import('./veterinario/recetas/recetas.module').then( m => m.RecetasPageModule),
+    canActivate: [AuthGuard]
+  },
+  {
+  path: 'veterinario/recetas/agregar-receta',
+  loadComponent: () => import('./veterinario/recetas/agregar-receta/agregar-receta.page').then(m => m.AgregarRecetaPage),
+  canActivate: [AuthGuard]
+  }
 ];
 
 @NgModule({

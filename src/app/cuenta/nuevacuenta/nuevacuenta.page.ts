@@ -46,7 +46,7 @@ export class NuevacuentaPage implements OnInit {
       run: new FormControl(null, [Validators.required]),
       nombre: new FormControl(null, [Validators.required, Validators.minLength(3)]),
       apellidos: new FormControl(null, [Validators.required, Validators.minLength(5)]),
-      celular: new FormControl(null, [Validators.required]),
+      celular: new FormControl(null, [Validators.required, Validators.maxLength(11)]),
       email: new FormControl(null, [Validators.required, Validators.email]),
       password: new FormControl(null, [Validators.required]),
       confpassword: new FormControl(null, [Validators.required]),

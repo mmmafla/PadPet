@@ -14,7 +14,7 @@ import { SupabaseService } from 'src/app/services/supabase.service';
 export class HeaderComponent  implements OnInit {
 
   @Input() title!: string;
-@Input() backButton: string = '';
+  @Input() backButton: string = '';
 
   isAuthenticated : boolean = false;
 

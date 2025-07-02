@@ -43,9 +43,9 @@ constructor() {
         },
         {
           text: 'Cerrar',
-          role: 'cancel'
+          role: 'cancel',
         }
-      ]
+      ],
     });
 
     await alert.present();
