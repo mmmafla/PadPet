@@ -3,7 +3,7 @@ import { RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
 import { createClient } from '@supabase/supabase-js';
-import { CommonModule, NgIf } from '@angular/common';
+import { CommonModule, NgIf  } from '@angular/common';
 
 const supabaseUrl = 'https://irorlonysbmkbdthvrmt.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyb3Jsb255c2Jta2JkdGh2cm10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYyODgwMDQsImV4cCI6MjA2MTg2NDAwNH0.s-ZEteHxMWX43NCQIuNmTWpbBoEUxseKyg_YaXpi6Ek';
@@ -20,6 +20,7 @@ export class PerfilPage implements OnInit {
   @ViewChild('fileInput') fileInput!: ElementRef;
   @ViewChild('fileFirmaInput') fileFirmaInput!: ElementRef;
   @ViewChild('fileInputFirma') fileInputFirma!: ElementRef;
+
 
   fotoPerfilUrl: string | null = null;
   nombreArchivoAnterior: string | null = null;
@@ -42,12 +43,13 @@ export class PerfilPage implements OnInit {
     this.fileInputFirma.nativeElement.click();
   }
 
+
   private extraerNombreDesdeUrl(url: string): string {
     const partes = url.split('/');
     return partes[partes.length - 1];
   }
 
-  async obtenerRunVet(): Promise<string | null> {
+  async obtenerRunVet(): Promise<number | null> {
     const { data: userData } = await supabase.auth.getUser();
     const userId = userData.user?.id;
 
@@ -64,7 +66,7 @@ export class PerfilPage implements OnInit {
       return null;
     }
 
-    return String(data.run_vet);
+    return data.run_vet;
   }
 
   async eliminarFotoPerfil() {
@@ -176,8 +178,9 @@ export class PerfilPage implements OnInit {
       return;
     }
 
-    const runVet = String(vetData.run_vet);
+    const runVet = vetData.run_vet;
 
+    // Obtener firma actual desde la BD para eliminarla
     const { data: dpData, error: dpError } = await supabase
       .from('dato_profesional')
       .select('firma_png')
@@ -199,6 +202,7 @@ export class PerfilPage implements OnInit {
       }
     }
 
+    // Subir nueva firma
     const extension = file.name.split('.').pop();
     const fileName = `firma-${runVet}-${Date.now()}.${extension}`;
 
@@ -235,6 +239,7 @@ export class PerfilPage implements OnInit {
     this.nombreFirmaAnterior = fileName;
     console.log('Firma nueva subida y registrada correctamente');
   }
+
 
   async eliminarFirma() {
     const runVet = await this.obtenerRunVet();

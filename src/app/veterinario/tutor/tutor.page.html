@@ -1,6 +1,9 @@
-<app-header backButton="/perfil" title="Tutores"></app-header>
+<ion-header class="ion-no-border">
+<app-header backButton="/perfil"></app-header>
+</ion-header>
 
-<ion-content class="fondo ion-padding">
+
+<ion-content class="fondo ion-padding" [fullscreen]="true">
 
   <!-- Refresher -->
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
@@ -28,34 +31,34 @@
             <ion-item lines="none" class="ion-text-wrap">
               <ion-label>
                 <h3>{{ tutor.nombre_tutor }} {{ tutor.apellidos_tutor }}</h3>
-                <p>- Celular: +569 {{ tutor.celular_tutor }}</p>
+                <p maxlength="11">- Celular: {{ tutor.celular_tutor }}</p>
                 <p>- Dirección: {{ tutor.direccion_tutor }}</p>
 
                 <!-- Lista de mascotas -->
-<div class="mascotas-container" style="padding-top: 8px; padding-left: 20px;">
-  <h3 style="margin: 0 0 2px;">Mascotas:</h3>
+                <div class="mascotas-container" style="padding-top: 8px; padding-left: 20px;">
+                  <h3 style="margin: 0 0 2px;">Mascotas:</h3>
 
-  <ng-container *ngIf="tutor.mascota?.length > 0; else sinMascotas">
-    <ul style="margin: 0; padding-left: 16px;">
-      <li *ngFor="let masc of tutor.mascota" style="text-transform: capitalize;font-size:small; color: black;font-weight: 300">
-        {{ masc.masc_nom }}
-      </li>
-    </ul>
-  </ng-container>
+                  <ng-container *ngIf="tutor.mascota?.length > 0; else sinMascotas">
+                    <ul style="margin: 0; padding-left: 16px;">
+                      <li *ngFor="let masc of tutor.mascota" style="text-transform: capitalize;font-size:small; color: black;font-weight: 300">
+                        {{ masc.masc_nom }}
+                      </li>
+                    </ul>
+                  </ng-container>
 
-  <ng-template #sinMascotas>
-    <p style="font-style: italic; color: #929292;">No hay mascotas registradas.</p>
-  </ng-template>
-</div>
+                  <ng-template #sinMascotas>
+                    <p style="font-style: italic; color: #929292;">No hay mascotas registradas.</p>
+                  </ng-template>
+                </div>
 
               </ion-label>
             </ion-item>
 
             <ion-item-options side="end">
-              <ion-item-option style="background-color: #8acabd;" (click)="irEditarTutor(tutor.run_tutor)">
+              <ion-item-option style="background-color: #8acabd;" (click)="irEditarTutor(tutor.id_tutor)">
                 <ion-icon slot="icon-only" name="create-outline"></ion-icon>
               </ion-item-option>
-              <ion-item-option style="background-color: #8a9aca;" (click)="irVerMascotas(tutor.run_tutor)">
+              <ion-item-option style="background-color: #8a9aca;" (click)="irVerMascotas(tutor.id_tutor)">
                 <ion-icon slot="icon-only" name="paw-outline"></ion-icon> Mascotas
               </ion-item-option>
             </ion-item-options>

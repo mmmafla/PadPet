@@ -1,101 +1,199 @@
-<app-header title="Bienvenido"></app-header>
+<ion-header class="ion-no-border">
+  <app-header title=""></app-header>
+</ion-header>
 
-<ion-content class="fondo">
+<ion-content class="fondo" [fullscreen]="true">
 
-<ion-card *ngIf="mostrarMensajeSolicitud" color="warning" class="ion-padding position-relative" style="border-radius: 20px;">
-  <!-- Botón para cerrar -->
-  <ion-button fill="clear" size="small" class="cerrar-btn" (click)="cerrarMensajeSolicitud()">
-    <ion-icon name="close-outline"></ion-icon>
-  </ion-button>
+  <!-- Mensaje de solicitud -->
+  <ion-card *ngIf="mostrarMensajeSolicitud" color="warning" class="ion-padding position-relative" style="border-radius: 20px;">
+    <ion-button fill="clear" size="small" class="cerrar-btn" (click)="cerrarMensajeSolicitud()">
+      <ion-icon name="close-outline"></ion-icon>
+    </ion-button>
 
-  <ion-card-content style="text-align: center;">
-<ion-icon name="information-circle-outline" style="font-size: 25px; vertical-align: middle; margin-right: 4px;"></ion-icon>
-
-    <strong>Solicitud enviada:</strong> {{ estadoSolicitud | titlecase }} <br />
-  </ion-card-content>
-</ion-card>
-
-
-<ion-grid>
-  <!----perfil-->
-  <ion-card class="perfil-card" [routerLink]="['/perfil']">
-    <ion-card-content>
-      <ion-grid>
-        <ion-row>
-          <ion-col size="auto" class="img-perfil">
-       <!---    <img src="" alt="Foto de perfil" class="profile-img"> -->
-          </ion-col>       
-          <ion-col size="auto" class="datos-medico">
-            <ion-card-title class="nombre">MV. {{ nombreVet || 'Cargando nombre'}}</ion-card-title>
-            <p class="run">RUN: {{ runVet || 'cargando run'}}</p>
-          </ion-col>
-        </ion-row>
-      </ion-grid>
+    <ion-card-content style="text-align: center;">
+      <ion-icon name="information-circle-outline" style="font-size: 25px; vertical-align: middle; margin-right: 4px;"></ion-icon>
+      <strong>Solicitud enviada:</strong> {{ estadoSolicitud | titlecase }} <br />
     </ion-card-content>
   </ion-card>
-<!--------------------------->
 
+  <ion-grid>
 
-<ion-row>
-  <!---TUTORES--->
-  <ion-col size="6">
-    <ion-card 
-      class="ion-card-importantes" 
-      [routerLink]="estadoSolicitud === 'aceptada' ? ['/tutor'] : null" 
-      [class.disabled]="estadoSolicitud !== 'aceptada'">
-      <ion-card-header>
-        <div>
-          <ion-icon name="paw-outline" class="icono2"></ion-icon>
-          <ion-card-title>Tutores</ion-card-title>
-        </div>
-      </ion-card-header>
-      <ion-card-content class="texto">
-        Agrega tutores y sus mascotas
+    <!-- Perfil -->
+    <ion-card class="perfil-card" [routerLink]="['/perfil']">
+      <ion-card-content>
+        <ion-grid>
+          <ion-row class="fila-perfil" align-items-center>
+            <ion-col size="12" size-md="auto" class="img-perfil">
+              <img [src]="logoVet" alt="Logo" class="profile-img">
+            </ion-col>
+            <ion-col size="12" size-md="true" class="datos-medico">
+              <ion-card-title class="nombre">MV. {{ nombreVet || 'Cargando nombre'}}</ion-card-title>
+              <p class="run">RUN: {{ runVet || 'cargando run'}}</p>
+            </ion-col>
+          </ion-row>
+        </ion-grid>
       </ion-card-content>
     </ion-card>
-  </ion-col>
 
-  <!---AGENDA--->
-  <ion-col size="6">
-    <ion-card 
-      class="ion-card-importantes" 
-      [routerLink]="estadoSolicitud === 'aceptada' ? ['/agenda'] : null" 
-      [class.disabled]="estadoSolicitud !== 'aceptada'">
-      <ion-card-header>
-        <div>
-          <ion-icon name="search-outline" class="icono2"></ion-icon>
-          <ion-card-title>Agenda</ion-card-title>
-        </div>
-      </ion-card-header>
-      <ion-card-content class="texto">
-        Sincronizado con Google Calendar
-      </ion-card-content>
-    </ion-card>
-  </ion-col>
+    <!-- Opciones -->
+    <ion-row>
 
-  <!---CONSULTA MÉDICA--->
-  <ion-col size="12">
-    <ion-card 
-      class="ion-card-otros" 
-      [routerLink]="estadoSolicitud === 'aceptada' ? ['/atencion-medica'] : null" 
-      [class.disabled]="estadoSolicitud !== 'aceptada'">
-      <ion-card-header>
-        <div>
-          <ion-card-title>CITA MÉDICA</ion-card-title>
-        </div>
-      </ion-card-header>
-      <ion-card-content class="texto">
-        Agrega una nueva consulta médica
-      </ion-card-content>
-    </ion-card>
-  </ion-col>
-</ion-row>
+      <!-- Tutores -->
+      <ion-col size="6">
+        <ion-item-sliding
+          class="ion-card-importantes"
+          #slidingItem
+          (ionOpen)="onSlideOpen()"
+          (ionClose)="onSlideClose()"
+        >
+          <ion-item
+            lines="none"
+            [class.disabled]="estadoSolicitud !== 'aceptada'"
+            button
+            (click)="estadoSolicitud === 'aceptada' ? irATutor() : null"
+          >
+            <div class="contenido-centro">
+              <ion-icon name="paw-sharp" class="icono2"></ion-icon>
+              <ion-card-title class="card-title">Tutores</ion-card-title>
+            </div>
+          </ion-item>
 
+          <ion-item-options side="end">
+            <ion-item-option
+              style="white-space: normal; width: 220px; cursor: pointer; background-color: #fffffa; color:#658faf"
+              (click)="irATutor()"
+            >
+              Aquí puedes agregar a los tutores y sus mascotas.
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+      </ion-col>
 
+      <!-- Agenda -->
+      <ion-col size="6">
+        <ion-item-sliding
+          class="ion-card-importantes"
+          #slidingAgenda
+          (ionOpen)="slidingOpenAgenda = true"
+          (ionClose)="slidingOpenAgenda = false"
+        >
+          <ion-item
+            lines="none"
+            [class.disabled]="estadoSolicitud !== 'aceptada'"
+            button
+            (click)="estadoSolicitud === 'aceptada' ? irAAgenda() : null"
+            [style.background]="slidingOpenAgenda ? '#fff' : 'transparent'"
+          >
+            <div class="contenido-centro">
+              <ion-icon name="calendar-sharp" class="icono2"></ion-icon>
+              <ion-card-title class="card-title">Agenda</ion-card-title>
+            </div>
+          </ion-item>
 
+          <ion-item-options side="end">
+            <ion-item-option
+              style="white-space: normal; width: 220px; cursor: pointer; background-color: #fffffa; color:#658faf"
+              (click)="irAAgenda()"
+            >
+              Visualiza tus citas sincronizadas con Google Calendar.
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+      </ion-col>
 
+      <!-- Cita médica -->
+      <ion-col size="12">
+        <ion-item-sliding
+          class="ion-card-otros"
+          #slidingConsulta
+          (ionOpen)="slidingOpenConsulta = true"
+          (ionClose)="slidingOpenConsulta = false"
+        >
+          <ion-item
+            lines="none"
+            [class.disabled]="estadoSolicitud !== 'aceptada'"
+            button
+            (click)="estadoSolicitud === 'aceptada' ? irAConsulta() : null"
+            [style.background]="slidingOpenConsulta ? '#fff' : 'transparent'"
+          >
+            <div class="contenido-centro">
+              <ion-card-title class="card-title">Cita médica</ion-card-title>
+            </div>
+          </ion-item>
 
+          <ion-item-options side="end">
+            <ion-item-option
+              style="white-space: normal; width: 240px; cursor: pointer; background-color: #fffffa; color:#658faf"
+              (click)="irAConsulta()"
+            >
+              Agrega una nueva atención médica para un animal y registra el tratamiento correspondiente.
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+      </ion-col>
 
-</ion-grid>
+      <!-- Recetas médicas -->
+      <ion-col size="12">
+        <ion-item-sliding
+          class="ion-card-otros"
+          #slidingRecetas
+          (ionOpen)="slidingOpenRecetas = true"
+          (ionClose)="slidingOpenRecetas = false"
+        >
+          <ion-item
+            lines="none"
+            [class.disabled]="estadoSolicitud !== 'aceptada'"
+            button
+            (click)="estadoSolicitud === 'aceptada' ? irARecetas() : null"
+            [style.background]="slidingOpenRecetas ? '#fff' : 'transparent'"
+          >
+            <div class="contenido-centro">
+              <ion-card-title class="card-title">Recetas médicas</ion-card-title>
+            </div>
+          </ion-item>
 
+          <ion-item-options side="end">
+            <ion-item-option
+              style="white-space: normal; width: 240px; cursor: pointer; background-color: #fffffa; color:#658faf"
+              (click)="irARecetas()"
+            >
+              Visualiza y gestiona los tratamientos médicos prescritos a los animales atendidos.
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+      </ion-col>
+
+      <!-- Estadísticas -->
+      <ion-col size="12">
+        <ion-item-sliding
+          class="ion-card-otros"
+          #slidingEstadisticas
+          (ionOpen)="slidingOpenEstadisticas = true"
+          (ionClose)="slidingOpenEstadisticas = false"
+        >
+          <ion-item
+            lines="none"
+            [class.disabled]="estadoSolicitud !== 'aceptada'"
+            button
+            (click)="estadoSolicitud === 'aceptada' ? irAConsulta() : null"
+            [style.background]="slidingOpenEstadisticas ? '#fff' : 'transparent'"
+          >
+            <div class="contenido-centro">
+              <ion-card-title class="card-title">Estadísticas</ion-card-title>
+            </div>
+          </ion-item>
+
+          <ion-item-options side="end">
+            <ion-item-option
+              style="white-space: normal; width: 240px; cursor: pointer; background-color: #fffffa; color:#658faf"
+              (click)="irAConsulta()"
+            >
+              Podrás visualizar las estadísticas de tus consultas médicas.
+            </ion-item-option>
+          </ion-item-options>
+        </ion-item-sliding>
+      </ion-col>
+
+    </ion-row>
+  </ion-grid>
 </ion-content>

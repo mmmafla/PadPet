@@ -10,15 +10,15 @@ const routes: Routes = [
   },
   {
     path: 'agregar-tutor',
-    loadChildren: () => import('./agregar-tutor/agregar-tutor.module').then( m => m.AgregarTutorPageModule)
+    loadChildren: () => import('./agregar-tutor/agregar-tutor.module').then(m => m.AgregarTutorPageModule)
   },
   {
-    path: 'editar-tutor',
-    loadChildren: () => import('./editar-tutor/editar-tutor.module').then( m => m.EditarTutorPageModule)
+    path: 'editar-tutor/:idTutor', // Ruta con parámetro dinámico idTutor
+    loadChildren: () => import('./editar-tutor/editar-tutor.module').then(m => m.EditarTutorPageModule)
   },
   {
-    path: 'mascotas',
-    loadChildren: () => import('./mascotas/mascotas.module').then( m => m.MascotasPageModule)
+    path: 'mascotas/:idTutor', // Ruta con parámetro dinámico idTutor
+    loadChildren: () => import('./mascotas/mascotas.module').then(m => m.MascotasPageModule)
   },
 ];
 

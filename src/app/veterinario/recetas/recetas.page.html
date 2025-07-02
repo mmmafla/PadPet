@@ -1,0 +1,93 @@
+<ion-header class="ion-no-border">
+  <app-header backButton="/home"></app-header>
+</ion-header>
+
+<ion-content class="fondo" [fullscreen]="true">
+
+  <h2>Historial de recetas</h2>
+
+  <!-- FILTRO -->
+  <ion-card class="filtro-card">
+    <ion-accordion-group expand="inset">
+      <ion-accordion value="filtro">
+        <ion-item slot="header" color="light">
+          <ion-icon name="funnel-outline" slot="start"></ion-icon>
+          <ion-label>Filtrar</ion-label>
+        </ion-item>
+
+        <div class="ion-padding" slot="content">
+
+          <!-- FILTRAR POR FECHA -->
+          <ion-item lines="none">
+            <ion-label>Fecha</ion-label>
+            <ion-datetime-button datetime="filtroFechaPopover"></ion-datetime-button>
+            <ion-modal [keepContentsMounted]="true">
+              <ng-template>
+                <ion-datetime
+                  id="filtroFechaPopover"
+                  presentation="date"
+                  cancel-text="Cancelar"
+                  done-text="Aplicar"
+                  [(ngModel)]="filtroFecha"
+                  (ionChange)="filtrarRecetas()"
+                  show-default-buttons="true"
+                  prefer-wheel="false">
+                </ion-datetime>
+              </ng-template>
+            </ion-modal>
+          </ion-item>
+
+          <ion-button 
+            class="btn-limpiar" 
+            expand="block" 
+            fill="outline" 
+            color="medium"
+            (click)="limpiarFiltros()">
+            Limpiar filtros
+          </ion-button>
+
+        </div>
+      </ion-accordion>
+    </ion-accordion-group>
+  </ion-card>
+
+  <!-- LISTA DE RECETAS -->
+  <ion-card *ngFor="let receta of historialRecetas" class="card2">
+    <ion-card-header>
+      <ion-card-title>{{ receta?.mascota?.masc_nom }}</ion-card-title>
+      <ion-card-subtitle>Fecha: {{ receta?.fecha_receta | date: 'medium' }}</ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
+      <p><strong>Indicaciones:</strong> {{ receta?.indicaciones }}</p>
+
+      <div *ngIf="receta?.detalle_receta?.length">
+        <h4>Medicamentos:</h4>
+        <ul>
+          <li *ngFor="let detalle of receta.detalle_receta">
+            {{ detalle.nombre_medicamento }} - {{ detalle.dosis_medicamento }} - {{ detalle.duracion_medicamento }}
+          </li>
+        </ul>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- MENSAJE SI NO HAY RECETAS -->
+  <ion-card *ngIf="historialRecetas.length === 0" class="card2">
+    <ion-card-content class="ion-text-center">
+      No hay recetas médicas registradas aún.
+    </ion-card-content>
+  </ion-card>
+
+  <!-- BOTÓN AGREGAR RECETA -->
+  <div class="boton-agregar">
+    <ion-button 
+      class="agregar-receta" 
+      expand="block"
+      (click)="irAgregarReceta()"
+    >
+      <ion-icon name="add" slot="start"></ion-icon> Nueva Receta
+    </ion-button>
+  </div>
+
+</ion-content>

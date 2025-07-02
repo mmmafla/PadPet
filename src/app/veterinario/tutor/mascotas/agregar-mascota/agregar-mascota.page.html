@@ -1,6 +1,9 @@
-<app-header backButton="/tutor" title="Agregar Mascota"></app-header>
+<ion-header class="ion-no-border">
+<app-header [backButton]="'/veterinario/tutor/mascotas/' + idTutor"></app-header>
+</ion-header>
 
-<ion-content class="fondo">
+<ion-content class="fondo" [fullscreen]="true">
+  
   <ion-card class="ion-card">
     <h2>Agregar mascota</h2>
     <form [formGroup]="mascotaForm" (ngSubmit)="guardarMascota()">
@@ -67,12 +70,6 @@
   <ion-input label="Edad (años)" [value]="mascotaForm.value.masc_edad_texto"  readonly     class="readonly-input"></ion-input>
 </ion-item>
 
-
-
-<!--PESO --------------------->
-        <ion-item>
-          <ion-input label="Peso (kg)" type="number" formControlName="masc_peso"></ion-input>
-        </ion-item>
 <!--ESPECIE --------------------->
         <ion-item>
           <ion-select

@@ -12,7 +12,6 @@ import { createClient } from '@supabase/supabase-js';
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
 import { FormsModule } from '@angular/forms';
 
-
 const supabaseUrl = 'https://irorlonysbmkbdthvrmt.supabase.co';
 const supabaseKey =
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyb3Jsb255c2Jta2JkdGh2cm10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYyODgwMDQsImV4cCI6MjA2MTg2NDAwNH0.s-ZEteHxMWX43NCQIuNmTWpbBoEUxseKyg_YaXpi6Ek';
@@ -36,11 +35,10 @@ export class AgregarMascotaPage implements OnInit {
   tamanio: any[] = [];
   esterilizado: any[] = [];
 
-  runTutor!: string;
+  idTutor!: string;  // CAMBIO: usar idTutor en vez de runTutor
   id_auth!: string;
 
-  
-fechaDesconocida: boolean = false;
+  fechaDesconocida: boolean = false;
 
   constructor(
     private fb: FormBuilder,
@@ -53,26 +51,26 @@ fechaDesconocida: boolean = false;
       id_sexo: ['', Validators.required],
       masc_nacimiento: [null],
       masc_edad: [null],
-      masc_peso: [null],
       id_especie: ['', Validators.required],
       id_raza: [null, Validators.required],
       id_tamanio: [null],
       id_pelaje: [null],
       masc_color: [''],
-      id_esterilizado: [null],
+      id_esterilizado: ['',Validators.required],
       id_grupo_sanguineo: [null],
       masc_num_chip: [null],
       masc_observaciones: [''],
+
       id_estado: [''],
-      run_tutor: [''],
+      id_tutor: [''],   // CAMBIO: id_tutor en vez de run_tutor
       fecha_desconocida: [false],
       masc_edad_texto: [''],
     });
   }
 
   async ngOnInit() {
-    this.runTutor = this.route.snapshot.paramMap.get('run_tutor') || '';
-    this.mascotaForm.patchValue({ run_tutor: this.runTutor });
+    this.idTutor = this.route.snapshot.paramMap.get('idTutor') || '';
+    this.mascotaForm.patchValue({ id_tutor: this.idTutor });  // PATCH con id_tutor
 
     const {
       data: { user },
@@ -101,11 +99,11 @@ fechaDesconocida: boolean = false;
       this.actualizarEdad();
     });
 
-      this.mascotaForm.get('masc_nacimiento')?.valueChanges.subscribe(() => {
-    if (!this.fechaDesconocida) {
-      this.actualizarEdad();
-    }
-  });
+    this.mascotaForm.get('masc_nacimiento')?.valueChanges.subscribe(() => {
+      if (!this.fechaDesconocida) {
+        this.actualizarEdad();
+      }
+    });
   }
 
   async cargarEspeciesFiltradas() {
@@ -159,95 +157,92 @@ fechaDesconocida: boolean = false;
     }
   }
 
-
   async cargarTamanio(){
     const { data, error} = await supabase.from('tamanio_mascota').select('*');
-        if (error) {
+    if (error) {
       console.error('Error cargando los tamaños de mascota', error);
     } else {
       this.tamanio = data || [];
     }
+  }
 
-   }
   async cargarPelaje(){
-        const { data, error} = await supabase.from('pelaje_mascota').select('*');
-        if (error) {
+    const { data, error} = await supabase.from('pelaje_mascota').select('*');
+    if (error) {
       console.error('Error cargando el pelaje de mascota', error);
     } else {
       this.pelaje = data || [];
     }
-
   }
+
   async cargarEsterilizado(){
-        const { data, error} = await supabase.from('esterilizado').select('*');
-        if (error) {
+    const { data, error} = await supabase.from('esterilizado').select('*');
+    if (error) {
       console.error('Error cargando esterilizado de mascota', error);
     } else {
       this.esterilizado = data || [];
     }
   }
 
-
-limpiarFecha() {
-  if (this.fechaDesconocida) {
-    this.mascotaForm.patchValue({ masc_nacimiento: null });
-  } else {
-    this.mascotaForm.patchValue({ masc_edad: null });
-  }
-}
-onFechaDesconocidaChange() {
-  this.fechaDesconocida = this.mascotaForm.value.fecha_desconocida;
-  this.limpiarFecha();
-}
-
-
-actualizarEdad() {
-  const fechaNacimiento = this.mascotaForm.value.masc_nacimiento;
-  if (!fechaNacimiento) {
-    this.mascotaForm.patchValue({ masc_edad: null, masc_edad_texto: '' });
-    return;
-  }
-
-  const nacimiento = new Date(fechaNacimiento);
-  const hoy = new Date();
-
-  let years = hoy.getFullYear() - nacimiento.getFullYear();
-  let months = hoy.getMonth() - nacimiento.getMonth();
-  const days = hoy.getDate() - nacimiento.getDate();
-
-  // Ajustar meses y años si no se ha cumplido el mes o día aún
-  if (months < 0 || (months === 0 && days < 0)) {
-    years--;
-    months += 12;
-  }
-  if (days < 0) {
-    months--;
-    if (months < 0) {
-      years--;
-      months += 12;
+  limpiarFecha() {
+    if (this.fechaDesconocida) {
+      this.mascotaForm.patchValue({ masc_nacimiento: null });
+    } else {
+      this.mascotaForm.patchValue({ masc_edad: null });
     }
   }
 
-  // Actualizar edad en número (solo años)
-  this.mascotaForm.patchValue({ masc_edad: years });
-
-  // Crear texto bonito para mostrar edad con años y meses
-  let edadTexto = '';
-  if (years > 0) {
-    edadTexto += years + (years === 1 ? ' año' : ' años');
-  }
-  if (months > 0) {
-    if (edadTexto.length > 0) edadTexto += ' y ';
-    edadTexto += months + (months === 1 ? ' mes' : ' meses');
-  }
-  if (edadTexto === '') {
-    edadTexto = 'Menos de un mes';
+  onFechaDesconocidaChange() {
+    this.fechaDesconocida = this.mascotaForm.value.fecha_desconocida;
+    this.limpiarFecha();
   }
 
-  // Guardar el texto para mostrar en la UI
-  this.mascotaForm.patchValue({ masc_edad_texto: edadTexto });
-}
+  actualizarEdad() {
+    const fechaNacimiento = this.mascotaForm.value.masc_nacimiento;
+    if (!fechaNacimiento) {
+      this.mascotaForm.patchValue({ masc_edad: null, masc_edad_texto: '' });
+      return;
+    }
 
+    const nacimiento = new Date(fechaNacimiento);
+    const hoy = new Date();
+
+    let years = hoy.getFullYear() - nacimiento.getFullYear();
+    let months = hoy.getMonth() - nacimiento.getMonth();
+    const days = hoy.getDate() - nacimiento.getDate();
+
+    // Ajustar meses y años si no se ha cumplido el mes o día aún
+    if (months < 0 || (months === 0 && days < 0)) {
+      years--;
+      months += 12;
+    }
+    if (days < 0) {
+      months--;
+      if (months < 0) {
+        years--;
+        months += 12;
+      }
+    }
+
+    // Actualizar edad en número (solo años)
+    this.mascotaForm.patchValue({ masc_edad: years });
+
+    // Crear texto bonito para mostrar edad con años y meses
+    let edadTexto = '';
+    if (years > 0) {
+      edadTexto += years + (years === 1 ? ' año' : ' años');
+    }
+    if (months > 0) {
+      if (edadTexto.length > 0) edadTexto += ' y ';
+      edadTexto += months + (months === 1 ? ' mes' : ' meses');
+    }
+    if (edadTexto === '') {
+      edadTexto = 'Menos de un mes';
+    }
+
+    // Guardar el texto para mostrar en la UI
+    this.mascotaForm.patchValue({ masc_edad_texto: edadTexto });
+  }
 
   async guardarMascota() {
     if (this.mascotaForm.invalid) {
@@ -257,29 +252,27 @@ actualizarEdad() {
 
     const formData = { ...this.mascotaForm.value };
 
-  formData.id_estado = 1;
-  formData.masc_num_chip = formData.masc_num_chip ? Number(formData.masc_num_chip) : null;
-  formData.masc_edad = formData.masc_edad ? Number(formData.masc_edad) : null;
-  formData.id_especie = Number(formData.id_especie);
-  formData.id_raza = formData.id_raza ? Number(formData.id_raza) : null;
-  formData.id_grupo_sanguineo = formData.id_grupo_sanguineo ? Number(formData.id_grupo_sanguineo) : null;
-  formData.id_sexo = Number(formData.id_sexo);
-  formData.id_pelaje = Number(formData.id_pelaje);
-  formData.id_tamanio = Number(formData.id_tamanio);
-  formData.id_esterilizado = Number(formData.id_esterilizado);
+    formData.id_estado = 1;
+    formData.masc_num_chip = formData.masc_num_chip ? Number(formData.masc_num_chip) : null;
+    formData.masc_edad = formData.masc_edad ? Number(formData.masc_edad) : null;
+    formData.id_especie = Number(formData.id_especie);
+    formData.id_raza = formData.id_raza ? Number(formData.id_raza) : null;
+    formData.id_grupo_sanguineo = formData.id_grupo_sanguineo ? Number(formData.id_grupo_sanguineo) : null;
+    formData.id_sexo = Number(formData.id_sexo);
+    formData.id_pelaje = Number(formData.id_pelaje);
+    formData.id_tamanio = Number(formData.id_tamanio);
+    formData.id_esterilizado = Number(formData.id_esterilizado);
 
-  delete formData.masc_edad_texto;
-  delete formData.fecha_desconocida;
+    delete formData.masc_edad_texto;
+    delete formData.fecha_desconocida;
 
     const { error } = await supabase.from('mascota').insert([formData]);
-
-
 
     if (error) {
       this.presentToast('Error guardando mascota: ' + error.message, 'danger');
     } else {
       this.presentToast('Mascota guardada correctamente', 'success');
-      this.router.navigate(['/veterinario/tutor/mascotas', this.runTutor]);
+      this.router.navigate(['/veterinario/tutor/mascotas', this.idTutor]);
     }
   }
 

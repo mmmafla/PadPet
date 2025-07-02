@@ -19,7 +19,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 })
 export class MascotasPage implements OnInit {
   mascotas: any[] = [];
-  runTutor!: string;
+  idTutor!: string;  // Cambié el nombre para ser más claro
 
   constructor(
     private route: ActivatedRoute,
@@ -29,19 +29,20 @@ export class MascotasPage implements OnInit {
   ) {}
 
   async ngOnInit() {
-    this.runTutor = this.route.snapshot.paramMap.get('run_tutor') || '';
+    this.idTutor = this.route.snapshot.paramMap.get('idTutor') || '';
     await this.cargarMascotas();
   }
-    async ionViewWillEnter() {
+
+  async ionViewWillEnter() {
     await this.cargarMascotas();
   }
 
   async cargarMascotas() {
-    // 1. Mascotas básicas
+    // 1. Mascotas básicas filtrando por id_tutor
     const { data: mascotasData, error: err1 } = await supabase
       .from('mascota')
-      .select('id_masc, masc_nom, id_raza, id_estado, run_tutor')
-      .eq('run_tutor', this.runTutor);
+      .select('id_masc, masc_nom, id_raza, id_estado, id_tutor')
+      .eq('id_tutor', this.idTutor);
 
     if (err1) {
       console.error('Error cargar mascotas', err1);
@@ -94,11 +95,11 @@ export class MascotasPage implements OnInit {
   }
 
   irAgregarMascota() {
-    this.router.navigate([`/veterinario/tutor/mascotas/${this.runTutor}/agregar`]);
+    this.router.navigate([`/veterinario/tutor/mascotas/${this.idTutor}/agregar`]);
   }
 
   irEditarMascota(idMasc: number) {
-    this.router.navigate(['/veterinario/tutor/mascotas/editar-mascota', this.runTutor, idMasc]);
+    this.router.navigate(['/veterinario/tutor/mascotas/editar-mascota', this.idTutor, idMasc]);
   }
 
   async confirmarEliminarMascota(mascota: any) {
@@ -139,13 +140,8 @@ export class MascotasPage implements OnInit {
     event.detail.complete();
   }
 
-
-
   // --------------------------------------------------HISTORIAL CLINICO
-
-verHistorialClinico(idMasc: number) {
-  this.router.navigate([`/veterinario/tutor/mascotas/${this.runTutor}/${idMasc}/historial-clinico`]);
-}
-
-
+  verHistorialClinico(idMasc: number) {
+    this.router.navigate([`/veterinario/tutor/mascotas/${this.idTutor}/${idMasc}/historial-clinico`]);
+  }
 }

@@ -1,6 +1,10 @@
-<app-header backButton="/home" title="Agregar tutor"></app-header>
+<ion-header class="ion-no-border">
+<app-header backButton="/home"></app-header>
+</ion-header>
 
-<ion-content class="fondo">
+
+<ion-content class="fondo" [fullscreen]="true">
+  
   <ion-card class="ion-card">
       <h2>Nuevo tutor</h2>
       
@@ -22,7 +26,7 @@
           <ion-input label="Correo" type="email" formControlName="correo_tutor"></ion-input>
         </ion-item>
         <ion-item>
-          <ion-input label="Celular +569" type="number" formControlName="celular_tutor"></ion-input>
+          <ion-input label="Celular" maxlength="11" inputmode="numeric" type="tel" formControlName="celular_tutor"></ion-input>
         </ion-item>
         <ion-item>
           <ion-select formControlName="id_region" label="Región" interface="popover" placeholder="Selecciona una región" (ionChange)="cargarCiudades()">

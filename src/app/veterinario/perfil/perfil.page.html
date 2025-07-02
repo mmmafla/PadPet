@@ -1,6 +1,8 @@
-<app-header  backButton="/home" title="Perfil"></app-header>
+<ion-header class="ion-no-border">
+<app-header  backButton="/home"></app-header>
+</ion-header>
 
-<ion-content class="fondo">
+<ion-content class="fondo" [fullscreen]="true">
 
 <!-----------------------DATOS PERSONALES --------------------------------->
 <ion-card class="card" style="text-align: center;">
@@ -32,11 +34,11 @@
 <ion-card class="card" style="text-align: center;">
          <h2>Imágenes</h2>
 
-      <h3>Foto de perfil</h3>
+      <h3>Logo</h3>
             <img *ngIf="fotoPerfilUrl" [src]="fotoPerfilUrl" alt="Foto de perfil" style="width: 120px; height: 120px; border-radius: 50%; margin: 10px auto;" />
-      <ion-button (click)="selectImage()" class="editar">Subir Foto de Perfil</ion-button>
+      <ion-button (click)="selectImage()" class="editar">Subir Logo</ion-button>
       <input type="file" accept="image/*" hidden #fileInput (change)="uploadImage($event)" />
-      <ion-button color="danger" *ngIf="fotoPerfilUrl" (click)="eliminarFotoPerfil()">Eliminar Foto de Perfil</ion-button>
+      <ion-button class="boton-eliminar" *ngIf="fotoPerfilUrl" (click)="eliminarFotoPerfil()">Eliminar Logo</ion-button>
 
       <h3 style="padding-top: 40px;">Firma profesional</h3>
                <img *ngIf="firmaUrl" [src]="firmaUrl" alt="Firma del veterinario"
@@ -45,7 +47,7 @@
             <p>Recomendamos que la imágen de la firma tenga fondo blanco para un mejor uso*</p>
          <ion-button (click)="selectFirma()" class="editar">Subir Firma</ion-button>
          <input type="file" accept="image/*" hidden #fileInputFirma (change)="uploadFirma($event)" />
-         <ion-button color="danger" *ngIf="firmaUrl" (click)="eliminarFirma()">Eliminar Firma</ion-button>
+         <ion-button class="boton-eliminar" *ngIf="firmaUrl" (click)="eliminarFirma()">Eliminar Firma</ion-button>
 
    
    

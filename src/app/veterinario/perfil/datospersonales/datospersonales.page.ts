@@ -29,7 +29,7 @@ export class DatospersonalesPage implements OnInit {
       apellidos_vet: new FormControl('', [Validators.required]),
       email_vet: new FormControl('', [Validators.required, Validators.email]),
       run_vet: new FormControl({ value: '', disabled: true }),
-      celular_vet: new FormControl('', [Validators.required]),
+      celular_vet: new FormControl('', [Validators.required, Validators.maxLength(11)]),
       direccion_vet: new FormControl('', [Validators.required]),
       id_region: new FormControl(null, [Validators.required]),
       id_ciudad: new FormControl(null, [Validators.required])
