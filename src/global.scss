@@ -27,17 +27,25 @@
 }
 
   .card2{
-    padding-top: 1%;
-    padding-bottom: 1%;
-    padding-left: 5%;
-    padding-right: 5%;
-    margin-left: 5%;
-    margin-right: 5%;
+    padding: 8px 5%;
+    margin: 10px 5%;
     background: rgb(251, 251, 251);
     border: 1px solid rgb(100, 181, 239);
-    box-shadow: 0 0 0px;
-    border-radius: 20px; 
+    box-shadow: none;
+    border-radius: 20px;
+
+
+    
 }
+      .card2 p {
+        margin: 3px 0;
+      }
+      .card2 h3 {
+        margin: 0 0 6px 0;
+        font-size: 16px;
+        font-weight: 600;
+      }
+
   .card3{
     padding-top:5%;
     padding-bottom: 5%;
@@ -58,7 +66,7 @@
     text-align: center;
     text-transform: uppercase;
     letter-spacing: 4px;
-    color: #5cb0f9 ;
+    color: #658faf ;
   }
 
   h3{
@@ -94,8 +102,37 @@ p{
   
     margin-top: 20px;
     display: block;
+    text-transform: uppercase;
 
   }
+    .boton-exportar{
+    --background:#8a9aca;
+    --color: #000000 ;
+    --border-radius: 20px;
+    --box-shadow: 0;
+    color: rgb(251, 251, 251);
+  
+    margin-top: 10px;
+    display: block;
+    text-transform: uppercase;
+  }
+
+.boton-enviar-directo {
+  --background: transparent;
+  --color: #000000;
+  --border-radius: 20px;
+  --border-width: 1px;
+  --border-style: solid;
+  --border-color: #8a9aca;
+  --box-shadow: none;
+
+  margin-top: 10px;
+  display: block;
+  width: 100%;
+  text-transform: uppercase;
+}
+
+
 
   .boton-guardar-generico{
   --background: #ffbf9a ; 
@@ -108,9 +145,27 @@ p{
       margin-top: 20px;
     display: block;
 
-   
-    
   }
+
+  .boton-eliminar {
+  --background: transparent;
+  --color: #000000;
+  --border-radius: 15px;
+  --border-width: 1px;
+  --border-style: solid;
+  --border-color: #8a9aca;
+  --box-shadow: none;
+  margin-top: 10px;
+  display: block;
+  width: 100%;
+  text-transform: uppercase;
+  align-items: center;
+}
+
+ion-header, ion-footer, ion-content {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
 
 
 /*
