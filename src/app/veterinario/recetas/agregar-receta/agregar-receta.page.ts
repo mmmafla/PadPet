@@ -10,6 +10,8 @@ const supabaseUrl = 'https://irorlonysbmkbdthvrmt.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyb3Jsb255c2Jta2JkdGh2cm10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYyODgwMDQsImV4cCI6MjA2MTg2NDAwNH0.s-ZEteHxMWX43NCQIuNmTWpbBoEUxseKyg_YaXpi6Ek';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+// ... (importaciones y configuración igual que antes)
+
 @Component({
   selector: 'app-agregar-receta',
   templateUrl: './agregar-receta.page.html',
@@ -25,7 +27,8 @@ export class AgregarRecetaPage implements OnInit {
   mascotaSeleccionada: any | null = null;
 
   tratamiento_indicaciones: string = '';
-  tratamientoList: { nombre: string; dosis: string; duracion: string }[] = [];
+  tratamientoList: { id_medicamento: number | null; dosis: string; duracion: string }[] = [];
+  medicamentosDisponibles: any[] = [];
 
   runVet: string | null = null;
 
@@ -39,7 +42,21 @@ export class AgregarRecetaPage implements OnInit {
     await this.obtenerRunVet();
     if (this.runVet) {
       this.cargarTutores();
+      this.cargarMedicamentos();
     }
+  }
+
+  async cargarMedicamentos() {
+    const { data, error } = await supabase
+      .from('medicamento')
+      .select('id_medicamento, nombre_medicamento');
+
+    if (error) {
+      console.error('Error al cargar medicamentos:', error);
+      return;
+    }
+
+    this.medicamentosDisponibles = data || [];
   }
 
   async obtenerRunVet() {
@@ -102,7 +119,7 @@ export class AgregarRecetaPage implements OnInit {
   }
 
   agregarMedicamento() {
-    this.tratamientoList.push({ nombre: '', dosis: '', duracion: '' });
+    this.tratamientoList.push({ id_medicamento: null, dosis: '', duracion: '' });
   }
 
   eliminarMedicamento(index: number) {
@@ -130,7 +147,7 @@ export class AgregarRecetaPage implements OnInit {
       return this.mostrarToast('Agrega al menos un medicamento', 'warning');
     }
     for (const med of this.tratamientoList) {
-      if (!med.nombre.trim() || !med.dosis.trim() || !med.duracion.trim()) {
+      if (!med.id_medicamento || !med.dosis.trim() || !med.duracion.trim()) {
         return this.mostrarToast('Completa todos los datos de los medicamentos', 'warning');
       }
     }
@@ -169,7 +186,7 @@ export class AgregarRecetaPage implements OnInit {
 
     const detalles = this.tratamientoList.map(med => ({
       id_receta: idReceta,
-      nombre_medicamento: med.nombre,
+      id_medicamento: med.id_medicamento,
       dosis_medicamento: med.dosis,
       duracion_medicamento: med.duracion
     }));
@@ -197,3 +214,4 @@ export class AgregarRecetaPage implements OnInit {
     this.tratamientoList = [];
   }
 }
+

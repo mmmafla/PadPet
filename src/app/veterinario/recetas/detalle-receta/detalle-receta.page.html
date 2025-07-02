@@ -1,0 +1,29 @@
+<ion-header class="ion-no-border">
+  <app-header backButton="/home"></app-header>
+</ion-header>
+
+<ion-content class="fondo" [fullscreen]="true">
+
+    <h2>Detalle Tratamiento</h2>
+
+ <ion-card class="card3">
+
+  <p>datos</p>
+
+
+<!----   <h2>Atención de {{ atencion.mascota?.masc_nom }}</h2>
+    <h3 style="text-align: center;"> Dueño: {{ atencion.mascota?.tutor?.nombre_tutor }} {{ atencion.mascota?.tutor?.apellidos_tutor }}  </h3>
+    <p><strong>Correo Tutor:</strong> {{ atencion.mascota?.tutor?.correo_tutor }}</p>
+    <p><strong>Teléfono Tutor:</strong> {{ atencion.mascota?.tutor?.celular_tutor }}</p>
+------------------------------------------------------------------------------------->
+   
+
+    <ion-button class="boton-editar" (click)="modificarReceta()">Modificar Tratamiento</ion-button>
+    <ion-button class="boton-exportar" (click)="exportarPdfReceta()">Descargar Tratamiento</ion-button>
+    <ion-button class="boton-exportar" (click)="exportarPdfRecetaPrueba()">Descargar LOCALHOST</ion-button>    
+    <ion-button class="boton-enviar-directo" (click)="enviarPdfReceta()">Enviar Tratamiento</ion-button>
+
+
+  </ion-card>
+
+</ion-content>

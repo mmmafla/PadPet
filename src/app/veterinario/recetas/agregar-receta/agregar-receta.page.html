@@ -1,5 +1,5 @@
 <ion-header class="ion-no-border">
-  <app-header backButton="/recetas" title="Nueva Receta"></app-header>
+  <app-header backButton="/recetas"></app-header>
 </ion-header>
 
 <ion-content class="fondo" [fullscreen]="true" style="padding-bottom: 80px;">
@@ -77,14 +77,21 @@
             <ion-icon name="close-outline"></ion-icon>
           </ion-button>
 
+          <!-- Selección de medicamento desde la base -->
           <ion-item>
             <ion-label position="stacked">Medicamento</ion-label>
-            <ion-input
-              [(ngModel)]="med.nombre"
-              name="nombreMedicamento{{i}}"
-              placeholder="Ej: Amoxicilina 500mg"
+            <ion-select
+              [(ngModel)]="med.id_medicamento"
+              name="medicamento{{i}}"
+              placeholder="Selecciona medicamento"
+              interface="popover"
               required>
-            </ion-input>
+              <ion-select-option
+                *ngFor="let m of medicamentosDisponibles"
+                [value]="m.id_medicamento">
+                {{ m.nombre_medicamento }}
+              </ion-select-option>
+            </ion-select>
           </ion-item>
 
           <ion-item>
@@ -108,14 +115,12 @@
           </ion-item>
         </div>
       </form>
+
+      <ion-toolbar>
+        <ion-button expand="block" shape="round" color="primary" (click)="guardarReceta()" class="boton-guardar-generico">
+          Guardar Receta
+        </ion-button>
+      </ion-toolbar>
     </ion-card-content>
   </ion-card>
 </ion-content>
-
-<ion-footer>
-  <ion-toolbar>
-    <ion-button expand="block" shape="round" color="primary" (click)="guardarReceta()">
-      Guardar Receta
-    </ion-button>
-  </ion-toolbar>
-</ion-footer>

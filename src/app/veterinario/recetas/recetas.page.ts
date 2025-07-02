@@ -112,7 +112,7 @@ export class RecetasPage implements OnInit {
     const idRecetas = recetas.map(r => r.id_receta);
     const { data: detalles, error: errorDetalles } = await supabase
       .from('detalle_receta')
-      .select('id_receta, nombre_medicamento, dosis_medicamento, duracion_medicamento')
+      .select('id_receta, id_medicamento, dosis_medicamento, duracion_medicamento, medicamento(nombre_medicamento)')
       .in('id_receta', idRecetas);
 
     if (errorDetalles || !detalles) {
@@ -148,6 +148,8 @@ export class RecetasPage implements OnInit {
   }
 
   verDetalleReceta(id: number) {
-    this.router.navigate(['/detalle-receta'], { state: { id: id } });
+    this.router.navigate(['/veterinario/recetas/detalle-receta'], { state: { id: id } });
   }
+
+
 }

@@ -10,6 +10,14 @@ const routes: Routes = [
   },  {
     path: 'agregar-receta',
     loadChildren: () => import('./agregar-receta/agregar-receta.module').then( m => m.AgregarRecetaPageModule)
+  },
+  {
+    path: 'detalle-receta',
+    loadChildren: () => import('./detalle-receta/detalle-receta.module').then( m => m.DetalleRecetaPageModule)
+  },
+  {
+    path: 'modificar-receta',
+    loadChildren: () => import('./modificar-receta/modificar-receta.module').then( m => m.ModificarRecetaPageModule)
   }
 
 ];

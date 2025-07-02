@@ -1,0 +1,29 @@
+/* Aplica solo a items del formulario */
+.form-item {
+  --padding-start: 8px;
+  --inner-padding-end: 8px;
+  --min-height: 60px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+}
+
+/* Label con slot start ocupa menos espacio */
+.form-item ion-label[slot="start"] {
+  flex: 0 0 30%;
+  font-weight: 500;
+  margin-right: 8px;
+  white-space: normal;
+}
+
+/* Asegurar que el input, select y textarea ocupen el resto del ancho */
+.form-item ion-input,
+.form-item ion-select,
+.form-item ion-textarea {
+  flex: 1;
+}
+
+/* Hacer más alto el textarea */
+.form-item ion-textarea {
+  min-height: 80px;
+}
