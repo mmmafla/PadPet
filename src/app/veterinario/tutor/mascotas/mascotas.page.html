@@ -1,6 +1,8 @@
-<app-header backButton="/tutor" title="Editar Mascota"></app-header>
+<ion-header class="ion-no-border">
+<app-header backButton="/tutor"></app-header>
+</ion-header>
 
-<ion-content class="fondo ion-padding">
+<ion-content class="fondo ion-padding" [fullscreen]="true">
 
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content></ion-refresher-content>

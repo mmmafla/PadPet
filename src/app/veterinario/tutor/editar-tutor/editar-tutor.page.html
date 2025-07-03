@@ -1,6 +1,9 @@
-<app-header backButton="/tutor" title="Editar tutor"></app-header>
+<ion-header class="ion-no-border">
+<app-header backButton="/tutor"></app-header>
+</ion-header>
 
-<ion-content class="fondo">
+<ion-content class="fondo" [fullscreen]="true">
+
   <ion-card class="ion-card">
           <h2>Editar tutor</h2>
     <form [formGroup]="tutorForm" (ngSubmit)="guardarCambios()">

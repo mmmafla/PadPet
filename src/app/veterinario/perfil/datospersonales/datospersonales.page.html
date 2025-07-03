@@ -1,7 +1,14 @@
-<app-header backButton="/perfil" title="Datos personales"></app-header>
+<ion-header class="ion-no-border">
+<app-header backButton="/perfil" ></app-header>
+</ion-header>
 
-<ion-content class="fondo">
+<ion-content class="fondo" [fullscreen]="true">
+
   <ion-card class="ion-card">
+        <h2>Datos personales</h2>
+    <p style="text-align: center;">
+      Mantén actualizada tu información personal y de contacto.
+    </p>
     <form [formGroup]="form" (ngSubmit)="actualizarDatos()">
       <ion-list>
         <ion-item>

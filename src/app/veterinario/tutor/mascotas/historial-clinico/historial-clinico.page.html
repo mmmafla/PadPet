@@ -1,6 +1,10 @@
-<app-header [backButton]="'/veterinario/tutor/mascotas/' + idMasc" title="Historial Clínico"></app-header>
+<ion-header class="ion-no-border">
+<app-header [backButton]="'/veterinario/tutor/mascotas/' + idMasc"></app-header>
+</ion-header>
 
-<ion-content class="fondo ion-padding">
+
+<ion-content class="fondo ion-padding" [fullscreen]="true">
+
   <ion-card *ngIf="atenciones.length > 0">
     <ion-list>
       <ion-item *ngFor="let atencion of atenciones">

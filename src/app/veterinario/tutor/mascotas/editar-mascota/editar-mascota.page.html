@@ -1,6 +1,10 @@
-<app-header [backButton]="'/veterinario/tutor/mascotas/' + idTutor" title="Editar Mascota"></app-header>
+<ion-header class="ion-no-border">
+<app-header [backButton]="'/veterinario/tutor/mascotas/' + idTutor"></app-header>
+</ion-header>
 
-<ion-content class="fondo">
+<ion-content class="fondo" [fullscreen]="true">
+
+
   <ion-card class="ion-card">
     <h2>Editar mascota</h2>
     <form [formGroup]="mascotaForm" (ngSubmit)="guardarMascota()">

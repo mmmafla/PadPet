@@ -1,6 +1,9 @@
-<app-header backButton="/perfil" title="Tutores"></app-header>
+<ion-header class="ion-no-border">
+<app-header backButton="/perfil"></app-header>
+</ion-header>
 
-<ion-content class="fondo ion-padding">
+
+<ion-content class="fondo ion-padding" [fullscreen]="true">
 
   <!-- Refresher -->
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">

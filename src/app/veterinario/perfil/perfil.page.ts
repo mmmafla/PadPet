@@ -4,6 +4,7 @@ import { IonicModule } from '@ionic/angular';
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
 import { createClient } from '@supabase/supabase-js';
 import { CommonModule, NgIf  } from '@angular/common';
+import { SupabaseService } from 'src/app/services/supabase.service';
 
 const supabaseUrl = 'https://irorlonysbmkbdthvrmt.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyb3Jsb255c2Jta2JkdGh2cm10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYyODgwMDQsImV4cCI6MjA2MTg2NDAwNH0.s-ZEteHxMWX43NCQIuNmTWpbBoEUxseKyg_YaXpi6Ek';
@@ -28,7 +29,7 @@ export class PerfilPage implements OnInit {
   firmaUrl: string | null = null;
   nombreFirmaAnterior: string | null = null;
 
-  constructor() {}
+  constructor(private supabaseService: SupabaseService) {}
 
   async ngOnInit() {
     await this.obtenerFotoPerfil();
