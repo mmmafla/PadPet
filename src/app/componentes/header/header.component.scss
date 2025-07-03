@@ -1,4 +1,12 @@
 .centrar {
-    text-align: center;
     text-transform: uppercase;
+
 }
+
+
+
+:host {
+  display: block;
+  padding-top: env(safe-area-inset-top);
+}
+

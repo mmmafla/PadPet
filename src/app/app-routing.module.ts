@@ -24,7 +24,7 @@ const routes: Routes = [
   {
   path: 'nueva-contrasena',
   loadChildren: () => import('./cuenta/olvidopass/nuevacontrasena/nuevacontrasena.module').then(m =>m.NuevacontrasenaPageModule)
-},
+  },
   {
     path: 'home',
     loadChildren: () => import('./veterinario/home/home.module').then( m => m.HomePageModule),
@@ -104,14 +104,36 @@ const routes: Routes = [
      canActivate: [AuthGuard] 
     
   },
-{
-  path: 'veterinario/tutor/mascotas/:idTutor/:id_masc/historial-clinico',
-  loadChildren: () => import("./veterinario/tutor/mascotas/historial-clinico/historial-clinico.module").then(m => m.HistorialClinicoPageModule),
-  canActivate: [AuthGuard] 
-},
-
-
- 
+  {
+    path: 'veterinario/tutor/mascotas/:idTutor/:id_masc/historial-clinico',
+    loadChildren: () => import("./veterinario/tutor/mascotas/historial-clinico/historial-clinico.module").then(m => m.HistorialClinicoPageModule),
+    canActivate: [AuthGuard] 
+  },
+  {
+    path: 'recetas',
+    loadChildren: () => import('./veterinario/recetas/recetas.module').then( m => m.RecetasPageModule),
+    canActivate: [AuthGuard]
+  },
+  {
+  path: 'veterinario/recetas/agregar-receta',
+  loadChildren: () => import('./veterinario/recetas/agregar-receta/agregar-receta.module').then(m => m.AgregarRecetaPageModule),
+  canActivate: [AuthGuard]
+  },
+  {
+  path: 'veterinario/recetas/detalle-receta',
+  loadChildren: () => import('./veterinario/recetas/detalle-receta/detalle-receta.module').then(m => m.DetalleRecetaPageModule),
+  canActivate: [AuthGuard]
+  },
+  {
+  path: 'veterinario/recetas/modificar-receta',
+  loadChildren: () => import('./veterinario/recetas/modificar-receta/modificar-receta.module').then(m => m.ModificarRecetaPageModule),
+  canActivate: [AuthGuard]
+  },
+  {
+    path: 'dashboard',
+    loadComponent: () =>
+      import('./veterinario/dashboard/dashboard.page').then(m => m.DashboardPage)
+  }
 ];
 
 @NgModule({
