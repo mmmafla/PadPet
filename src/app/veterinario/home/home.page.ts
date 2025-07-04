@@ -154,4 +154,10 @@ export class HomePage implements OnInit {
       this.router.navigate(['/recetas']);
     }
   }
+
+  irADashboard() {
+    if (this.estadoSolicitud === 'aceptada') {
+      this.router.navigate(['/dashboard']);
+    }
+  }
 }

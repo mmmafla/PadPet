@@ -175,7 +175,7 @@
             lines="none"
             [class.disabled]="estadoSolicitud !== 'aceptada'"
             button
-            (click)="estadoSolicitud === 'aceptada' ? irAConsulta() : null"
+            (click)="estadoSolicitud === 'aceptada' ? irADashboard() : null"
             [style.background]="slidingOpenEstadisticas ? '#fff' : 'transparent'"
           >
             <div class="contenido-centro">
