@@ -23,7 +23,8 @@ export class ModificarRecetaPage implements OnInit {
   receta: any;
 
   tratamiento_indicaciones: string = '';
-  tratamientoList: { id_medicamento: number | null; dosis: string; duracion: string }[] = [];
+  tratamientoList: { id_medicamento: number | null; nombre: string; dosis: string; duracion: string; frecuencia?: string }[] = [];
+
   medicamentosDisponibles: any[] = [];
 
   constructor(
@@ -36,39 +37,31 @@ export class ModificarRecetaPage implements OnInit {
   }
 
   async ngOnInit() {
-    await this.cargarMedicamentos();
+
     if (this.idReceta) {
       await this.cargarDatosReceta(this.idReceta);
     }
   }
 
-  async cargarMedicamentos() {
-    const { data, error } = await supabase
-      .from('medicamento')
-      .select('id_medicamento, nombre_medicamento');
-
-    if (error) {
-      console.error('Error al cargar medicamentos:', error);
-      return;
-    }
-
-    this.medicamentosDisponibles = data || [];
-  }
 
   async cargarDatosReceta(id: number) {
     const { data, error } = await supabase
       .from('receta')
-      .select(`
-        id_receta,
-        indicaciones,
-        id_masc,
-        mascota:mascota(masc_nom),
-        detalle_receta (
-          id_medicamento,
-          dosis_medicamento,
-          duracion_medicamento
-        )
-      `)
+  .select(`
+    id_receta,
+    indicaciones,
+    id_masc,
+    mascota:mascota(masc_nom),
+    detalle_receta (
+      id_medicamento,
+      dosis_medicamento,
+      duracion_medicamento,
+      frecuencia_medicamento,
+      medicamento (
+        nombre_medicamento
+      )
+    )
+  `)
       .eq('id_receta', id)
       .single();
 
@@ -79,15 +72,18 @@ export class ModificarRecetaPage implements OnInit {
 
     this.receta = data;
     this.tratamiento_indicaciones = data.indicaciones;
-    this.tratamientoList = data.detalle_receta.map((detalle: any) => ({
-      id_medicamento: detalle.id_medicamento,
-      dosis: detalle.dosis_medicamento,
-      duracion: detalle.duracion_medicamento
-    }));
+      this.tratamientoList = data.detalle_receta.map((detalle: any) => ({
+        id_medicamento: detalle.id_medicamento,
+        nombre: detalle.medicamento?.nombre_medicamento || '',
+        dosis: detalle.dosis_medicamento,
+        duracion: detalle.duracion_medicamento,
+        frecuencia: detalle.frecuencia_medicamento
+      }));
+
   }
 
   agregarMedicamento() {
-    this.tratamientoList.push({ id_medicamento: null, dosis: '', duracion: '' });
+  this.tratamientoList.push({ id_medicamento: null, nombre: '', dosis: '', duracion: '',frecuencia:'' });
   }
 
   eliminarMedicamento(index: number) {
@@ -157,7 +153,8 @@ export class ModificarRecetaPage implements OnInit {
       id_receta: this.idReceta,
       id_medicamento: med.id_medicamento,
       dosis_medicamento: med.dosis,
-      duracion_medicamento: med.duracion
+      duracion_medicamento: med.duracion,
+      frecuencia_medicamento: med.frecuencia
     }));
 
     const { error: insertError } = await supabase
@@ -174,6 +171,8 @@ export class ModificarRecetaPage implements OnInit {
       state: { id: this.idReceta }
     });
   }
+
+  
 
   async eliminarReceta() {
     const alert = await this.alertController.create({

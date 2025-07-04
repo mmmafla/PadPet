@@ -48,9 +48,10 @@
         >
           <ion-item
             lines="none"
-            [class.disabled]="estadoSolicitud !== 'aceptada'"
+            [disabled]="estadoSolicitud !== '1'"
+            [class.disabled]="estadoSolicitud !== '1'"
             button
-            (click)="estadoSolicitud === 'aceptada' ? irATutor() : null"
+            (click)="estadoSolicitud === '1' ? irATutor() : null"
           >
             <div class="contenido-centro">
               <ion-icon name="paw-sharp" class="icono2"></ion-icon>
@@ -79,9 +80,10 @@
         >
           <ion-item
             lines="none"
-            [class.disabled]="estadoSolicitud !== 'aceptada'"
+            [disabled]="estadoSolicitud !== '1'"
+            [class.disabled]="estadoSolicitud !== '1'"
             button
-            (click)="estadoSolicitud === 'aceptada' ? irAAgenda() : null"
+            (click)="estadoSolicitud === '1' ? irAAgenda() : null"
             [style.background]="slidingOpenAgenda ? '#fff' : 'transparent'"
           >
             <div class="contenido-centro">
@@ -111,9 +113,10 @@
         >
           <ion-item
             lines="none"
-            [class.disabled]="estadoSolicitud !== 'aceptada'"
+            [disabled]="estadoSolicitud !== '1'"
+            [class.disabled]="estadoSolicitud !== '1'"
             button
-            (click)="estadoSolicitud === 'aceptada' ? irAConsulta() : null"
+            (click)="estadoSolicitud === '1' ? irAConsulta() : null"
             [style.background]="slidingOpenConsulta ? '#fff' : 'transparent'"
           >
             <div class="contenido-centro">
@@ -142,9 +145,10 @@
         >
           <ion-item
             lines="none"
-            [class.disabled]="estadoSolicitud !== 'aceptada'"
+            [disabled]="estadoSolicitud !== '1'"
+            [class.disabled]="estadoSolicitud !== '1'"
             button
-            (click)="estadoSolicitud === 'aceptada' ? irARecetas() : null"
+            (click)="estadoSolicitud === '1' ? irARecetas() : null"
             [style.background]="slidingOpenRecetas ? '#fff' : 'transparent'"
           >
             <div class="contenido-centro">
@@ -173,9 +177,10 @@
         >
           <ion-item
             lines="none"
-            [class.disabled]="estadoSolicitud !== 'aceptada'"
+            [disabled]="estadoSolicitud !== '1'"
+            [class.disabled]="estadoSolicitud !== '1'"
             button
-            (click)="estadoSolicitud === 'aceptada' ? irADashboard() : null"
+            (click)="estadoSolicitud === '1' ? irADashboard() : null"
             [style.background]="slidingOpenEstadisticas ? '#fff' : 'transparent'"
           >
             <div class="contenido-centro">

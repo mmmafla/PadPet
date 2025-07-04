@@ -4,47 +4,43 @@
 
 <ion-content class="fondo" [fullscreen]="true">
 
-  <h2 *ngIf="receta">Detalle Tratamiento</h2>
 
   <ion-card class="card3" *ngIf="receta">
 
     <!-- Información de la mascota y tutor -->
     <h2 style="text-align: center;">
-      Receta para: {{ receta.mascota?.masc_nom }}
+     Tratamiento para {{ receta.mascota?.masc_nom }}
     </h2>
 
     <h3 style="text-align: center;">
       Dueño: {{ receta.mascota?.tutor?.nombre_tutor }} {{ receta.mascota?.tutor?.apellidos_tutor }}
     </h3>
 
-    <p><strong>Correo Tutor:</strong> {{ receta.mascota?.tutor?.correo_tutor }}</p>
-    <p><strong>Teléfono Tutor:</strong> {{ receta.mascota?.tutor?.celular_tutor }}</p>
+    <p><strong>Correo Tutor: </strong>{{ receta.mascota?.tutor?.correo_tutor }}</p>
+    <p><strong>Teléfono Tutor: </strong>{{ receta.mascota?.tutor?.celular_tutor }}</p>
+    <p><strong>Direccion: </strong>{{receta.mascota?.tutor?.direccion_tutor}}</p>
 
     <!-- Título de separación -->
-    <h4 style="text-align: center; margin-top: 1.5rem; border-top: 1px solid #ccc; padding-top: 1rem;">
-      Detalles de la receta médica
-    </h4>
+    <h3 style="text-align: center; margin-top: 1.5rem; border-top: 1px solid #ccc; padding-top: 1rem;">
+      Detalles del tratamiento
+    </h3>
 
     <!-- Información de la receta -->
     <p><strong>Fecha:</strong> {{ receta.fecha_receta | date: 'mediumDate' }}</p>
 
-    <p><strong>Indicaciones:</strong></p>
-    <ion-textarea
-      readonly
-      [value]="receta.indicaciones"
-      autoGrow="true"
-      class="ion-margin-bottom"
-    ></ion-textarea>
+    <p><strong>Indicaciones: </strong>{{receta.indicaciones}}</p>
 
     <!-- Medicamentos -->
     <div *ngIf="receta.detalle_receta?.length">
-      <h3>Medicamentos:</h3>
+      <h4>Medicamentos:</h4>
       <ion-list lines="none">
         <ion-item *ngFor="let med of receta.detalle_receta">
-          <ion-label>
+          <ion-label >
             <h4>{{ med.medicamento?.nombre_medicamento || 'Sin nombre' }}</h4>
-            <p><strong>Dosis:</strong> {{ med.dosis_medicamento }}</p>
-            <p><strong>Duración:</strong> {{ med.duracion_medicamento }}</p>
+            <p><strong>Dosis: </strong>{{ med.dosis_medicamento }}</p>
+            <p><strong>Frecuencia: </strong>{{med.frecuencia_medicamento}}</p>
+            <p><strong>Duración: </strong>{{ med.duracion_medicamento }}</p>
+          
           </ion-label>
         </ion-item>
       </ion-list>

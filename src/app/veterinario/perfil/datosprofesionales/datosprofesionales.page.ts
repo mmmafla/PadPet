@@ -7,7 +7,7 @@ import { HeaderComponent } from 'src/app/componentes/header/header.component';
 import { Router } from '@angular/router';
 import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = 'https://irorlonysbmkbdthvrmt.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyb3Jsb255c2Jta2JkdGh2cm10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYyODgwMDQsImV4cCI6MjA2MTg2NDAwNH0.s-ZEteHxMWX43NCQIuNmTWpbBoEUxseKyg_YaXpi6Ek';
+const supabaseKey = 'eyJhbGciOiJI...';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 @Component({
@@ -28,9 +28,13 @@ export class DatosprofesionalesPage implements OnInit {
   fotoTituloUrl: string | null = null;
   fotoTituloFileName: string | null = null;
 
-  estadoSolicitud: string | null = null;
+  estadoSolicitudId: number | null = null;
   mensajeSolicitud: string | null = null;
   solicitudYaExiste = false;
+
+  readonly ESTADO_ACEPTADA = 1;
+  readonly ESTADO_RECHAZADA = 2;
+  readonly ESTADO_PENDIENTE = 3;
 
   supabase = inject(SupabaseService);
   toastController = inject(ToastController);
@@ -162,7 +166,7 @@ export class DatosprofesionalesPage implements OnInit {
     try {
       const { data: solicitudesExistentes } = await this.supabase
         .from('solicitud')
-        .select('id_solicitud, estado')
+        .select('id_solicitud, id_est_solicitud')
         .eq('run_vet', this.runVet)
         .order('fecha_envio', { ascending: false })
         .limit(1);
@@ -170,28 +174,30 @@ export class DatosprofesionalesPage implements OnInit {
       if (!solicitudesExistentes || solicitudesExistentes.length === 0) {
         await this.supabase.from('solicitud').insert({
           run_vet: this.runVet,
-          estado: 'pendiente',
+          id_est_solicitud: this.ESTADO_PENDIENTE,
           fecha_envio: new Date().toISOString(),
         });
       } else {
         const solicitud = solicitudesExistentes[0];
-        if (solicitud.estado === 'rechazada') {
+        if (solicitud.id_est_solicitud === this.ESTADO_RECHAZADA) {
           await this.supabase.from('solicitud').update({
-            estado: 'pendiente',
+            id_est_solicitud: this.ESTADO_PENDIENTE,
             comentario: null,
             fecha_envio: new Date().toISOString()
           }).eq('id_solicitud', solicitud.id_solicitud);
         } else {
-          this.estadoSolicitud = solicitud.estado;
+          this.estadoSolicitudId = solicitud.id_est_solicitud;
           this.mensajeSolicitud = 'Ya existe una solicitud enviada.';
           this.mostrarToast('Ya existe una solicitud enviada.', 'warning');
           return;
         }
       }
 
-      await this.supabase.from('veterinario').update({ estado_solicitud: 'pendiente' }).eq('run_vet', this.runVet);
+      await this.supabase.from('veterinario')
+        .update({ estado_solicitud: this.ESTADO_PENDIENTE })
+        .eq('run_vet', this.runVet);
 
-      this.estadoSolicitud = 'pendiente';
+      this.estadoSolicitudId = this.ESTADO_PENDIENTE;
       this.mensajeSolicitud = 'Su solicitud se encuentra pendiente de aprobación.';
       this.mostrarToast('Solicitud enviada correctamente');
 
@@ -199,6 +205,30 @@ export class DatosprofesionalesPage implements OnInit {
       console.error('Error al enviar la solicitud:', error);
       this.mostrarToast('Hubo un error al enviar la solicitud.', 'danger');
     }
+  }
+
+  async verificarSolicitudExistente() {
+    const { data: solicitudExistente, error } = await this.supabase
+      .from('solicitud')
+      .select('id_est_solicitud')
+      .eq('run_vet', this.runVet)
+      .order('fecha_envio', { ascending: false })
+      .limit(1);
+
+    if (error) return;
+
+    if (solicitudExistente && solicitudExistente.length > 0) {
+      this.estadoSolicitudId = solicitudExistente[0].id_est_solicitud;
+      this.mensajeSolicitud = 'Ya has enviado una solicitud.';
+      this.solicitudYaExiste = true;
+    }
+  }
+
+  puedeEnviarSolicitud(): boolean {
+    return this.form.valid &&
+      this.fotoTituloFileName !== null &&
+      this.estadoSolicitudId !== this.ESTADO_PENDIENTE &&
+      this.estadoSolicitudId !== this.ESTADO_ACEPTADA;
   }
 
   async mostrarToast(mensaje: string, color: string = 'success') {
@@ -290,24 +320,4 @@ export class DatosprofesionalesPage implements OnInit {
     await alert.present();
   }
 
-  async verificarSolicitudExistente() {
-    const { data: solicitudExistente, error } = await this.supabase
-      .from('solicitud')
-      .select('estado')
-      .eq('run_vet', this.runVet)
-      .order('fecha_envio', { ascending: false })
-      .limit(1);
-
-    if (error) return;
-
-    if (solicitudExistente && solicitudExistente.length > 0) {
-      this.estadoSolicitud = solicitudExistente[0].estado;
-      this.mensajeSolicitud = 'Ya has enviado una solicitud.';
-      this.solicitudYaExiste = true;
-    }
-  }
-
-  puedeEnviarSolicitud(): boolean {
-    return this.form.valid && this.fotoTituloFileName !== null && this.estadoSolicitud !== 'pendiente' && this.estadoSolicitud !== 'aceptada';
-  }
 }

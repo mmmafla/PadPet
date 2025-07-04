@@ -1,9 +1,8 @@
 <ion-header class="ion-no-border">
-<app-header backButton="/perfil"></app-header>
+  <app-header backButton="/perfil"></app-header>
 </ion-header>
 
 <ion-content class="fondo" [fullscreen]="true">
-  
   <ion-card class="ion-card">
     <h2>Datos profesionales</h2>
     <p style="text-align: center;">
@@ -107,15 +106,15 @@
       </ion-button>
 
       <!-- MENSAJES DE ESTADO -->
-      <ion-text *ngIf="estadoSolicitud === 'pendiente'" color="warning" class="ion-margin-top">
+      <ion-text *ngIf="estadoSolicitudId === 3" color="warning" class="ion-margin-top">
         Tu solicitud ya fue enviada y está pendiente de aprobación.
       </ion-text>
 
-      <ion-text *ngIf="estadoSolicitud === 'aceptada'" color="success" class="ion-margin-top">
+      <ion-text *ngIf="estadoSolicitudId === 1" color="success" class="ion-margin-top">
         ✅ Tu solicitud ha sido aceptada. Ya puedes usar todas las funciones de la aplicación.
       </ion-text>
 
-      <ion-text *ngIf="estadoSolicitud === 'rechazada'" color="danger" class="ion-margin-top">
+      <ion-text *ngIf="estadoSolicitudId === 2" color="danger" class="ion-margin-top">
         Tu solicitud fue rechazada. Puedes revisar los datos y reenviar.
       </ion-text>
 
