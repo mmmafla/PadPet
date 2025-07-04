@@ -4,25 +4,57 @@
 
 <ion-content class="fondo" [fullscreen]="true">
 
-    <h2>Detalle Tratamiento</h2>
+  <h2 *ngIf="receta">Detalle Tratamiento</h2>
 
- <ion-card class="card3">
+  <ion-card class="card3" *ngIf="receta">
 
-  <p>datos</p>
+    <!-- Información de la mascota y tutor -->
+    <h2 style="text-align: center;">
+      Receta para: {{ receta.mascota?.masc_nom }}
+    </h2>
 
+    <h3 style="text-align: center;">
+      Dueño: {{ receta.mascota?.tutor?.nombre_tutor }} {{ receta.mascota?.tutor?.apellidos_tutor }}
+    </h3>
 
-<!----   <h2>Atención de {{ atencion.mascota?.masc_nom }}</h2>
-    <h3 style="text-align: center;"> Dueño: {{ atencion.mascota?.tutor?.nombre_tutor }} {{ atencion.mascota?.tutor?.apellidos_tutor }}  </h3>
-    <p><strong>Correo Tutor:</strong> {{ atencion.mascota?.tutor?.correo_tutor }}</p>
-    <p><strong>Teléfono Tutor:</strong> {{ atencion.mascota?.tutor?.celular_tutor }}</p>
-------------------------------------------------------------------------------------->
-   
+    <p><strong>Correo Tutor:</strong> {{ receta.mascota?.tutor?.correo_tutor }}</p>
+    <p><strong>Teléfono Tutor:</strong> {{ receta.mascota?.tutor?.celular_tutor }}</p>
 
-    <ion-button class="boton-editar" (click)="modificarReceta()">Modificar Tratamiento</ion-button>
-    <ion-button class="boton-exportar" (click)="exportarPdfReceta()">Descargar Tratamiento</ion-button>
-    <ion-button class="boton-exportar" (click)="exportarPdfRecetaPrueba()">Descargar LOCALHOST</ion-button>    
-    <ion-button class="boton-enviar-directo" (click)="enviarPdfReceta()">Enviar Tratamiento</ion-button>
+    <!-- Título de separación -->
+    <h4 style="text-align: center; margin-top: 1.5rem; border-top: 1px solid #ccc; padding-top: 1rem;">
+      Detalles de la receta médica
+    </h4>
 
+    <!-- Información de la receta -->
+    <p><strong>Fecha:</strong> {{ receta.fecha_receta | date: 'mediumDate' }}</p>
+
+    <p><strong>Indicaciones:</strong></p>
+    <ion-textarea
+      readonly
+      [value]="receta.indicaciones"
+      autoGrow="true"
+      class="ion-margin-bottom"
+    ></ion-textarea>
+
+    <!-- Medicamentos -->
+    <div *ngIf="receta.detalle_receta?.length">
+      <h3>Medicamentos:</h3>
+      <ion-list lines="none">
+        <ion-item *ngFor="let med of receta.detalle_receta">
+          <ion-label>
+            <h4>{{ med.medicamento?.nombre_medicamento || 'Sin nombre' }}</h4>
+            <p><strong>Dosis:</strong> {{ med.dosis_medicamento }}</p>
+            <p><strong>Duración:</strong> {{ med.duracion_medicamento }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+    </div>
+
+    <!-- Botones de acción -->
+    <ion-button type="button" class="boton-editar" (click)="modificarReceta()">Modificar Tratamiento</ion-button>
+    <ion-button type="button" class="boton-exportar" (click)="exportarPdfReceta()">Descargar Tratamiento</ion-button>
+    <ion-button type="button" class="boton-exportar" (click)="exportarPdfRecetaPrueba()">Descargar LOCALHOST</ion-button>
+    <ion-button type="button" class="boton-enviar-directo" (click)="enviarPdfReceta()">Enviar Tratamiento</ion-button>
 
   </ion-card>
 
