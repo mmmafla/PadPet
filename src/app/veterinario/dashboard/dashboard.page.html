@@ -1,14 +1,12 @@
-<ion-header>
-  <app-header backButton="/home" title="Dashboard"></app-header>
+<ion-header class="ion-no-border">
+  <app-header title=""></app-header>
 </ion-header>
 
 <ion-content class="fondo" [fullscreen]="true">
 
-  <!-- Filtro de mes y año -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Resumen mensual</ion-card-title>
-    </ion-card-header>
+  <!-- Filtro de mes y año --> 
+  <ion-card class="card4">
+<h3 style="text-align: center;">Resumen Mensual</h3>
     <ion-card-content>
       <ion-grid>
         <ion-row>
@@ -48,10 +46,10 @@
   </ion-card>
 
   <!-- Estadísticas del mes -->
-<ion-card *ngIf="estadisticas">
-  <ion-card-header>
-    <ion-card-title>Total atenciones: {{ estadisticas.total_atenciones }}</ion-card-title>
-  </ion-card-header>
+<ion-card *ngIf="estadisticas" class="card4">
+
+    <h3 style="text-align: center;">Total atenciones: {{ estadisticas.total_atenciones }}</h3>
+
 
   <ion-card-content>
 

@@ -50,7 +50,6 @@ export class AgregarAtencionMedicaPage implements OnInit {
   mostrarSelectorFecha = false;
   mostrarSelectorHora = false;
 
-  medicamentosDisponibles: any[] = [];
 
   atencion = {
     motivo: null,
@@ -122,7 +121,6 @@ export class AgregarAtencionMedicaPage implements OnInit {
     this.cargarsLocomotorOpciones();
     this.cargarsReproductorOpciones();
     this.cargarTiposAlimentacion();
-    this.cargarMedicamentos();
   }
 
   // ------------------------- Carga de datos -------------------------
@@ -169,12 +167,6 @@ export class AgregarAtencionMedicaPage implements OnInit {
     const { data, error } = await supabase.from('tipo_alimentacion').select('*');
     if (error) return console.error('Error al cargar tipo de alimentación:', error);
     this.tipoAlimentacion = data;
-  }
-
-  async cargarMedicamentos() {
-    const { data, error } = await supabase.from('medicamento').select('id_medicamento, nombre_medicamento');
-    if (error) return console.error('Error al cargar medicamentos:', error);
-    this.medicamentosDisponibles = data;
   }
 
   //--------------------------------------
@@ -399,42 +391,85 @@ export class AgregarAtencionMedicaPage implements OnInit {
   }
 
   // ------------------------- Guardar receta y detalle receta -------------------------
-  async guardarRecetaEnBD(idAtencion: number) {
-    if (this.tratamientoList.length === 0) return;
+async guardarRecetaEnBD(idAtencion: number) {
+  if (this.tratamientoList.length === 0) return;
 
-    const { data: recetaData, error: recetaError } = await supabase
-      .from('receta')
-      .insert([
-        {
-          indicaciones: this.atencion.tratamiento_indicaciones,
-          id_masc: this.mascotaSeleccionada.id_masc,
-          fecha_receta: new Date().toISOString(),
-        },
-      ])
-      .select('id_receta')
-      .single();
+  // 1. Insertar receta
+  const { data: recetaData, error: recetaError } = await supabase
+    .from('receta')
+    .insert([
+      {
+        indicaciones: this.atencion.tratamiento_indicaciones,
+        id_masc: this.mascotaSeleccionada.id_masc,
+        fecha_receta: new Date().toISOString(),
+      },
+    ])
+    .select('id_receta')
+    .single();
 
-    if (recetaError || !recetaData) {
-      console.error('Error al insertar receta:', recetaError);
-      return this.mostrarToast('No se pudo guardar la receta.', 'danger');
+  if (recetaError || !recetaData) {
+    console.error('Error al insertar receta:', recetaError);
+    return this.mostrarToast('No se pudo guardar la receta.', 'danger');
+  }
+
+  const idReceta = recetaData.id_receta;
+
+  // 2. Insertar medicamentos si no existen
+  for (const med of this.tratamientoList) {
+    let idMedicamento: number | null = null;
+
+    if (med.nombre && med.nombre.trim() !== '') {
+      // Buscar si ya existe el medicamento (ignorando mayúsculas/minúsculas)
+      const { data: existente, error: buscarError } = await supabase
+        .from('medicamento')
+        .select('id_medicamento')
+        .ilike('nombre_medicamento', med.nombre.trim());
+
+      if (buscarError) {
+        console.error('Error al buscar medicamento:', buscarError);
+        continue; // saltar este medicamento si hay error
+      }
+
+      if (existente && existente.length > 0) {
+        idMedicamento = existente[0].id_medicamento;
+      } else {
+        // Insertar nuevo medicamento
+        const { data: nuevoMed, error: medError } = await supabase
+          .from('medicamento')
+          .insert([{ nombre_medicamento: med.nombre.trim() }])
+          .select('id_medicamento')
+          .single();
+
+        if (medError || !nuevoMed) {
+          console.error('Error al insertar medicamento:', medError);
+          continue; // saltar este medicamento
+        }
+
+        idMedicamento = nuevoMed.id_medicamento;
+      }
     }
 
-    const idReceta = recetaData.id_receta;
-
-    const detalles = this.tratamientoList.map((med) => ({
-      id_receta: idReceta,
-      id_medicamento: med.id_medicamento,
-      dosis_medicamento: med.dosis,
-      duracion_medicamento: med.duracion,
-    }));
-
-    const { error: detalleError } = await supabase.from('detalle_receta').insert(detalles);
+    // 3. Insertar detalle receta
+    const { error: detalleError } = await supabase.from('detalle_receta').insert([
+      {
+        id_receta: idReceta,
+        id_medicamento: idMedicamento,
+        dosis_medicamento: med.dosis,
+        duracion_medicamento: med.duracion,
+        frecuencia_medicamento: med.frecuencia,
+      },
+    ]);
 
     if (detalleError) {
       console.error('Error al guardar detalle receta:', detalleError);
-      return this.mostrarToast('No se pudieron guardar los medicamentos de la receta.', 'danger');
+      await this.mostrarToast('Uno o más medicamentos no se pudieron guardar.', 'danger');
     }
   }
+}
+
+
+//---------------------------------------------------
+
 
   reiniciarFormulario() {
     this.tutorSeleccionado = null;
