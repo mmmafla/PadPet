@@ -39,13 +39,13 @@ constructor(private platform: Platform) {
         {
           text: 'Enviar Correo',
           handler: () => {
-            window.open('mailto:ja.alvarezc@duocuc.cl');
+            window.open('mailto:padpet.contacto@gmail.com');
           }
         },
         {
           text: 'WhatsApp',
           handler: () => {
-            window.open('https://wa.me/56984048112');
+            window.open('https://wa.me/56930555576');
           }
         },
         {
