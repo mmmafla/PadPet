@@ -104,7 +104,7 @@ export class ModificarRecetaPage implements OnInit {
     toast.present();
   }
 
-  async guardarCambios() {
+  async guardarCambiosReceta() {
     if (!this.tratamiento_indicaciones.trim()) {
       return this.mostrarToast('Escribe indicaciones generales', 'warning');
     }
@@ -175,7 +175,6 @@ export class ModificarRecetaPage implements OnInit {
     });
   }
 
-  // Nueva función para eliminar receta
   async eliminarReceta() {
     const alert = await this.alertController.create({
       header: '¿Eliminar receta?',
@@ -190,7 +189,6 @@ export class ModificarRecetaPage implements OnInit {
   }
 
   private async confirmarEliminar() {
-    // Primero eliminar detalles de receta (dependencias)
     const { error: deleteDetallesError } = await supabase
       .from('detalle_receta')
       .delete()
@@ -201,7 +199,6 @@ export class ModificarRecetaPage implements OnInit {
       return this.mostrarToast('Error al eliminar detalles de la receta', 'danger');
     }
 
-    // Luego eliminar la receta
     const { error: deleteRecetaError } = await supabase
       .from('receta')
       .delete()
@@ -213,7 +210,6 @@ export class ModificarRecetaPage implements OnInit {
     }
 
     this.mostrarToast('Receta eliminada correctamente', 'success');
-    // Navegar a la lista de recetas después de eliminar
     this.router.navigate(['/recetas']);
   }
 }
