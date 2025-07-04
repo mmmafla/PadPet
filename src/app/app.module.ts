@@ -11,6 +11,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { FormularioComponent } from './componentes/formulario/formulario.component';
 import { HeaderComponent } from './componentes/header/header.component';
+import { ChartComponent } from './componentes/chart/chart.component';
 import { HttpClientModule } from '@angular/common/http'; // ✅ Importación agregada
 
 @NgModule({
@@ -23,6 +24,7 @@ import { HttpClientModule } from '@angular/common/http'; // ✅ Importación agr
     CommonModule,
     FormularioComponent,
     HeaderComponent,
+    ChartComponent,
     HttpClientModule // ✅ Módulo agregado a imports
   ],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
