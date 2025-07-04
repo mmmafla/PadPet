@@ -124,13 +124,16 @@ const routes: Routes = [
   loadChildren: () => import('./veterinario/recetas/detalle-receta/detalle-receta.module').then(m => m.DetalleRecetaPageModule),
   canActivate: [AuthGuard]
   },
-    {
+  {
   path: 'veterinario/recetas/modificar-receta',
   loadChildren: () => import('./veterinario/recetas/modificar-receta/modificar-receta.module').then(m => m.ModificarRecetaPageModule),
   canActivate: [AuthGuard]
   },
-
-
+  {
+    path: 'dashboard',
+    loadComponent: () =>
+      import('./veterinario/dashboard/dashboard.page').then(m => m.DashboardPage)
+  }
 ];
 
 @NgModule({
