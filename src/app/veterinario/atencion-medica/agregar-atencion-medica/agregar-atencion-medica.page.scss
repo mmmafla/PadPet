@@ -71,38 +71,3 @@ ion-select::part(text) {
 
 }
 
-.acordeon-consulta {
-  --background: #f9f9f9;
-}
-
-ion-button {
-  margin-bottom: 8px;
-}
-
-.botones-fecha-hora {
-  display: flex;
-  gap: 12px; /* espacio entre botones */
-  justify-content: space-between;
-  flex-wrap: wrap; /* opcional para responsividad */
-}
-
-.botones-fecha-hora ion-button {
-  flex: 1;
-}
-
-.texto-fecha-hora {
-  text-align: center;
-  margin-top: 10px;
-}
-
-.texto-fecha-hora p {
-  margin: 4px 0;
-}
-
-.botones-fecha-hora ion-button {
-  flex: 1;
-}
-
-.espacio-abajo {
-  padding-bottom: 16px;
-}
