@@ -79,7 +79,7 @@ export class LoginPage implements OnInit {
       message: mensaje,
       duration: 2000,
       color,
-      position: 'middle',
+      position: 'bottom',
     });
     toast.present();
   }
