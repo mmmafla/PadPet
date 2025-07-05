@@ -30,7 +30,7 @@ export class AgregarAtencionMedicaPage implements OnInit {
   nivelesHidratacion: any[] = [];
   tipoAlimentacion: any[] = [];
 
-  tratamientoList: any[] = [];
+  tratamientoList: { nombre?: string; dosis: string; duracion: string; frecuencia?: string }[] = [];
 
   pielOpciones: any[] = [];
   ojosOpciones: any[] = [];
@@ -49,7 +49,6 @@ export class AgregarAtencionMedicaPage implements OnInit {
 
   mostrarSelectorFecha = false;
   mostrarSelectorHora = false;
-
 
   atencion = {
     motivo: null,
@@ -103,8 +102,16 @@ export class AgregarAtencionMedicaPage implements OnInit {
     private alertController: AlertController
   ) {}
 
-  ngOnInit() {
-    this.cargarTutores();
+  async ngOnInit() {
+    const navigation = this.router.getCurrentNavigation();
+    const state = navigation?.extras.state as {
+      id_tutor?: string;
+      id_mascota?: number;
+      nombre_tutor?: string;
+      nombre_mascota?: string;
+    };
+
+    await this.cargarTutores();
     this.cargarMotivosConsulta();
     this.cargarEstadosSensoriales();
     this.cargarNivelesHidratacion();
@@ -121,7 +128,25 @@ export class AgregarAtencionMedicaPage implements OnInit {
     this.cargarsLocomotorOpciones();
     this.cargarsReproductorOpciones();
     this.cargarTiposAlimentacion();
+
+    // Seleccionar tutor y mascota automáticamente si se enviaron desde otra página
+    if (state?.id_tutor && state?.id_mascota) {
+      const tutor = this.tutores.find((t) => t.id_tutor === state.id_tutor);
+      if (tutor) {
+        this.tutorSeleccionado = tutor;
+        this.busquedaTutor = `${tutor.nombre_tutor} ${tutor.apellidos_tutor || ''}`;
+        this.tutoresFiltrados = [];
+
+        const mascota = (tutor.mascota || []).find((m: any) => m.id_masc === state.id_mascota);
+        if (mascota) {
+          this.mascotaSeleccionada = mascota;
+        } else {
+          this.mascotaSeleccionada = { id_masc: state.id_mascota, masc_nom: state.nombre_mascota || '' };
+        }
+      }
+    }
   }
+
 
   // ------------------------- Carga de datos -------------------------
   async cargarTutores() {
@@ -142,104 +167,103 @@ export class AgregarAtencionMedicaPage implements OnInit {
       .eq('run_vet', vet.run_vet);
 
     if (tutoresError) return console.error('Error al cargar tutores:', tutoresError);
-    this.tutores = tutores;
+    this.tutores = tutores || [];
   }
 
   async cargarMotivosConsulta() {
     const { data, error } = await supabase.from('motivo_consulta').select('*');
     if (error) return console.error('Error al cargar motivos:', error);
-    this.motivosConsulta = data;
+    this.motivosConsulta = data || [];
   }
 
   async cargarEstadosSensoriales() {
     const { data, error } = await supabase.from('estado_sensorial').select('id_estado_sensorial, estado_sensorial');
     if (error) return console.error('Error al cargar estados sensoriales:', error);
-    this.estadoSensorial = data;
+    this.estadoSensorial = data || [];
   }
 
   async cargarNivelesHidratacion() {
     const { data, error } = await supabase.from('hidratacion').select('hidratacion_id, estado_hidratacion');
     if (error) return console.error('Error al cargar niveles de hidratación:', error);
-    this.nivelesHidratacion = data;
+    this.nivelesHidratacion = data || [];
   }
 
   async cargarTiposAlimentacion() {
     const { data, error } = await supabase.from('tipo_alimentacion').select('*');
     if (error) return console.error('Error al cargar tipo de alimentación:', error);
-    this.tipoAlimentacion = data;
+    this.tipoAlimentacion = data || [];
   }
 
-  //--------------------------------------
   async cargarPielOpciones() {
     const { data, error } = await supabase.from('piel_obp').select('*');
     if (error) return console.error('Error al cargar Piel', error);
-    this.pielOpciones = data.sort((a, b) => a.estado_piel.localeCompare(b.estado_piel));
+    this.pielOpciones = (data || []).sort((a, b) => a.estado_piel.localeCompare(b.estado_piel));
   }
 
   async cargarOjosOpciones() {
     const { data, error } = await supabase.from('ojos_obp').select('*');
     if (error) return console.error('Error al cargar Ojos', error);
-    this.ojosOpciones = data.sort((a, b) => a.estado_ojos.localeCompare(b.estado_ojos));
+    this.ojosOpciones = (data || []).sort((a, b) => a.estado_ojos.localeCompare(b.estado_ojos));
   }
 
   async cargarOidosOpciones() {
     const { data, error } = await supabase.from('oidos_obp').select('*');
     if (error) return console.error('Error al cargar Oidos', error);
-    this.oidosOpciones = data.sort((a, b) => a.estado_oidos.localeCompare(b.estado_oidos));
+    this.oidosOpciones = (data || []).sort((a, b) => a.estado_oidos.localeCompare(b.estado_oidos));
   }
 
   async cargarDentaduraOpciones() {
     const { data, error } = await supabase.from('dentadura_obp').select('*');
     if (error) return console.error('Error al cargar Dentadura', error);
-    this.dentaduraOpciones = data.sort((a, b) => a.estado_dentadura.localeCompare(b.estado_dentadura));
+    this.dentaduraOpciones = (data || []).sort((a, b) => a.estado_dentadura.localeCompare(b.estado_dentadura));
   }
 
   async cargarsDigestivoOpciones() {
     const { data, error } = await supabase.from('sdigestivo_obp').select('*');
     if (error) return console.error('Error al cargar Sistema Digestivo', error);
-    this.sDigestivoOpciones = data.sort((a, b) => a.estado_sdigestivo.localeCompare(b.estado_sdigestivo));
+    this.sDigestivoOpciones = (data || []).sort((a, b) => a.estado_sdigestivo.localeCompare(b.estado_sdigestivo));
   }
 
   async cargarsCardioVascularOpciones() {
     const { data, error } = await supabase.from('scvascular_obp').select('*');
     if (error) return console.error('Error al cargar Sistema Cardio Vascular', error);
-    this.sCardioVascularOpciones = data.sort((a, b) => a.estado_scvascular.localeCompare(b.estado_scvascular));
+    this.sCardioVascularOpciones = (data || []).sort((a, b) => a.estado_scvascular.localeCompare(b.estado_scvascular));
   }
 
   async cargarSRespiratoorioOpciones() {
     const { data, error } = await supabase.from('srespiratorio_obp').select('*');
     if (error) return console.error('Error al cargar Sistema Respiratorio', error);
-    this.sRespiratorioOpciones = data.sort((a, b) => a.estado_srespiratorio.localeCompare(b.estado_srespiratorio));
+    this.sRespiratorioOpciones = (data || []).sort((a, b) => a.estado_srespiratorio.localeCompare(b.estado_srespiratorio));
   }
 
   async cargarSUrinarioOpciones() {
     const { data, error } = await supabase.from('surinario_obp').select('*');
     if (error) return console.error('Error al cargar Sistema Urinario', error);
-    this.sUrinarioOpciones = data.sort((a, b) => a.estado_surinario.localeCompare(b.estado_surinario));
+    this.sUrinarioOpciones = (data || []).sort((a, b) => a.estado_surinario.localeCompare(b.estado_surinario));
   }
 
   async cargarsNerviocoOpciones() {
     const { data, error } = await supabase.from('snervioso_obp').select('*');
     if (error) return console.error('Error al cargar Sistema Nervioso', error);
-    this.sNerviosoOpciones = data.sort((a, b) => a.estado_snervioso.localeCompare(b.estado_snervioso));
+    this.sNerviosoOpciones = (data || []).sort((a, b) => a.estado_snervioso.localeCompare(b.estado_snervioso));
   }
 
   async cargarsLinfaticoOpciones() {
     const { data, error } = await supabase.from('slinfatico_obp').select('*');
     if (error) return console.error('Error al cargar Sistema Linfático', error);
-    this.sLinfaticoOpciones = data.sort((a, b) => a.estado_slinfatico.localeCompare(b.estado_slinfatico));
+    this.sLinfaticoOpciones = (data || []).sort((a, b) => a.estado_slinfatico.localeCompare(b.estado_slinfatico));
   }
 
   async cargarsLocomotorOpciones() {
     const { data, error } = await supabase.from('slocomotor_obp').select('*');
     if (error) return console.error('Error al cargar Sistema Locomotor', error);
-    this.sLocomotorOpciones = data.sort((a, b) => a.estado_slocomotor.localeCompare(b.estado_slocomotor));
+    this.sLocomotorOpciones = (data || []).sort((a, b) => a.estado_slocomotor.localeCompare(b.estado_slocomotor));
   }
 
   async cargarsReproductorOpciones() {
     const { data, error } = await supabase.from('sreproductor_obp').select('*');
     if (error) return console.error('Error al cargar Sistema Reproductor', error);
-    this.sReproductorOpciones = data.sort((a, b) => a.estado_sreproductor.localeCompare(b.estado_sreproductor));
+    this.sReproductorOpciones = (data || []).sort((a, b) => a.estado_sreproductor.localeCompare(b.estado_sreproductor));
   }
 
   // ------------------------- Tutor y mascota -------------------------
@@ -270,22 +294,9 @@ export class AgregarAtencionMedicaPage implements OnInit {
     this.atencion.hora = event.detail.value.split('T')[1].substring(0, 5);
   }
 
-  async abrirSelectorFecha() {
-    const modal = await this.modalCtrl.create({
-      component: ModalFechaComponent,
-      componentProps: { fecha: this.atencion.fecha },
-    });
-    await modal.present();
-    const { data } = await modal.onDidDismiss();
-    if (data) {
-      this.atencion.fecha = data.fecha;
-      this.atencion.hora = data.hora;
-    }
-  }
-
   // ------------------------- Tratamiento -------------------------
   agregarMedicamento() {
-    this.tratamientoList.push({ id_medicamento: null, dosis: '', duracion: '' });
+    this.tratamientoList.push({ nombre: '', dosis: '', duracion: '', frecuencia: '' });
   }
 
   eliminarMedicamento(index: number) {
@@ -311,6 +322,44 @@ export class AgregarAtencionMedicaPage implements OnInit {
 
     return data.run_vet;
   }
+
+  async abrirSelectorFecha() {
+    // Convertir fecha si existe y está en formato dd-mm-yyyy
+    let fechaISO: string | null = null;
+    if (this.atencion.fecha) {
+      const [dia, mes, anio] = this.atencion.fecha.split('-');
+      fechaISO = `${anio}-${mes}-${dia}`;
+    }
+
+    const modal = await this.modalCtrl.create({
+      component: ModalFechaComponent,
+      componentProps: { fecha: fechaISO },
+    });
+    await modal.present();
+
+    const { data } = await modal.onDidDismiss();
+    if (data) {
+      // Convertir de vuelta a dd-mm-yyyy
+      const [year, month, day] = data.fecha.split('-');
+      this.atencion.fecha = `${day}-${month}-${year}`;
+      this.atencion.hora = data.hora;
+    }
+  }
+
+  asignarFechaHoraActual() {
+    const ahora = new Date();
+
+    const anio = ahora.getFullYear();
+    const mes = String(ahora.getMonth() + 1).padStart(2, '0');
+    const dia = String(ahora.getDate()).padStart(2, '0');
+    const horas = String(ahora.getHours()).padStart(2, '0');
+    const minutos = String(ahora.getMinutes()).padStart(2, '0');
+
+    this.atencion.fecha = `${dia}-${mes}-${anio}`;
+    this.atencion.hora = `${horas}:${minutos}`;
+  }
+
+
 
   async guardarAtencion() {
     if (!this.tutorSeleccionado || !this.mascotaSeleccionada)
@@ -391,85 +440,83 @@ export class AgregarAtencionMedicaPage implements OnInit {
   }
 
   // ------------------------- Guardar receta y detalle receta -------------------------
-async guardarRecetaEnBD(idAtencion: number) {
-  if (this.tratamientoList.length === 0) return;
+  async guardarRecetaEnBD(idAtencion: number) {
+    if (this.tratamientoList.length === 0) return;
 
-  // 1. Insertar receta
-  const { data: recetaData, error: recetaError } = await supabase
-    .from('receta')
-    .insert([
-      {
-        indicaciones: this.atencion.tratamiento_indicaciones,
-        id_masc: this.mascotaSeleccionada.id_masc,
-        fecha_receta: new Date().toISOString(),
-      },
-    ])
-    .select('id_receta')
-    .single();
+    // 1. Insertar receta
+    const { data: recetaData, error: recetaError } = await supabase
+      .from('receta')
+      .insert([
+        {
+          indicaciones: this.atencion.tratamiento_indicaciones || '',
+          id_masc: this.mascotaSeleccionada.id_masc,
+          fecha_receta: new Date().toISOString(),
+          id_atencion_medica: idAtencion, // si tienes esa FK, opcional
+        },
+      ])
+      .select('id_receta')
+      .single();
 
-  if (recetaError || !recetaData) {
-    console.error('Error al insertar receta:', recetaError);
-    return this.mostrarToast('No se pudo guardar la receta.', 'danger');
-  }
+    if (recetaError || !recetaData) {
+      console.error('Error al insertar receta:', recetaError);
+      this.mostrarToast('Error al guardar la receta.', 'danger');
+      return;
+    }
 
-  const idReceta = recetaData.id_receta;
+    const idReceta = recetaData.id_receta;
 
-  // 2. Insertar medicamentos si no existen
-  for (const med of this.tratamientoList) {
-    let idMedicamento: number | null = null;
+    // 2. Por cada medicamento en tratamientoList, verificar si existe en 'medicamento'
+    //    Si no existe, insertarlo y obtener su id_medicamento
+    //    Luego insertar en detalle_receta
 
-    if (med.nombre && med.nombre.trim() !== '') {
-      // Buscar si ya existe el medicamento (ignorando mayúsculas/minúsculas)
-      const { data: existente, error: buscarError } = await supabase
+    for (const med of this.tratamientoList) {
+      if (!med.nombre || !med.dosis || !med.duracion) continue;
+
+      // Verificar si medicamento existe
+      const { data: medExistente, error: medError } = await supabase
         .from('medicamento')
         .select('id_medicamento')
-        .ilike('nombre_medicamento', med.nombre.trim());
+        .eq('nombre_medicamento', med.nombre.trim())
+        .limit(1)
+        .single();
 
-      if (buscarError) {
-        console.error('Error al buscar medicamento:', buscarError);
-        continue; // saltar este medicamento si hay error
-      }
+      let idMedicamento: number | null = null;
 
-      if (existente && existente.length > 0) {
-        idMedicamento = existente[0].id_medicamento;
-      } else {
-        // Insertar nuevo medicamento
-        const { data: nuevoMed, error: medError } = await supabase
+      if (medError) {
+        // No existe medicamento, insertarlo
+        const { data: medInsert, error: medInsertError } = await supabase
           .from('medicamento')
           .insert([{ nombre_medicamento: med.nombre.trim() }])
           .select('id_medicamento')
           .single();
 
-        if (medError || !nuevoMed) {
-          console.error('Error al insertar medicamento:', medError);
-          continue; // saltar este medicamento
+        if (medInsertError || !medInsert) {
+          console.error('Error al insertar medicamento:', medInsertError);
+          this.mostrarToast(`Error al insertar medicamento ${med.nombre}`, 'danger');
+          continue;
         }
+        idMedicamento = medInsert.id_medicamento;
+      } else {
+        idMedicamento = medExistente.id_medicamento;
+      }
 
-        idMedicamento = nuevoMed.id_medicamento;
+      // Insertar en detalle_receta
+      const { error: detalleError } = await supabase.from('detalle_receta').insert([
+        {
+          id_receta: idReceta,
+          id_medicamento: idMedicamento,
+          dosis_medicamento: med.dosis,
+          duracion_medicamento: med.duracion,
+          frecuencia_medicamento: med.frecuencia || null,
+        },
+      ]);
+
+      if (detalleError) {
+        console.error('Error al insertar detalle_receta:', detalleError);
+        this.mostrarToast(`Error al guardar medicamento ${med.nombre} en la receta.`, 'danger');
       }
     }
-
-    // 3. Insertar detalle receta
-    const { error: detalleError } = await supabase.from('detalle_receta').insert([
-      {
-        id_receta: idReceta,
-        id_medicamento: idMedicamento,
-        dosis_medicamento: med.dosis,
-        duracion_medicamento: med.duracion,
-        frecuencia_medicamento: med.frecuencia,
-      },
-    ]);
-
-    if (detalleError) {
-      console.error('Error al guardar detalle receta:', detalleError);
-      await this.mostrarToast('Uno o más medicamentos no se pudieron guardar.', 'danger');
-    }
   }
-}
-
-
-//---------------------------------------------------
-
 
   reiniciarFormulario() {
     this.tutorSeleccionado = null;
@@ -522,11 +569,10 @@ async guardarRecetaEnBD(idAtencion: number) {
     this.tratamientoList = [];
   }
 
-  // ------------------------- Toast -------------------------
-  async mostrarToast(mensaje: string, color: 'success' | 'danger' = 'success', duracion = 2000) {
+  async mostrarToast(mensaje: string, color: 'success' | 'danger' = 'success') {
     const toast = await this.toastController.create({
       message: mensaje,
-      duration: duracion,
+      duration: 3000,
       color,
       position: 'bottom',
     });
