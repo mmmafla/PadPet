@@ -19,13 +19,9 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 })
 export class ModificarRecetaPage implements OnInit {
   idReceta: number;
-
   receta: any;
-
   tratamiento_indicaciones: string = '';
-  tratamientoList: { id_medicamento: number | null; nombre: string; dosis: string; duracion: string; frecuencia?: string }[] = [];
-
-  medicamentosDisponibles: any[] = [];
+  tratamientoList: { nombre: string; dosis: string; duracion: string; frecuencia: string }[] = [];
 
   constructor(
     private toastController: ToastController,
@@ -37,31 +33,28 @@ export class ModificarRecetaPage implements OnInit {
   }
 
   async ngOnInit() {
-
     if (this.idReceta) {
       await this.cargarDatosReceta(this.idReceta);
     }
   }
 
-
   async cargarDatosReceta(id: number) {
     const { data, error } = await supabase
       .from('receta')
-  .select(`
-    id_receta,
-    indicaciones,
-    id_masc,
-    mascota:mascota(masc_nom),
-    detalle_receta (
-      id_medicamento,
-      dosis_medicamento,
-      duracion_medicamento,
-      frecuencia_medicamento,
-      medicamento (
-        nombre_medicamento
-      )
-    )
-  `)
+      .select(`
+        id_receta,
+        indicaciones,
+        id_masc,
+        mascota:mascota(masc_nom),
+        detalle_receta (
+          dosis_medicamento,
+          duracion_medicamento,
+          frecuencia_medicamento,
+          medicamento (
+            nombre_medicamento
+          )
+        )
+      `)
       .eq('id_receta', id)
       .single();
 
@@ -72,18 +65,16 @@ export class ModificarRecetaPage implements OnInit {
 
     this.receta = data;
     this.tratamiento_indicaciones = data.indicaciones;
-      this.tratamientoList = data.detalle_receta.map((detalle: any) => ({
-        id_medicamento: detalle.id_medicamento,
-        nombre: detalle.medicamento?.nombre_medicamento || '',
-        dosis: detalle.dosis_medicamento,
-        duracion: detalle.duracion_medicamento,
-        frecuencia: detalle.frecuencia_medicamento
-      }));
-
+    this.tratamientoList = data.detalle_receta.map((detalle: any) => ({
+      nombre: detalle.medicamento?.nombre_medicamento || '',
+      dosis: detalle.dosis_medicamento,
+      duracion: detalle.duracion_medicamento,
+      frecuencia: detalle.frecuencia_medicamento || ''
+    }));
   }
 
   agregarMedicamento() {
-  this.tratamientoList.push({ id_medicamento: null, nombre: '', dosis: '', duracion: '',frecuencia:'' });
+    this.tratamientoList.push({ nombre: '', dosis: '', duracion: '', frecuencia: '' });
   }
 
   eliminarMedicamento(index: number) {
@@ -101,16 +92,17 @@ export class ModificarRecetaPage implements OnInit {
   }
 
   async guardarCambiosReceta() {
-    if (!this.tratamiento_indicaciones.trim()) {
-      return this.mostrarToast('Escribe indicaciones generales', 'warning');
-    }
+    // Indicaciones NO obligatorias, por eso no se valida aquí.
+
     if (this.tratamientoList.length === 0) {
       return this.mostrarToast('Agrega al menos un medicamento', 'warning');
     }
+
     for (const med of this.tratamientoList) {
-      if (!med.id_medicamento || !med.dosis.trim() || !med.duracion.trim()) {
-        return this.mostrarToast('Completa todos los datos de los medicamentos', 'warning');
+      if (!med.nombre.trim()) {
+        return this.mostrarToast('El nombre del medicamento es obligatorio', 'warning');
       }
+      // dosis, duración y frecuencia NO obligatorios
     }
 
     const alert = await this.alertController.create({
@@ -125,8 +117,35 @@ export class ModificarRecetaPage implements OnInit {
     await alert.present();
   }
 
+  async insertarOMedicamento(nombre: string): Promise<number | null> {
+    const { data: existente, error: errorBusqueda } = await supabase
+      .from('medicamento')
+      .select('id_medicamento')
+      .ilike('nombre_medicamento', nombre.trim())
+      .maybeSingle();
+
+    if (errorBusqueda) {
+      console.error('Error buscando medicamento:', errorBusqueda);
+      return null;
+    }
+
+    if (existente) return existente.id_medicamento;
+
+    const { data: insertado, error: errorInsert } = await supabase
+      .from('medicamento')
+      .insert({ nombre_medicamento: nombre.trim() })
+      .select('id_medicamento')
+      .single();
+
+    if (errorInsert) {
+      console.error('Error insertando medicamento:', errorInsert);
+      return null;
+    }
+
+    return insertado.id_medicamento;
+  }
+
   async actualizarRecetaEnBD() {
-    // Actualizar indicaciones
     const { error: updateError } = await supabase
       .from('receta')
       .update({ indicaciones: this.tratamiento_indicaciones })
@@ -137,7 +156,6 @@ export class ModificarRecetaPage implements OnInit {
       return this.mostrarToast('No se pudo actualizar la receta', 'danger');
     }
 
-    // Eliminar detalles anteriores
     const { error: deleteError } = await supabase
       .from('detalle_receta')
       .delete()
@@ -145,17 +163,27 @@ export class ModificarRecetaPage implements OnInit {
 
     if (deleteError) {
       console.error(deleteError);
-      return this.mostrarToast('No se pudieron limpiar los medicamentos', 'danger');
+      return this.mostrarToast('Error al limpiar medicamentos previos', 'danger');
     }
 
-    // Insertar nuevos detalles
-    const nuevosDetalles = this.tratamientoList.map(med => ({
-      id_receta: this.idReceta,
-      id_medicamento: med.id_medicamento,
-      dosis_medicamento: med.dosis,
-      duracion_medicamento: med.duracion,
-      frecuencia_medicamento: med.frecuencia
-    }));
+    const nuevosDetalles: any[] = [];
+
+    for (const med of this.tratamientoList) {
+      const idMedicamento = await this.insertarOMedicamento(med.nombre);
+      if (!idMedicamento) continue;
+
+      nuevosDetalles.push({
+        id_receta: this.idReceta,
+        id_medicamento: idMedicamento,
+        dosis_medicamento: med.dosis,
+        duracion_medicamento: med.duracion,
+        frecuencia_medicamento: med.frecuencia
+      });
+    }
+
+    if (nuevosDetalles.length === 0) {
+      return this.mostrarToast('No se pudieron insertar los medicamentos', 'danger');
+    }
 
     const { error: insertError } = await supabase
       .from('detalle_receta')
@@ -171,8 +199,6 @@ export class ModificarRecetaPage implements OnInit {
       state: { id: this.idReceta }
     });
   }
-
-  
 
   async eliminarReceta() {
     const alert = await this.alertController.create({

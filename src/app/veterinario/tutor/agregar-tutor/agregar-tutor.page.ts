@@ -32,14 +32,14 @@ export class AgregarTutorPage implements OnInit {
 
   async ngOnInit() {
     this.tutorForm = this.fb.group({
-      run_tutor: ['', [Validators.required, this.rutValidator]],
+      run_tutor: ['', this.rutValidator], // opcional
       nombre_tutor: ['', Validators.required],
       apellidos_tutor: ['', Validators.required],
-      direccion_tutor: ['', Validators.required],
-      correo_tutor: ['', [Validators.required, Validators.email]],
-      celular_tutor: ['', [Validators.required, Validators.maxLength(11)]],
-      id_region: ['', Validators.required],
-      id_ciudad: ['', Validators.required]
+      direccion_tutor: [''], // opcional
+      correo_tutor: ['', Validators.email], // solo validación de email, no requerido
+      celular_tutor: ['', [Validators.required, Validators.maxLength(11), Validators.pattern('^[0-9]*$')]],
+      id_region: [''], // opcional
+      id_ciudad: ['']  // opcional
     });
 
     await this.obtenerRunVeterinario();
