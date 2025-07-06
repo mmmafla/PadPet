@@ -79,13 +79,13 @@
 
 <ion-card class="card-receta">
      <h4 style="text-align: center;">Receta/Tratamiento</h4>
-  <ion-card-content>
+  <ion-card-content >
     <ng-container *ngIf="receta; else sinTratamiento">
       <p><strong>Indicaciones:</strong> {{ receta.indicaciones || 'Sin indicaciones específicas.' }}</p>
 
       <ion-list class="med-lista" *ngIf="medicamentosReceta && medicamentosReceta.length > 0; else noMedicamentos">
         <ion-item lines="none" *ngFor="let med of medicamentosReceta">
-          <ion-label>
+          <ion-label >
             <h3>{{ med.medicamento?.nombre_medicamento || 'Medicamento desconocido' }}</h3>
             <p>Dosis: {{ med.dosis_medicamento || '-' }}</p>
             <p>Duración: {{ med.duracion_medicamento || '-' }}</p>
@@ -98,8 +98,9 @@
       </ng-template>
 
       <div class="botones-receta">
-        <ion-button  class="boton-editar" (click)="modificarReceta()">Modificar Receta</ion-button>
-        <ion-button class="boton-exportar" >Descargar Receta</ion-button>
+        <ion-button  class="boton-editar" (click)="  modificarReceta()">Modificar Receta</ion-button>
+     <ion-button class="boton-exportar" (click)="descargarPdfReceta()">Descargar Receta Local</ion-button>
+        <ion-button class="boton-exportar" >Compartir Receta</ion-button>
       </div>
     </ng-container>
 
@@ -107,7 +108,7 @@
       <p><em>No existe tratamiento registrado para esta atención.</em></p>
     </ng-template>
   </ion-card-content>
-</ion-card>
+</ion-card> 
 
 
   <!-- <h4 style="text-align: center;">Próximo control</h4> --> 
@@ -115,9 +116,9 @@
     <!--------------------------------------------------------------------------------------->
     <ion-button class="boton-editar" (click)="modificarConsulta()">Modificar consulta</ion-button>
 
-    <ion-button class="boton-exportar" (click)="exportarPdf()">Descargar consulta</ion-button>
-    <ion-button class="boton-exportar" (click)="exportarPdfPrueba()">Descargar LOCALHOST</ion-button>   
-    <ion-button class="boton-enviar-directo" (click)="enviarPdf()">Enviar consulta</ion-button>
+    <ion-button class="boton-exportar" (click)="descargarCelularPDFAtencion()">Descargar consulta</ion-button>
+    <ion-button class="boton-exportar" (click)="exportarPdfAtencion()">Descargar LOCALHOST</ion-button>   
+    <ion-button class="boton-enviar-directo" >Enviar consulta</ion-button>
 
   </ion-card>
 

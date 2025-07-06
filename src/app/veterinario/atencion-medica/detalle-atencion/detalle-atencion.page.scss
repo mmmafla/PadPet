@@ -15,4 +15,40 @@
 
 }
 
+.med-lista{
+  background-color: transparent;
+}
 
+
+.med-lista ion-item {
+  --background: transparent !important;
+  --ion-item-background: transparent !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  --padding-start: 0 !important;
+  --inner-padding-end: 0 !important;
+  --border-width: 0 !important;
+  --border-style: none !important;
+  --border-color: transparent !important;
+}
+
+.med-lista ion-label {
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.lista-medicamentos {
+  background: transparent;
+}
+
+.item-medicamento {
+  --background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
