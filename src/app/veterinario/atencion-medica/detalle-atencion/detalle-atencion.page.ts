@@ -160,7 +160,7 @@ private dibujarMarcoYPie(doc: jsPDF, numeroPagina: number) {
   const textoPagina = `Página ${numeroPagina}`;
   const anchoTexto = doc.getTextWidth(textoPagina);
   const xCentro = (doc.internal.pageSize.getWidth() - anchoTexto) / 2;
-  const yPie = 350;
+  const yPie = 345;
   doc.text(textoPagina, xCentro, yPie);
 }
 
@@ -176,7 +176,7 @@ private dibujarMarcoYPie(doc: jsPDF, numeroPagina: number) {
 ): number {
   const lineas = doc.splitTextToSize(texto, anchoMax);
   for (let linea of lineas) {
-    if (y >= 300) {
+    if (y >= 290) {
         doc.addPage();
         this.dibujarMarcoYPie(doc, doc.getNumberOfPages());
         y = 20; 
@@ -200,6 +200,8 @@ private async generarPdf(): Promise<Blob> {
   unit: 'mm',           
   format: 'legal' 
 });
+
+let firmaImagen: HTMLImageElement | null = null;
 
   // Función interna para terminar el PDF y devolverlo como Blob
   const terminarDoc = (): Blob => {
@@ -419,14 +421,16 @@ doc.text(this.atencion?.diagnostico ?? '-', 20 + doc.getTextWidth('Diagnóstico:
 
 
     // DATOS VETERINARIO
-
+if (firmaImagen) {
+  doc.addImage(firmaImagen, 'PNG', 80, 300, 50, 25); 
+}
             doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
-    doc.text(`MV ${this.atencion?.veterinario?.nombre_vet} ${this.atencion?.veterinario?.apellidos_vet}`, 105, 335, { align: 'center' });
-    doc.text(`${this.atencion?.veterinario?.run_vet}`, 105, 340, { align: 'center' });
+    doc.text(`MV ${this.atencion?.veterinario?.nombre_vet} ${this.atencion?.veterinario?.apellidos_vet}`, 105, 330, { align: 'center' });
+    doc.text(`${this.atencion?.veterinario?.run_vet}`, 105, 335, { align: 'center' });
     doc.setFontSize(9);
-    doc.text(`Correo: ${this.atencion?.veterinario?.email_vet}`, 31, 345) ;
-    doc.text(`Celular: +569 ${this.atencion?.veterinario?.celular_vet}`, 145, 345) ; 
+    doc.text(`Correo: ${this.atencion?.veterinario?.email_vet}`, 31, 340) ;
+    doc.text(`Celular: +569 ${this.atencion?.veterinario?.celular_vet}`, 145, 340) ; 
 
     return doc.output('blob');
   };
@@ -466,7 +470,7 @@ if (this.logoVet?.startsWith('http') || this.atencion?.veterinario?.dato_profesi
     if (this.atencion?.veterinario?.dato_profesional?.firma_png?.startsWith('http')) {
       firmaImg.crossOrigin = 'anonymous';
       firmaImg.onload = () => {
-        doc.addImage(firmaImg, 'PNG', 70, 300, 70, 30); // Ajusta posición/tamaño si lo deseas
+        firmaImagen = firmaImg;
         firmaCargada = true;
         terminarSiListo();
       };
