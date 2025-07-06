@@ -1,8 +1,8 @@
-<ion-header class="ion-no-border">
-<app-header backButton="/tutor"></app-header>
+<ion-header class="ion-safe-area-top ion-no-border">
+  <app-header backButton="/tutor" title=""></app-header>
 </ion-header>
 
-<ion-content class="fondo ion-padding" [fullscreen]="true">
+<ion-content fullscreen="true" class="ion-padding fondo">
 
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content></ion-refresher-content>

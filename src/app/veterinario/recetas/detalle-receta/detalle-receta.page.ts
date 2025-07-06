@@ -101,7 +101,7 @@ const { data, error } = await supabase
     });
   }
 // -------------------------------------------------------------
-private async generarPdf(): Promise<Blob> {
+private async generarPdfReceta(): Promise<Blob> {
   const doc = new jsPDF({ format: 'a4', unit: 'mm' });
 
   // Función para terminar el documento
@@ -296,7 +296,7 @@ private async generarPdf(): Promise<Blob> {
 // -------------------------------------------------------------
 
   exportarPdfRecetaPrueba() {
-    this.generarPdf().then(pdfBlob => {
+    this.generarPdfReceta().then(pdfBlob => {
       const url = URL.createObjectURL(pdfBlob);
       const a = document.createElement('a');
       const nombre = this.receta?.mascota?.masc_nom?.replace(/ /g, '_') || 'Receta';
@@ -310,7 +310,7 @@ private async generarPdf(): Promise<Blob> {
   }
 
   async exportarPdfReceta() {
-    const pdfBlob = await this.generarPdf();
+    const pdfBlob = await this.generarPdfReceta();
 
     const base64 = await new Promise<string>((resolve) => {
       const reader = new FileReader();
@@ -354,7 +354,7 @@ private async generarPdf(): Promise<Blob> {
   }
 
   async enviarPdfReceta() {
-    const pdfBlob = await this.generarPdf();
+    const pdfBlob = await this.generarPdfReceta();
 
     const base64 = await new Promise<string>((resolve) => {
       const reader = new FileReader();

@@ -1,9 +1,9 @@
-<ion-header class="ion-no-border">
+<ion-header class="ion-safe-area-top ion-no-border">
 <app-header [backButton]="'/veterinario/tutor/mascotas/' + idMasc"></app-header>
 </ion-header>
 
 
-<ion-content class="fondo ion-padding" [fullscreen]="true">
+<ion-content fullscreen="true" class="ion-padding fondo">
 
   <ion-card *ngIf="atenciones.length > 0">
     <ion-list>

@@ -49,15 +49,15 @@ export class AgregarMascotaPage implements OnInit {
   ) {
     this.mascotaForm = this.fb.group({
       masc_nom: ['', Validators.required],
-      id_sexo: ['', Validators.required],
+      id_sexo: [''],
       masc_nacimiento: [null],
       masc_edad: [null],
       id_especie: ['', Validators.required],
-      id_raza: [null, Validators.required],
+      id_raza: [null],
       id_tamanio: [null],
       id_pelaje: [null],
       masc_color: [''],
-      id_esterilizado: ['',Validators.required],
+      id_esterilizado: [''],
       id_grupo_sanguineo: [null],
       masc_num_chip: [null],
       masc_observaciones: [''],
@@ -254,15 +254,15 @@ export class AgregarMascotaPage implements OnInit {
     const formData = { ...this.mascotaForm.value };
 
     formData.id_estado = 1;
-    formData.masc_num_chip = formData.masc_num_chip ? Number(formData.masc_num_chip) : null;
-    formData.masc_edad = formData.masc_edad ? Number(formData.masc_edad) : null;
+    formData.masc_num_chip = formData.masc_num_chip ? Number(formData.masc_num_chip) : 0;
+    formData.masc_edad = formData.masc_edad ? Number(formData.masc_edad) : 0;
     formData.id_especie = Number(formData.id_especie);
     formData.id_raza = formData.id_raza ? Number(formData.id_raza) : null;
-    formData.id_grupo_sanguineo = formData.id_grupo_sanguineo ? Number(formData.id_grupo_sanguineo) : null;
-    formData.id_sexo = Number(formData.id_sexo);
-    formData.id_pelaje = Number(formData.id_pelaje);
-    formData.id_tamanio = Number(formData.id_tamanio);
-    formData.id_esterilizado = Number(formData.id_esterilizado);
+    formData.id_grupo_sanguineo = formData.id_grupo_sanguineo ? Number(formData.id_grupo_sanguineo): null;
+    formData.id_sexo = formData.id_sexo ? Number(formData.id_sexo) : 30;
+    formData.id_pelaje = formData.id_pelaje? Number(formData.id_pelaje):8;
+    formData.id_tamanio = formData.id_tamanio? Number(formData.id_tamanio):6;
+    formData.id_esterilizado = formData.id_esterilizado ? Number(formData.id_esterilizado) : 3;
 
     delete formData.masc_edad_texto;
     delete formData.fecha_desconocida;

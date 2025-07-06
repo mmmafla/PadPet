@@ -1,9 +1,7 @@
-<ion-header class="ion-no-border">
-<app-header backButton="/perfil"></app-header>
-</ion-header>
 
+<app-header backButton="/home" title=""></app-header>
 
-<ion-content class="fondo ion-padding" [fullscreen]="true">
+<ion-content class="fondo" [fullscreen]="true">
 
   <!-- Refresher -->
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">

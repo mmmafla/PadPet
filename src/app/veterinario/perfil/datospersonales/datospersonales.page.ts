@@ -18,6 +18,7 @@ export class DatospersonalesPage implements OnInit {
   form: FormGroup;
   regiones: any[] = [];
   ciudades: any[] = [];
+  correoActual: string = ''; // Nuevo: para comparar si se cambia el correo
 
   supabase = inject(SupabaseService);
   toastController = inject(ToastController);
@@ -35,10 +36,8 @@ export class DatospersonalesPage implements OnInit {
       id_ciudad: new FormControl(null, [Validators.required])
     });
 
-    // Cuando cambie la región, actualizar las ciudades correspondientes
     this.form.get('id_region')?.valueChanges.subscribe(regionId => {
       this.cargarCiudadesPorRegion(regionId);
-      // También resetear ciudad para que no quede una ciudad que no pertenece a la nueva región
       this.form.get('id_ciudad')?.setValue(null);
     });
   }
@@ -48,7 +47,6 @@ export class DatospersonalesPage implements OnInit {
     await this.cargarDatosVeterinario();
   }
 
-  // Carga todas las regiones
   async cargarRegiones() {
     try {
       const { data, error } = await this.supabase
@@ -66,7 +64,6 @@ export class DatospersonalesPage implements OnInit {
     }
   }
 
-  // Carga las ciudades según la región seleccionada
   async cargarCiudadesPorRegion(id_region: number | null) {
     if (!id_region) {
       this.ciudades = [];
@@ -92,7 +89,6 @@ export class DatospersonalesPage implements OnInit {
     }
   }
 
-  // Carga datos del veterinario y establece la región y ciudad seleccionadas
   async cargarDatosVeterinario() {
     try {
       const { data: { user }, error } = await this.supabase.auth.getUser();
@@ -125,7 +121,8 @@ export class DatospersonalesPage implements OnInit {
           id_ciudad: data.id_ciudad ?? null
         });
 
-        // Cargar ciudades de la región actual para mostrar en el select
+        this.correoActual = data.email_vet; // Guardamos el correo original
+
         if (data.id_region) {
           await this.cargarCiudadesPorRegion(data.id_region);
         }
@@ -135,7 +132,6 @@ export class DatospersonalesPage implements OnInit {
     }
   }
 
-  // Actualiza los datos del veterinario
   async actualizarDatos() {
     if (this.form.invalid) return;
 
@@ -158,6 +154,20 @@ export class DatospersonalesPage implements OnInit {
         return;
       }
 
+      // Si el correo fue cambiado, actualizamos en Supabase Auth
+      if (email_vet !== this.correoActual) {
+        const { error: authError } = await this.supabase.auth.updateUser({ email: email_vet });
+
+        if (authError) {
+          console.error('Error al actualizar el correo en Authentication:', authError);
+          this.mostrarToast('Error al actualizar el correo de inicio de sesión', 'danger');
+          return;
+        } else {
+          this.mostrarToast('Correo actualizado en Authentication. Revisa tu correo.', 'success');
+        }
+      }
+
+      // Actualizamos la tabla veterinario
       const { error: updateError } = await this.supabase
         .from('veterinario')
         .update({
