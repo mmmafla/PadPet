@@ -1,18 +1,18 @@
-<ion-header class="ion-safe-area-top ion-no-border">
-  <app-header backButton="/recetas"></app-header>
-</ion-header>
 
-<ion-content fullscreen="true" class="ion-padding fondo">
+  <app-header backButton="/"></app-header>
+
+
+<ion-content fullscreen="true" class="fondo">
 
   <ion-card class="card3">
-    <h2 style="text-align: center;">Editar tratamiento</h2>
+    <h2 style="text-align: center;">Editar Receta</h2>
 
-    <ion-list class="formulario-editar" style="text-align: center;" *ngIf="receta?.mascota?.masc_nom" lines="none">
+    <ion-list style="text-align: center" *ngIf="receta?.mascota?.masc_nom">
       <!-- Mostrar el nombre de la mascota asociada a la receta -->
       <h3>Tratamiento de {{ receta.mascota.masc_nom }} </h3>
 
       <!-- Indicaciones generales (NO obligatorio) -->
-      <ion-item lines="full">
+      <ion-item class="consulta-item" lines="none">
         <ion-label position="stacked">Indicaciones</ion-label>
         <ion-textarea
           [(ngModel)]="tratamiento_indicaciones" autoGrow="true" name="tratamiento_indicaciones">
@@ -20,7 +20,7 @@
       </ion-item>
 
       <!-- Botón agregar medicamento -->
-      <ion-item lines="none" class="ion-align-items-center">
+      <ion-item class="ion-align-items-center" lines="none">
         <ion-label>Rp</ion-label>
         <ion-button fill="clear" color="primary" (click)="agregarMedicamento()" slot="end">
           Agregar <ion-icon name="add-circle-outline"></ion-icon>
@@ -41,30 +41,28 @@
 
         <!-- Medicamento obligatorio con asterisco rojo -->
         <ion-item>
-          <ion-label slot="start">
-            Medicamento: <span style="color: red;">*</span>
-          </ion-label>
+          <ion-label position="stacked"> Medicamento: <span style="color: red;">*</span></ion-label>
           <ion-input [(ngModel)]="tratamientoList[i].nombre" name="nombre_medicamento{{i}}" required>
           </ion-input>
         </ion-item>
 
         <!-- Dosis NO obligatorio -->
         <ion-item>
-          <ion-label slot="start">Dosis:</ion-label>
+          <ion-label position="stacked">Dosis</ion-label>
           <ion-input [(ngModel)]="med.dosis" name="dosisMedicamento{{i}}">
           </ion-input>
         </ion-item>
 
         <!-- Frecuencia NO obligatorio -->
         <ion-item>
-          <ion-label slot="start">Frecuencia:</ion-label>
+          <ion-label position="stacked">Frecuencia</ion-label>
           <ion-input [(ngModel)]="med.frecuencia" name="frecuencia{{i}}">
           </ion-input>
         </ion-item>
 
         <!-- Duración NO obligatorio -->
         <ion-item lines="none">
-          <ion-label slot="start">Duración</ion-label>
+          <ion-label position="stacked">Duración</ion-label>
           <ion-input [(ngModel)]="med.duracion" name="duracionMedicamento{{i}}">
           </ion-input>
         </ion-item>

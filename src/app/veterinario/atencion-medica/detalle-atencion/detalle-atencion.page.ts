@@ -162,6 +162,14 @@ private dibujarMarcoYPie(doc: jsPDF, numeroPagina: number) {
   const xCentro = (doc.internal.pageSize.getWidth() - anchoTexto) / 2;
   const yPie = 345;
   doc.text(textoPagina, xCentro, yPie);
+
+    // Firma "Generado en PadPet" en esquina inferior derecha
+  const textoFirma = 'Generado en PadPet';
+  const anchoFirma = doc.getTextWidth(textoFirma);
+  const xFirma = doc.internal.pageSize.getWidth() - 15 - anchoFirma;
+  doc.text(textoFirma, xFirma, yPie);
+
+
 }
 
 
@@ -427,7 +435,7 @@ if (firmaImagen) {
             doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text(`MV ${this.atencion?.veterinario?.nombre_vet} ${this.atencion?.veterinario?.apellidos_vet}`, 105, 330, { align: 'center' });
-    doc.text(`${this.atencion?.veterinario?.run_vet}`, 105, 335, { align: 'center' });
+    doc.text(`RUN ${this.atencion?.veterinario?.run_vet}`, 105, 335, { align: 'center' });
     doc.setFontSize(9);
     doc.text(`Correo: ${this.atencion?.veterinario?.email_vet}`, 31, 340) ;
     doc.text(`Celular: +569 ${this.atencion?.veterinario?.celular_vet}`, 145, 340) ; 
