@@ -1,5 +1,5 @@
 <ion-header class="ion-no-border">
-  <app-header backButton="/home" title="Detalle de Atención"></app-header>
+  <app-header backButton="/home"></app-header>
 </ion-header>
 
 <ion-content class="fondo" [fullscreen]="true">
@@ -100,12 +100,13 @@
       <p><em>No existe tratamiento registrado para esta atención.</em></p>
     </ng-template>
 
-    <h4 style="text-align: center;">Próximo control</h4>
+  <!-- <h4 style="text-align: center;">Próximo control</h4> --> 
 
     <!--------------------------------------------------------------------------------------->
     <ion-button class="boton-editar" (click)="modificarConsulta()">Modificar consulta</ion-button>
     <ion-button class="boton-editar" (click)="modificarReceta()">Modificar Receta</ion-button> 
     <ion-button class="boton-exportar" (click)="exportarPdf()">Descargar consulta</ion-button>
+    <ion-button class="boton-exportar" (click)="exportarPdfReceta()">Descargar receta</ion-button>
     <ion-button class="boton-exportar" (click)="exportarPdfPrueba()">Descargar LOCALHOST</ion-button>   
     <ion-button class="boton-enviar-directo" (click)="enviarPdf()">Enviar consulta</ion-button>
 
