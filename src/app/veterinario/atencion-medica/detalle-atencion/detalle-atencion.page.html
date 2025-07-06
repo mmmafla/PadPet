@@ -1,7 +1,6 @@
 <ion-header class="ion-no-border">
-<app-header backButton="/home" title="Detalle de Atención"></app-header>
+  <app-header backButton="/home" title="Detalle de Atención"></app-header>
 </ion-header>
-
 
 <ion-content class="fondo" [fullscreen]="true">
 
@@ -11,84 +10,103 @@
   <!-- Solo muestra la tarjeta si la data ya está cargada -->
   <ion-card class="card3" *ngIf="atencion">
     <h2>Atención de {{ atencion.mascota?.masc_nom }}</h2>
-    <h3 style="text-align: center;"> Dueño: {{ atencion.mascota?.tutor?.nombre_tutor }} {{ atencion.mascota?.tutor?.apellidos_tutor }}  </h3>
+    <h3 style="text-align: center;">
+      Dueño: {{ atencion.mascota?.tutor?.nombre_tutor }} {{ atencion.mascota?.tutor?.apellidos_tutor }}
+    </h3>
     <p><strong>Correo Tutor:</strong> {{ atencion.mascota?.tutor?.correo_tutor }}</p>
     <p><strong>Teléfono Tutor:</strong> {{ atencion.mascota?.tutor?.celular_tutor }}</p>
- <!--------------------------------------------------------------------------------------->
-   
-    <h4 style="text-align: center;">Datos consulta</h4>
 
+    <!--------------------------------------------------------------------------------------->
+    <h4 style="text-align: center;">Datos consulta</h4>
     <p><strong>Fecha:</strong> {{ atencion.fecha_hora_atencion | date:'medium' }}</p>
     <p><strong>Motivo:</strong> {{ atencion.motivo_consulta?.motivo }}</p>
     <p><strong>Anamnesis:</strong> {{ atencion.anamnesis }}</p>
     <p><strong>Diagnóstico:</strong> {{ atencion.diagnostico }}</p>
     <p><strong>Observaciones:</strong> {{ atencion.observaciones }}</p>
 
-<!--------------------------------------------------------------------------------------->
-
+    <!--------------------------------------------------------------------------------------->
     <h4 style="text-align: center;">Alimentación</h4>
-        <p><strong>Tipo de Alimentación: </strong> {{ atencion.tipo_alimentacion?.tipo_alimentacion }}</p>
-        <p><strong>Cantidad alimento: </strong> {{ atencion.cantidad_alimentacion }} gr/ml</p>
-        <p><strong>Veces al día:</strong> {{ atencion.veces_alimentacion }}</p>
-<!--------------------------------------------------------------------------------------->
+    <p><strong>Tipo de Alimentación: </strong> {{ atencion.tipo_alimentacion?.tipo_alimentacion }}</p>
+    <p><strong>Cantidad alimento: </strong> {{ atencion.cantidad_alimentacion }} gr/ml</p>
+    <p><strong>Veces al día:</strong> {{ atencion.veces_alimentacion }}</p>
 
+    <!--------------------------------------------------------------------------------------->
     <h4 style="text-align: center;">Examen General</h4>
-        <p><strong>Mucosas: </strong> {{ atencion.mucosa }}</p>
-        <p><strong>Temperatura :</strong> {{ atencion.temperatura }} °C</p>
-        <p><strong>Peso: </strong> {{ atencion.peso }} Kg</p>
-        <p><strong>Condicion corporal: </strong> {{ atencion.condicion_corporal }}</p>
-        <p><strong>Estado sensorial: </strong> {{ atencion.estado_sensorial?.estado_sensorial }}</p>
-        <p><strong>Hidratación: </strong> {{ atencion.hidratacion?.estado_hidratacion }}</p>
-        <p><strong>Observación: </strong> {{ atencion.observacion_examen }}</p>
-<!--------------------------------------------------------------------------------------->
+    <p><strong>Mucosas: </strong> {{ atencion.mucosa }}</p>
+    <p><strong>Temperatura :</strong> {{ atencion.temperatura }} °C</p>
+    <p><strong>Peso: </strong> {{ atencion.peso }} Kg</p>
+    <p><strong>Condicion corporal: </strong> {{ atencion.condicion_corporal }}</p>
+    <p><strong>Estado sensorial: </strong> {{ atencion.estado_sensorial?.estado_sensorial }}</p>
+    <p><strong>Hidratación: </strong> {{ atencion.hidratacion?.estado_hidratacion }}</p>
+    <p><strong>Observación: </strong> {{ atencion.observacion_examen }}</p>
 
+    <!--------------------------------------------------------------------------------------->
     <h4 style="text-align: center;">Examen Particular</h4>
-        <p><strong>Piel y Pelaje: </strong> {{ atencion.piel_obp?.estado_piel }}</p>
-        <p><i>‣ Observaciones: {{atencion.obs_piel}} </i></p>
-        <p><strong>Ojos: </strong> {{ atencion.ojos_obp?.estado_ojos }}</p>
-              <p><i>‣ Observaciones: {{atencion.obs_ojos}} </i></p>
-        <p><strong>Oidos: </strong> {{ atencion.oidos_obp?.estado_oidos }}</p>
-        <p><i>‣ Observaciones: {{atencion.obs_oidos}} </i></p>
-        <p><strong>Dentadura: </strong> {{ atencion.dentadura_obp?.estado_dentadura }}</p>
-        <p><i>‣ Observaciones: {{atencion.obs_dentadura}} </i></p>
+    <p><strong>Piel y Pelaje: </strong> {{ atencion.piel_obp?.estado_piel }}</p>
+    <p><i>‣ Observaciones: {{atencion.obs_piel}} </i></p>
+    <p><strong>Ojos: </strong> {{ atencion.ojos_obp?.estado_ojos }}</p>
+    <p><i>‣ Observaciones: {{atencion.obs_ojos}} </i></p>
+    <p><strong>Oidos: </strong> {{ atencion.oidos_obp?.estado_oidos }}</p>
+    <p><i>‣ Observaciones: {{atencion.obs_oidos}} </i></p>
+    <p><strong>Dentadura: </strong> {{ atencion.dentadura_obp?.estado_dentadura }}</p>
+    <p><i>‣ Observaciones: {{atencion.obs_dentadura}} </i></p>
 
-        <p><strong>Sistema Digestivo: </strong> {{ atencion.sdigestivo_obp?.estado_sdigestivo }}</p>
-        <p><i>‣ Observaciones: {{atencion.obs_sdigestivo}} </i></p>
+    <p><strong>Sistema Digestivo: </strong> {{ atencion.sdigestivo_obp?.estado_sdigestivo }}</p>
+    <p><i>‣ Observaciones: {{atencion.obs_sdigestivo}} </i></p>
 
-          <p><strong>Sistema Cardio Vascular: </strong> {{ atencion.scvascular_obp?.estado_scvascular}}</p>
-        <p><i>‣ Observaciones: {{atencion.obs_scvascular}} </i></p>
-        
-        <p><strong>Sistema Respiratorio: </strong> {{ atencion.srespiratorio_obp?.estado_srespiratorio }}</p>
-        <p><i>‣ Observaciones: {{atencion.obs_srespiratorio}} </i></p>
+    <p><strong>Sistema Cardio Vascular: </strong> {{ atencion.scvascular_obp?.estado_scvascular}}</p>
+    <p><i>‣ Observaciones: {{atencion.obs_scvascular}} </i></p>
 
-        <p><strong>Sistema Urinario: </strong> {{ atencion.surinario_obp?.estado_surinario }}</p>
-        <p><i>‣ Observaciones: {{atencion.obs_surinario}} </i></p>
+    <p><strong>Sistema Respiratorio: </strong> {{ atencion.srespiratorio_obp?.estado_srespiratorio }}</p>
+    <p><i>‣ Observaciones: {{atencion.obs_srespiratorio}} </i></p>
 
-        <p><strong>Sistema Nervioso: </strong> {{ atencion.snervioso_obp?.estado_snervioso}}</p>
-        <p><i>‣ Observaciones: {{atencion.obs_snervioso}} </i></p>
+    <p><strong>Sistema Urinario: </strong> {{ atencion.surinario_obp?.estado_surinario }}</p>
+    <p><i>‣ Observaciones: {{atencion.obs_surinario}} </i></p>
 
-        <p><strong>Sistema Linfático: </strong> {{ atencion.slinfatico_obp?.estado_slinfatico }}</p>
-        <p><i>‣ Observaciones: {{atencion.obs_slinfatico}} </i></p>
-          
-        <p><strong>Sistema Locomotor: </strong> {{ atencion.slocomotor_obp?.estado_slocomotor }}</p>
-        <p><i>‣ Observaciones: {{atencion.obs_slocomotor}} </i></p>
+    <p><strong>Sistema Nervioso: </strong> {{ atencion.snervioso_obp?.estado_snervioso}}</p>
+    <p><i>‣ Observaciones: {{atencion.obs_snervioso}} </i></p>
 
-        <p><strong>Sistema Reproductor: </strong> {{ atencion.sreproductor_obp?.estado_sreproductor }}</p>
-        <p><i>‣ Observaciones: {{atencion.obs_sreproductor}} </i></p>
+    <p><strong>Sistema Linfático: </strong> {{ atencion.slinfatico_obp?.estado_slinfatico }}</p>
+    <p><i>‣ Observaciones: {{atencion.obs_slinfatico}} </i></p>
 
+    <p><strong>Sistema Locomotor: </strong> {{ atencion.slocomotor_obp?.estado_slocomotor }}</p>
+    <p><i>‣ Observaciones: {{atencion.obs_slocomotor}} </i></p>
 
-<!--------------------------------------------------------------------------------------->
-      <h4 style="text-align: center;">Tratamiento/Indicaciones</h4>
-<!---   <h4 style="text-align: center;">Productos aplicados</h4> ---> 
+    <p><strong>Sistema Reproductor: </strong> {{ atencion.sreproductor_obp?.estado_sreproductor }}</p>
+    <p><i>‣ Observaciones: {{atencion.obs_sreproductor}} </i></p>
+
+    <!--------------------------------------------------------------------------------------->
+    <h4 style="text-align: center;">Tratamiento/Indicaciones</h4>
+
+    <ng-container *ngIf="receta; else sinTratamiento">
+      <p><strong>Indicaciones:</strong> {{ receta.indicaciones || 'Sin indicaciones específicas.' }}</p>
+
+      <ion-list *ngIf="medicamentosReceta && medicamentosReceta.length > 0; else noMedicamentos">
+        <ion-item *ngFor="let med of medicamentosReceta">
+          <ion-label>
+            <h3>{{ med.medicamento?.nombre_medicamento || 'Medicamento desconocido' }}</h3>
+            <p>Dosis: {{ med.dosis_medicamento || '-' }}</p>
+            <p>Duración: {{ med.duracion_medicamento || '-' }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+
+      <ng-template #noMedicamentos>
+        <p><em>No hay medicamentos registrados para esta receta.</em></p>
+      </ng-template>
+    </ng-container>
+
+    <ng-template #sinTratamiento>
+      <p><em>No existe tratamiento registrado para esta atención.</em></p>
+    </ng-template>
+
     <h4 style="text-align: center;">Próximo control</h4>
 
-
-
-
-<!--------------------------------------------------------------------------------------->
+    <!--------------------------------------------------------------------------------------->
     <ion-button class="boton-editar" (click)="modificarConsulta()">Modificar consulta</ion-button>
+    <ion-button class="boton-editar" (click)="modificarReceta()">Modificar Receta</ion-button> 
     <ion-button class="boton-exportar" (click)="exportarPdf()">Descargar consulta</ion-button>
-    <ion-button class="boton-exportar" (click)="exportarPdfPrueba()">Descargar LOCALHOST</ion-button>    
+    <ion-button class="boton-exportar" (click)="exportarPdfPrueba()">Descargar LOCALHOST</ion-button>   
     <ion-button class="boton-enviar-directo" (click)="enviarPdf()">Enviar consulta</ion-button>
 
   </ion-card>

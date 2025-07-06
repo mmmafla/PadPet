@@ -6,6 +6,7 @@ import { IonicModule, ModalController, ToastController, AlertController } from '
 import { createClient } from '@supabase/supabase-js';
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
 import { ModalFechaComponent } from 'src/app/modal-fecha/modal-fecha.component';
+import { ActivatedRoute } from '@angular/router';
 
 const supabaseUrl = 'https://irorlonysbmkbdthvrmt.supabase.co';
 const supabaseKey =
@@ -99,10 +100,44 @@ export class AgregarAtencionMedicaPage implements OnInit {
     private modalCtrl: ModalController,
     private toastController: ToastController,
     private router: Router,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
+
+    this.cargarTutores().then(() => {
+      this.route.queryParams.subscribe((params) => {
+      const runTutor = params['run_tutor'];
+      const idMascota = params['id_mascota'];
+
+      console.log('📥 Parámetros recibidos:', { idMascota, runTutor });
+      console.log('📋 Tutores disponibles:', this.tutores);
+
+      if (runTutor && idMascota) {
+        
+        const tutor = this.tutores.find((t) => t.run_tutor === runTutor);
+        console.log('👤 Tutor encontrado:', tutor);
+
+        if (tutor) {
+          this.seleccionarTutor(tutor);
+
+          const mascota = tutor.mascota.find((m: any) => m.id_masc === idMascota);
+          console.log('🐾 Mascota encontrada:', mascota);
+
+          if (mascota) {
+            this.mascotaSeleccionada = mascota;
+          } else {
+            console.warn('❌ Mascota no encontrada dentro del tutor.');
+          }
+        } else {
+          console.warn('❌ Tutor no encontrado con run:', runTutor);
+        }
+      }
+    });
+
+    });
+
     this.cargarTutores();
     this.cargarMotivosConsulta();
     this.cargarEstadosSensoriales();
@@ -120,6 +155,7 @@ export class AgregarAtencionMedicaPage implements OnInit {
     this.cargarsLocomotorOpciones();
     this.cargarsReproductorOpciones();
     this.cargarTiposAlimentacion();
+    
   }
 
   // ------------------------- Carga de datos -------------------------
@@ -407,6 +443,7 @@ export class AgregarAtencionMedicaPage implements OnInit {
             indicaciones: this.atencion.tratamiento_indicaciones || '',
             id_masc: this.mascotaSeleccionada.id_masc,
             run_vet: runVet,
+            id_atencion: idAtencion,
           },
         ])
         .select('id_receta')

@@ -2,14 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { IonicModule, ToastController } from '@ionic/angular';
+import { IonicModule, ToastController, AlertController } from '@ionic/angular';
 import { createClient } from '@supabase/supabase-js';
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
-import { jsPDF } from "jspdf";
+import { jsPDF } from 'jspdf';
 import { Share } from '@capacitor/share';
 import { Filesystem, Directory } from '@capacitor/filesystem';
-import { AlertController } from '@ionic/angular';
-import { observeNotification } from 'rxjs/internal/Notification';
 
 const supabaseUrl = 'https://irorlonysbmkbdthvrmt.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyb3Jsb255c2Jta2JkdGh2cm10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYyODgwMDQsImV4cCI6MjA2MTg2NDAwNH0.s-ZEteHxMWX43NCQIuNmTWpbBoEUxseKyg_YaXpi6Ek';
@@ -19,77 +17,77 @@ const supabase = createClient(supabaseUrl, supabaseKey);
   selector: 'app-detalle-atencion',
   templateUrl: './detalle-atencion.page.html',
   styleUrls: ['./detalle-atencion.page.scss'],
-      standalone: true,
-    imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule, HeaderComponent] 
+  standalone: true,
+  imports: [IonicModule, CommonModule, FormsModule, ReactiveFormsModule, HeaderComponent]
 })
 export class DetalleAtencionPage implements OnInit {
   atencionId!: number;
-  atencion: any ;
-    logoVet: string = '';
+  atencion: any;
+  receta: any = null;
+  medicamentosReceta: any[] = [];
+  logoVet: string = '';
 
-    alertController = inject(AlertController);
-    toastController = inject(ToastController);
+  alertController = inject(AlertController);
+  toastController = inject(ToastController);
 
   constructor(private router: Router) {
     const navigation = this.router.getCurrentNavigation();
     this.atencionId = navigation?.extras?.state?.['id'];
-
   }
 
   async ngOnInit() {
     if (this.atencionId) {
       await this.cargarAtencion();
+      await this.cargarReceta();
     }
   }
-  ionViewWillEnter() {
-  if (this.atencionId) {
-    this.cargarAtencion();
-  }
-}
 
-  
-// ------------------------------------------------------------- CARGAR ATENCIÓN
+  ionViewWillEnter() {
+    if (this.atencionId) {
+      this.cargarAtencion();
+      this.cargarReceta();
+    }
+  }
+
   async cargarAtencion() {
     const { data, error } = await supabase
       .from('atencion_medica')
-  .select(`
-    *, 
-    mascota (
-      *, 
-      raza (
-        nom_raza,
-        especie ( nom_especie )
-      ),
-      tutor (
-        *,
-        ciudad (
-          nombre_ciudad
+      .select(`
+        *, 
+        mascota (
+          *, 
+          raza (
+            nom_raza,
+            especie ( nom_especie )
+          ),
+          tutor (
+            *,
+            ciudad ( nombre_ciudad )
+          ),
+          sexo_mascota ( masc_sexo ),
+          grupo_sanguineo ( nom_grupo_sanguineo )
+        ),
+        motivo_consulta ( motivo ),
+        hidratacion ( estado_hidratacion ),
+        estado_sensorial ( estado_sensorial ),
+        piel_obp ( estado_piel ),
+        ojos_obp ( estado_ojos ),
+        oidos_obp ( estado_oidos ),
+        dentadura_obp ( estado_dentadura ),
+        sdigestivo_obp ( estado_sdigestivo ),
+        scvascular_obp ( estado_scvascular ),
+        srespiratorio_obp ( estado_srespiratorio ),
+        surinario_obp ( estado_surinario ),
+        snervioso_obp ( estado_snervioso ),
+        slinfatico_obp ( estado_slinfatico ),
+        slocomotor_obp ( estado_slocomotor ),
+        sreproductor_obp ( estado_sreproductor ),
+        tipo_alimentacion ( tipo_alimentacion ),
+        veterinario (
+          nombre_vet, apellidos_vet, run_vet, celular_vet, email_vet,  
+          dato_profesional ( foto_perfil )
         )
-      ),
-      sexo_mascota ( masc_sexo ),
-      grupo_sanguineo ( nom_grupo_sanguineo )
-    ),
-    motivo_consulta ( motivo ),
-    hidratacion ( estado_hidratacion ),
-    estado_sensorial ( estado_sensorial ),
-    piel_obp ( estado_piel ),
-    ojos_obp ( estado_ojos ),
-    oidos_obp ( estado_oidos ),
-    dentadura_obp ( estado_dentadura ),
-    sdigestivo_obp ( estado_sdigestivo ),
-    scvascular_obp ( estado_scvascular ),
-    srespiratorio_obp ( estado_srespiratorio ),
-    surinario_obp ( estado_surinario ),
-    snervioso_obp ( estado_snervioso ),
-    slinfatico_obp ( estado_slinfatico ),
-    slocomotor_obp ( estado_slocomotor ),
-    sreproductor_obp ( estado_sreproductor ),
-    tipo_alimentacion ( tipo_alimentacion ),
-    veterinario ( nombre_vet, apellidos_vet, run_vet, celular_vet, email_vet,  
-          dato_profesional (
-          foto_perfil
-        ) )
-  `)
+      `)
       .eq('id', this.atencionId)
       .single();
 
@@ -98,21 +96,64 @@ export class DetalleAtencionPage implements OnInit {
     } else {
       this.atencion = data;
       this.logoVet = this.atencion?.veterinario?.dato_profesional?.foto_perfil || 'assets/default-user.png';
-
     }
   }
 
-// ------------------------------------------------------------- MODIFICAR ATENCIÓN
+  async cargarReceta() {
+    const { data: receta, error: errorReceta } = await supabase
+      .from('receta')
+      .select('*')
+      .eq('id_atencion', this.atencionId)
+      .single();
+
+    if (errorReceta) {
+      console.warn('No se encontró receta para esta atención.');
+      return;
+    }
+
+    this.receta = receta;
+
+    const { data: detalles, error: errorDetalles } = await supabase
+      .from('detalle_receta')
+      .select(`
+        *,
+        medicamento (
+          nombre_medicamento
+        )
+      `)
+      .eq('id_receta', receta.id_receta);
+
+    if (errorDetalles) {
+      console.error('Error al cargar detalle de la receta:', errorDetalles);
+    } else {
+      this.medicamentosReceta = detalles ?? [];
+    }
+  }
+
   modificarConsulta() {
-  this.router.navigate(['/editar-atencion'], {
-    state: { atencion: this.atencion }
-  });
+    this.router.navigate(['/editar-atencion'], {
+      state: { atencion: this.atencion }
+    });
+  }
+
+  modificarReceta() {
+  if (this.receta && this.receta.id_receta) {
+    this.router.navigate(['/veterinario/recetas/modificar-receta', this.receta.id_receta]);
+  } else {
+    this.toastController.create({
+      message: 'No hay receta para modificar.',
+      duration: 2000,
+      color: 'warning'
+    }).then(toast => toast.present());
+  }
 }
 
-truncarTexto(texto: string, max: number = 80): string {
-  if (!texto) return '-';
-  return texto.length > max ? texto.substring(0, max) + '...' : texto;
-}
+
+
+  truncarTexto(texto: string, max: number = 80): string {
+    if (!texto) return '-';
+    return texto.length > max ? texto.substring(0, max) + '...' : texto;
+  }
 
 // ------------------------------------------------------------------------------------ PDF
 // ------------------------------------------------------------------------------------ PDF

@@ -150,7 +150,7 @@ limpiarFiltros() {
   }
 
 verDetalle(id: number) {
-  this.router.navigate(['/detalle-atencion'], { state: { id: id }  });
+  this.router.navigate(['/detalle-atencion'], { state: { id: id }  });
 }
 
 }
