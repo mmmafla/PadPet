@@ -1,7 +1,7 @@
 
 <app-header backButton="/home" title=""></app-header>
 
-<ion-content class="fondo" [fullscreen]="true">
+<ion-content class="fondo ion-padding-bottom" [fullscreen]="true">
 
   <!-- Refresher -->
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
@@ -77,10 +77,12 @@
   </ion-card>
 
   <!-- Botón agregar tutor -->
-  <div class="boton-agregar">
+  <ion-footer class="footer-transparente">
     <ion-button class="agregar-tutor" expand="block" (click)="irAgregarTutor()">
-      <ion-icon name="add" slot="start"></ion-icon> Agregar tutor
+      <ion-icon name="add" slot="start"></ion-icon>
+      Agregar tutor
     </ion-button>
-  </div>
+</ion-footer>
+  
 
 </ion-content>

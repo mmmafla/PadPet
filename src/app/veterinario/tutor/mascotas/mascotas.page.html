@@ -2,7 +2,7 @@
   <app-header backButton="/tutor" title=""></app-header>
 </ion-header>
 
-<ion-content fullscreen="true" class="ion-padding fondo">
+<ion-content fullscreen="true" class="ion-padding-bottom fondo">
 
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
@@ -54,10 +54,12 @@
 
 
     <!-- Botón agregar mascota -->
-  <div class="boton-agregar">
+
+    <ion-footer class="footer-transparente">
     <ion-button class="agregar-mascota" expand="block" (click)="irAgregarMascota()">
-      <ion-icon name="add" slot="start"></ion-icon> Agregar mascota
+      <ion-icon name="add" slot="start"></ion-icon>
+      Agregar Mascota
     </ion-button>
-  </div>
+    </ion-footer>
 
 </ion-content>

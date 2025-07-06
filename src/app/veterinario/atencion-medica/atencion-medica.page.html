@@ -3,7 +3,7 @@
 </ion-header>
 
 
-<ion-content class="fondo" [fullscreen]="true">
+<ion-content class="fondo ion-padding-bottom" [fullscreen]="true">
 
 
 <h2>Historial de atención</h2>
@@ -76,11 +76,14 @@
 <!-----------------------HISTORIAL DE ATENCION----------------------------------->
 
   <!----------- Botón agregar atencion ---------------->
-<div class="boton-agregar">
-  <ion-button class="agregar-atencion" expand="block"  (click)="irAgregarAtencion()">
-    <ion-icon name="add" slot="start"></ion-icon> Nueva Atención
-  </ion-button>
-</div>
+
+    <ion-footer class="footer-transparente">
+    <ion-button class="agregar-atencion" expand="block" (click)="irAgregarAtencion()">
+      <ion-icon name="add" slot="start"></ion-icon>
+      Nueva Atenión
+    </ion-button>
+    </ion-footer>
+
 <!----------- Botón agregar atencion ---------------->
   
 </ion-content>

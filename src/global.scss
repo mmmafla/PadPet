@@ -197,15 +197,26 @@ ion-item.consulta-item {
 
 }
 
-//
-//ion-header {
-//  padding-top: 5px;
 
-//}
+
+
+.footer-transparente {
+  --background: transparent !important; /* fondo totalmente transparente */
+  border-top: none !important;          /* sin línea superior */
+  box-shadow: none !important;          /* sin sombra */
+  backdrop-filter: none !important;     /* elimina efecto de difuminado */
+  --ion-safe-area-bottom: 0px !important; /* elimina espacio extra abajo si aplica */
+}
+
+
 
 ion-content {
   padding-bottom: env(safe-area-inset-bottom);
 }
+.page-content {
+  padding-bottom: env(safe-area-inset-bottom); // iOS + Android moderno
+}
+
 
 .keyboard-is-open ion-content {
   --padding-bottom: 300px; // ajusta según el teclado
