@@ -5,13 +5,14 @@
 
 <ion-content fullscreen="true" class="ion-padding fondo">
 
-  <ion-card *ngIf="atenciones.length > 0">
+  <ion-card *ngIf="atenciones.length > 0" class="ion-card">
     <ion-list>
-      <ion-item *ngFor="let atencion of atenciones">
+<ion-item *ngFor="let atencion of atenciones" [routerLink]="['/veterinario/detalle-atencion', atencion.id_atencion]">
         <ion-label>
-          <h3>{{ atencion.fecha_atencion | date:'medium' }}</h3>
+          <h4>{{ atencion.anamnesis }}</h4>
           <p>Diagnóstico: {{ atencion.diagnostico }}</p>
           <p>Tratamientos: {{ atencion.tratamientos }}</p>
+          <p>{{atencion.fecha_hora_atencion | date: 'medium'}}</p>
         </ion-label>
       </ion-item>
     </ion-list>

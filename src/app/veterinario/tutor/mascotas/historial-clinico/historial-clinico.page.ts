@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { createClient } from '@supabase/supabase-js';
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
@@ -16,7 +16,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
   templateUrl: './historial-clinico.page.html',
   styleUrls: ['./historial-clinico.page.scss'],
     standalone: true,
-  imports: [IonicModule, HeaderComponent, CommonModule]
+  imports: [IonicModule, HeaderComponent, CommonModule, RouterModule]
 })
 export class HistorialClinicoPage implements OnInit {
  idMasc!: number;
