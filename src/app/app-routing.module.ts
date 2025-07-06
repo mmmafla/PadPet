@@ -125,7 +125,7 @@ const routes: Routes = [
   canActivate: [AuthGuard]
   },
   {
-  path: 'veterinario/recetas/modificar-receta',
+  path: 'veterinario/recetas/modificar-receta/:id_receta',
   loadChildren: () => import('./veterinario/recetas/modificar-receta/modificar-receta.module').then(m => m.ModificarRecetaPageModule),
   canActivate: [AuthGuard]
   },
@@ -142,4 +142,4 @@ const routes: Routes = [
   ],
   exports: [RouterModule]
 })
-export class AppRoutingModule { }
+export class AppRoutingModule { }

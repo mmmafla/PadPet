@@ -75,15 +75,17 @@ async registrarVeterinario(run: string, nombre: string, apellidos: string, email
     const { error: insertError } = await this.supabase
       .from('veterinario')
       .insert([
-        {
-          id_auth: userId,   
-          run_vet: run,
-          nombre_vet: nombre,
-          apellidos_vet: apellidos,
-          email_vet: email,
-          celular_vet: celular
-        }
-      ]);
+          {
+            id_auth: userId,   
+            run_vet: run,
+            nombre_vet: nombre,
+            apellidos_vet: apellidos,
+            email_vet: email,
+            celular_vet: celular,
+            estado_solicitud: 4 // ← Estado "Sin solicitud"
+          }
+        ]);
+
 
     if (insertError) {
       console.error('Error al insertar veterinario:', insertError);
