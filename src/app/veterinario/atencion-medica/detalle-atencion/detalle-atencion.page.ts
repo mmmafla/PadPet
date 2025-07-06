@@ -85,7 +85,7 @@ export class DetalleAtencionPage implements OnInit {
         tipo_alimentacion ( tipo_alimentacion ),
         veterinario (
           nombre_vet, apellidos_vet, run_vet, celular_vet, email_vet,  
-          dato_profesional ( foto_perfil )
+          dato_profesional ( foto_perfil,firma_png )
         )
       `)
       .eq('id', this.atencionId)
@@ -148,12 +148,48 @@ export class DetalleAtencionPage implements OnInit {
   }
 }
 
+private dibujarMarcoYPie(doc: jsPDF, numeroPagina: number) {
+  // Dibuja el borde
+  doc.setLineWidth(1);
+  doc.setDrawColor(237, 249, 249);
+  doc.rect(10, 10, 196, 338);
+
+  // Pie de página con número de página centrado abajo
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  const textoPagina = `Página ${numeroPagina}`;
+  const anchoTexto = doc.getTextWidth(textoPagina);
+  const xCentro = (doc.internal.pageSize.getWidth() - anchoTexto) / 2;
+  const yPie = 350;
+  doc.text(textoPagina, xCentro, yPie);
+}
 
 
-  truncarTexto(texto: string, max: number = 80): string {
-    if (!texto) return '-';
-    return texto.length > max ? texto.substring(0, max) + '...' : texto;
+//--------------------------------
+  private escribirTextoMultilinea(
+  doc: jsPDF,
+  texto: string,
+  x: number,
+  y: number,
+  anchoMax: number,
+  salto: number
+): number {
+  const lineas = doc.splitTextToSize(texto, anchoMax);
+  for (let linea of lineas) {
+    if (y >= 300) {
+        doc.addPage();
+        this.dibujarMarcoYPie(doc, doc.getNumberOfPages());
+        y = 20; 
+        doc.setFontSize(10);
+doc.setFont('helvetica', 'normal');
+
+    }
+    doc.text(linea, x, y);
+    y += salto;
   }
+  return y;
+}
+
 
 // ------------------------------------------------------------------------------------ PDF
 // ------------------------------------------------------------------------------------ PDF
@@ -167,10 +203,8 @@ private async generarPdf(): Promise<Blob> {
 
   // Función interna para terminar el PDF y devolverlo como Blob
   const terminarDoc = (): Blob => {
-    // Marco en toda la hoja
-    doc.setLineWidth(1);
-    doc.setDrawColor(237, 249, 249);
-    doc.rect(10, 10, 196, 338);
+    this.dibujarMarcoYPie(doc, 1);
+
 
     // TÍTULO PRINCIPAL
     doc.setFontSize(15);
@@ -299,66 +333,94 @@ private async generarPdf(): Promise<Blob> {
     doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text(`Motivo de consulta: ${this.atencion?.motivo_consulta?.motivo}`, 25, 100);
-    doc.text(`Anamnesis: ${this.atencion?.anamnesis ?? '-'}`, 110, 100);
-    doc.text(`Observaciones: ${this.atencion?.observaciones ?? '-'}`, 25, 105);
+      y = 105;
+      const anamnesisTexto = `Anamnesis: ${this.atencion?.anamnesis ?? '-'}`;
+      y = this.escribirTextoMultilinea(doc, anamnesisTexto, 25, y, 170, 5);
+      const observacionesTexto = `Observaciones: ${this.atencion?.observaciones ?? '-'}`;
+      y = this.escribirTextoMultilinea(doc, observacionesTexto, 25, y, 170, 5);
 //------------------------
     doc.setFont('helvetica', 'bold');
-    doc.text(`EXAMEN GENERAL`, 20, 110);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Mucosas: ${this.atencion?.mucosa ?? '-'}`, 25, 115);
-      doc.text(`Temperatura: ${this.atencion?.temperatura} ºC`, 110, 115);
-    doc.text(`Peso: ${this.atencion?.peso ?? '-'} Kg`, 25, 120);
-      doc.text(`Condición corporal: ${this.atencion?.condicion_corporal ?? '-'}`, 110, 120);
-    doc.text(`Estado sensorial: ${this.atencion?.estado_sensorial?.estado_sensorial ?? '-'}`, 25, 125);
-      doc.text(`Estado hidratación: ${this.atencion?.hidratacion?.estado_hidratacion ?? '-'}`, 110, 125);
-    doc.text(`Observaciones: ${this.atencion?.observacion_examen ?? '-'}`, 25, 130);
- // ------------------
+    doc.text(`EXAMEN GENERAL`, 20,y);
+ y += 5;
+doc.setFont('helvetica', 'normal');
+// 
+        const examenGeneral = [
+          { label: 'Mucosas', valor: this.atencion?.mucosa ?? '-' },
+          { label: 'Temperatura', valor: `${this.atencion?.temperatura ?? '-'} ºC` },
+          { label: 'Peso', valor: `${this.atencion?.peso ?? '-'} Kg` },
+          { label: 'Condición corporal', valor: this.atencion?.condicion_corporal ?? '-' },
+          { label: 'Estado sensorial', valor: this.atencion?.estado_sensorial?.estado_sensorial ?? '-' },
+          { label: 'Estado hidratación', valor: this.atencion?.hidratacion?.estado_hidratacion ?? '-' },
+        ];
+              // Recorremos los pares de 2 en 2 (columna izquierda y derecha)
+              for (let i = 0; i < examenGeneral.length; i += 2) {
+                const itemIzq = examenGeneral[i];
+                const itemDer = examenGeneral[i + 1];
 
- 
+                doc.text(`${itemIzq.label}: ${itemIzq.valor}`, 25, y);
+                if (itemDer) {
+                  doc.text(`${itemDer.label}: ${itemDer.valor}`, 110, y);
+                }
+                y += 5;
+              }
+// Observaciones debajo
+const obsGeneral = `Observaciones: ${this.atencion?.observacion_examen ?? '-'}`;
+y = this.escribirTextoMultilinea(doc, obsGeneral, 25, y, 170, 5);
+
+
+          // ------------------
+          // Título del bloque
+          doc.setFont('helvetica', 'bold');
+          doc.text(`EXAMEN PARTICULAR`, 20, y);
+          y += 5;
+
+
+          doc.setFont('helvetica', 'normal');
+          // Datos del examen particular
+          const examenParticular = [
+            { label: 'Piel y Pelaje', estado: this.atencion?.piel_obp?.estado_piel, obs: this.atencion?.obs_piel },
+            { label: 'Ojos', estado: this.atencion?.ojos_obp?.estado_ojos, obs: this.atencion?.obs_ojos },
+            { label: 'Oídos', estado: this.atencion?.oidos_obp?.estado_oidos, obs: this.atencion?.obs_oidos },
+            { label: 'Dentadura', estado: this.atencion?.dentadura_obp?.estado_dentadura, obs: this.atencion?.obs_dentadura },
+            { label: 'Sistema Digestivo', estado: this.atencion?.sdigestivo_obp?.estado_sdigestivo, obs: this.atencion?.obs_sdigestivo },
+            { label: 'Sistema Cardio Vascular', estado: this.atencion?.scvascular_obp?.estado_scvascular, obs: this.atencion?.obs_scvascular },
+            { label: 'Sistema Respiratorio', estado: this.atencion?.srespiratorio_obp?.estado_srespiratorio, obs: this.atencion?.obs_srespiratorio },
+            { label: 'Sistema Urinario', estado: this.atencion?.surinario_obp?.estado_surinario, obs: this.atencion?.obs_surinario },
+            { label: 'Sistema Nervioso', estado: this.atencion?.snervioso_obp?.estado_snervioso, obs: this.atencion?.obs_snervioso },
+            { label: 'Sistema Linfático', estado: this.atencion?.slinfatico_obp?.estado_slinfatico, obs: this.atencion?.obs_linfatico },
+            { label: 'Sistema Locomotor', estado: this.atencion?.slocomotor_obp?.estado_slocomotor, obs: this.atencion?.obs_slocomotor },
+            { label: 'Sistema Reproductor', estado: this.atencion?.sreproductor_obp?.estado_sreproductor, obs: this.atencion?.obs_sreproductor }
+          ];
+          for (const item of examenParticular) {
+            const linea = `${item.label}: ${item.estado ?? '-'}  • Observación: ${item.obs ?? '-'}`;
+            y = this.escribirTextoMultilinea(doc, linea, 25, y, 170, 5);
+            y += 1;
+          }
+
+// ----------------
+
     doc.setFont('helvetica', 'bold');
-    doc.text(`EXAMEN PARTICULAR`, 20, 135);
-    doc.setFont('helvetica', 'normal');
-    doc.text(`Piel y Pelaje: ${this.atencion?.piel_obp?.estado_piel ?? '-'}`, 25, 140);
-              doc.text(`• Observación: ${this.truncarTexto(this.atencion?.obs_piel)}`, 30, 145);
-    doc.text(`Ojos: ${this.atencion?.ojos_obp?.estado_ojos ?? '-'}`, 25, 150);
-              doc.text(`• Observación: ${this.truncarTexto(this.atencion?.obs_ojos)}`, 30, 155);
-    doc.text(`Oídos: ${this.atencion?.oidos_obp?.estado_oidos ?? '-'}`, 25, 160);
-              doc.text(`• Observación: ${this.atencion?.obs_oidos ?? '-'}`, 30, 165);     
-    doc.text(`Dentadura: ${this.atencion?.dentadura_obp?.estado_dentadura ?? '-'}`, 25, 170);
-              doc.text(`• Observación: ${this.truncarTexto(this.atencion?.obs_dentadura)}`, 30, 175);
-    doc.text(`Sistema Digestivo: ${this.atencion?.sdigestivo_obp?.estado_sdigestivo ?? '-'}`, 25, 180);  
-              doc.text(`• Observación: ${this.truncarTexto(this.atencion?.obs_sdigestivo) ?? '-'}`, 30, 185);
-    doc.text(`Sistema Cardio Vascular: ${this.atencion?.scvascular_obp?.estado_scvascular ?? '-'}`, 25, 190);
-              doc.text(`• Observación: ${this.truncarTexto(this.atencion?.obs_scvascular) ?? '-'}`, 30, 195); 
-    doc.text(`Sistema Respiratorio: ${this.atencion?.srespiratorio_obp?.estado_srespiratorio ?? '-'}`, 30, 200);
-              doc.text(`• Observación: ${this.truncarTexto(this.atencion?.obs_srespiratorio) ?? '-'}`, 30, 205); 
-    doc.text(`Sistema Urinario: ${this.atencion?.surinario_obp?.estado_surinario ?? '-'}`, 25, 210);
-              doc.text(`• Observación: ${this.truncarTexto(this.atencion?.obs_surinario) ?? '-'}`, 30, 215); 
-    doc.text(`Sistema Nervioso: ${this.atencion?.snervioso_obp?.estado_snervioso ?? '-'}`, 25, 220);
-              doc.text(`• Observación: ${this.truncarTexto(this.atencion?.obs_snervioso) ?? '-'}`, 30, 225); 
-    doc.text(`Sistema Linfático: ${this.atencion?.slinfatico_obp?.estado_slinfatico ?? '-'}`, 25, 230);
-              doc.text(`• Observación: ${this.truncarTexto(this.atencion?.obs_linfatico) ?? '-'}`, 30, 235); 
-    doc.text(`Sistema Locomotor: ${this.atencion?.slocomotor_obp?.estado_slocomotor ?? '-'}`, 25, 240);  
-                  doc.text(`• Observación: ${this.truncarTexto(this.atencion?.obs_surinario) ?? '-'}`, 30, 245); 
-    doc.text(`Sistema Reproductor: ${this.atencion?.sreproductor_obp?.estado_sreproductor ?? '-'}`, 25, 250); 
-              doc.text(`• Observación: ${this.truncarTexto(this.atencion?.obs_sreproductor) ?? '-'}`, 30, 255); 
+    y += 5;
+    doc.text(`ALIMENTACIÓN`, 20,y);
+    y += 5;
+          const alimentacionTexto = 
+            `Tipo Alimentación: ${this.atencion?.tipo_alimentacion?.tipo_alimentacion ?? '-'}\n` +
+            `Cantidad de Alimentación: ${this.atencion?.cantidad_alimentacion ?? '-'}\n` +
+            `Veces al día: ${this.atencion?.veces_alimentaión ?? '-'}`;
+doc.setFont('helvetica', 'normal');
+y = this.escribirTextoMultilinea(doc, alimentacionTexto, 25, y, 170, 5);
 
-    // ----------------
+ // Diagnostico
+y += 5;
+doc.setFont('helvetica', 'bold');
+doc.text('Diagnóstico:', 20, y);
+doc.setFont('helvetica', 'normal');
+doc.text(this.atencion?.diagnostico ?? '-', 20 + doc.getTextWidth('Diagnóstico: ') + 2, y);
 
-    doc.setFont('helvetica', 'bold');
-    doc.text(`ALIMENTACIÓN`, 20, 260);
-    doc.setFont('helvetica', 'normal');
-          doc.text(`Tipo Alimentación: ${this.atencion?.tipo_alimentacion?.tipo_alimentacion ?? '-'}`, 25, 265);
-          doc.text(`Cantidad de Alimentación: ${this.atencion?.cantidad_alimentacion ?? '-'}`, 25, 270);
-          doc.text(`Veces al día: ${this.atencion?.veces_alimentaión ?? '-'}`, 25, 275); 
-          doc.text(`Diagnóstico: ${this.atencion?.diagnostico ?? '-'}`, 20, 285);
-
-    doc.setFont('helvetica', 'bold');
-    doc.text(`TRATAMIENTO/INDICACIONES`, 20, 290);
-    doc.setFont('helvetica', 'normal');       
 
     // DATOS VETERINARIO
-    doc.setFontSize(10);
+
+            doc.setFontSize(10);
     doc.setFont('helvetica', 'normal');
     doc.text(`MV ${this.atencion?.veterinario?.nombre_vet} ${this.atencion?.veterinario?.apellidos_vet}`, 105, 335, { align: 'center' });
     doc.text(`${this.atencion?.veterinario?.run_vet}`, 105, 340, { align: 'center' });
@@ -369,26 +431,59 @@ private async generarPdf(): Promise<Blob> {
     return doc.output('blob');
   };
 
-  // Si hay logo, cargar la imagen antes de terminar
-  if (this.logoVet && this.logoVet.startsWith('http')) {
-    return new Promise<Blob>((resolve) => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';  
-      img.onload = () => {
-        doc.addImage(img, 'PNG', 160, 10, 30, 30);
-        resolve(terminarDoc());
-      };
-      img.onerror = () => {
-        console.warn('No se pudo cargar la imagen del logo.');
-        resolve(terminarDoc());
-      };
-      img.src = this.logoVet;
-    });
-  } else {
-    return terminarDoc();
-  }
-}
+  // Si hay logo y firma , cargar la imagen antes de terminar
+//
+if (this.logoVet?.startsWith('http') || this.atencion?.veterinario?.dato_profesional?.firma_png?.startsWith('http')) {
+  return new Promise<Blob>((resolve) => {
+    const logoImg = new Image();
+    const firmaImg = new Image();
+    let logoCargado = false;
+    let firmaCargada = false;
 
+    const terminarSiListo = () => {
+      if ((logoCargado || !this.logoVet) && (firmaCargada || !this.atencion?.veterinario?.dato_profesional?.firma_png)) {
+        resolve(terminarDoc());
+      }
+    };
+
+    if (this.logoVet?.startsWith('http')) {
+      logoImg.crossOrigin = 'anonymous';
+      logoImg.onload = () => {
+        doc.addImage(logoImg, 'PNG', 160, 10, 40, 30);
+        logoCargado = true;
+        terminarSiListo();
+      };
+      logoImg.onerror = () => {
+        console.warn('No se pudo cargar el logo.');
+        logoCargado = true;
+        terminarSiListo();
+      };
+      logoImg.src = this.logoVet;
+    } else {
+      logoCargado = true;
+    }
+
+    if (this.atencion?.veterinario?.dato_profesional?.firma_png?.startsWith('http')) {
+      firmaImg.crossOrigin = 'anonymous';
+      firmaImg.onload = () => {
+        doc.addImage(firmaImg, 'PNG', 70, 300, 70, 30); // Ajusta posición/tamaño si lo deseas
+        firmaCargada = true;
+        terminarSiListo();
+      };
+      firmaImg.onerror = () => {
+        console.warn('No se pudo cargar la firma.');
+        firmaCargada = true;
+        terminarSiListo();
+      };
+      firmaImg.src = this.atencion.veterinario.dato_profesional.firma_png;
+    } else {
+      firmaCargada = true;
+    }
+  });
+} else {
+  return terminarDoc();
+}
+}
 // ------------------------------------------------------------- EXPORTAR PDF PRUEBA (solo para navegador)
 exportarPdfPrueba() {
   this.generarPdf().then(pdfBlob => {
