@@ -32,12 +32,12 @@ export class AgregarTutorPage implements OnInit {
 
   async ngOnInit() {
     this.tutorForm = this.fb.group({
-      run_tutor: ['', this.rutValidator], // opcional
+      run_tutor: [''], // opcional
       nombre_tutor: ['', Validators.required],
       apellidos_tutor: ['', Validators.required],
       direccion_tutor: [''], // opcional
       correo_tutor: ['', Validators.email], // solo validación de email, no requerido
-      celular_tutor: ['', [Validators.required, Validators.maxLength(11), Validators.pattern('^[0-9]*$')]],
+      celular_tutor: ['', [Validators.required, Validators.maxLength(11)]],
       id_region: [''], // opcional
       id_ciudad: ['']  // opcional
     });
@@ -91,49 +91,30 @@ export class AgregarTutorPage implements OnInit {
     }
   }
 
-  rutValidator(control: AbstractControl) {
-    const run = control.value;
-    if (!run) return null;
 
-    const rut = run.toString().replace(/\./g, '').replace(/-/g, '').toUpperCase();
-    if (rut.length < 2) return { invalidRut: true };
 
-    const cuerpo = rut.slice(0, -1);
-    const dv = rut.slice(-1);
+async guardarTutor() {
+  if (this.tutorForm.invalid || !this.runVet) return;
 
-    let suma = 0;
-    let multiplo = 2;
+  const formValue = { ...this.tutorForm.value };
 
-    for (let i = cuerpo.length - 1; i >= 0; i--) {
-      suma += parseInt(cuerpo.charAt(i)) * multiplo;
-      multiplo = multiplo < 7 ? multiplo + 1 : 2;
-    }
+  formValue.celular_tutor = formValue.celular_tutor ? Number(formValue.celular_tutor) : null;
+  formValue.id_region = formValue.id_region ? Number(formValue.id_region) : null;
+  formValue.id_ciudad = formValue.id_ciudad ? Number(formValue.id_ciudad) : null;
 
-    const dvEsperado = 11 - (suma % 11);
-    const dvCalc = dvEsperado === 11 ? '0' : dvEsperado === 10 ? 'K' : dvEsperado.toString();
+  const nuevoTutor = {
+    ...formValue,
+    run_vet: this.runVet
+  };
 
-    if (dv !== dvCalc) {
-      return { invalidRut: true };
-    }
-
-    return null;
-  }
-
-  async guardarTutor() {
-    if (this.tutorForm.invalid || !this.runVet) return;
-
-    const nuevoTutor = {
-      ...this.tutorForm.value,
-      run_vet: this.runVet
-    };
-
-    const { error } = await supabase.from('tutor').insert(nuevoTutor);
-    if (error) {
-      console.error('Error al guardar tutor:', error);
-    } else {
-      console.log('Tutor guardado con éxito');
-      this.tutorForm.reset();
-    }
+  const { error } = await supabase.from('tutor').insert(nuevoTutor);
+  if (error) {
+    console.error('Error al guardar tutor:', error);
+  } else {
+    console.log('Tutor guardado con éxito');
+    this.tutorForm.reset();
     this.router.navigate(['/tutor']);
   }
+}
+
 }

@@ -71,3 +71,16 @@ ion-select::part(text) {
 
 }
 
+.botones-fecha-hora {
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+
+  ion-button {
+    flex: 1;
+  }
+}
+
+ion-textarea {
+  width: 100%;
+}

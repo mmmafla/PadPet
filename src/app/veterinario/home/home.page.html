@@ -1,8 +1,7 @@
-<ion-header class="ion-safe-area-top ion-no-border">
-  <app-header title=""></app-header>
-</ion-header>
+ <app-header title=""></app-header>
 
-<ion-content fullscreen="true" class="ion-padding fondo">
+
+<ion-content class="fondo" [fullscreen]="true">
 
   <!-- Mensaje de solicitud -->
   <ion-card *ngIf="mostrarMensajeSolicitud" [color]="getColorEstado()" class="ion-padding position-relative" style="border-radius: 20px;">
@@ -40,7 +39,7 @@
     <ion-row>
 
       <!-- Tutores -->
-      <ion-col size="6">
+      <ion-col size="6" [routerLink]="['/tutor']">
         <ion-item-sliding
           class="ion-card-importantes"
           #slidingItem

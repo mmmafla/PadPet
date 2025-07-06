@@ -2,12 +2,12 @@
   <app-header backButton="/tutor" title=""></app-header>
 </ion-header>
 
-<ion-content fullscreen="true" class="ion-padding fondo">
+<ion-content [fullscreen]="true" class="fondo">
   
   <ion-card class="ion-card">
       <h2>Nuevo tutor</h2>
       
-    <form [formGroup]="tutorForm" (ngSubmit)="guardarTutor()">
+    <form [formGroup]="tutorForm" >
       <ion-list>
         <ion-item>
           <ion-label position="stacked">RUN Tutor</ion-label>
@@ -43,8 +43,7 @@
             Celular <span class="requerido">*</span>
           </ion-label>
           <ion-input
-            type="tel"
-            inputmode="numeric"
+            type="number"
             maxlength="11"
             formControlName="celular_tutor"
           ></ion-input>

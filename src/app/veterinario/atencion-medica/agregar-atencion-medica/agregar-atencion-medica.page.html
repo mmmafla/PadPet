@@ -156,7 +156,7 @@
             </ion-item>
             <div slot="content">
               <ion-item>
-                <ion-textarea label="Mucosa" [(ngModel)]="atencion.mucosa" name="mucosa"></ion-textarea>
+                <ion-textarea label="Mucosas" [(ngModel)]="atencion.mucosa" name="mucosa"></ion-textarea>
               </ion-item>
 
               <ion-item>
@@ -168,7 +168,8 @@
               </ion-item>
 
               <ion-item>
-                <ion-textarea label="Condición corporal" [(ngModel)]="atencion.condicion_corporal" name="condicion_corporal"></ion-textarea>
+                  <ion-label position="stacked">Condicion corporal</ion-label>
+                <ion-textarea [(ngModel)]="atencion.condicion_corporal" name="condicion_corporal"></ion-textarea>
               </ion-item>
 
               <ion-item>
@@ -188,7 +189,8 @@
               </ion-item>
 
               <ion-item>
-                <ion-textarea label="Observaciones" [(ngModel)]="atencion.observacion" name="observacion"></ion-textarea>
+                <ion-label position="stacked">Observaciones</ion-label>
+                <ion-textarea [(ngModel)]="atencion.observacion" name="observacion"></ion-textarea>
               </ion-item>
             </div>
           </ion-accordion>
@@ -210,9 +212,8 @@
                 </ion-select>
               </ion-item>
               <ion-item>
-                <i>
-                  <ion-input label="‣ Observación" type="text" [(ngModel)]="atencion.obs_piel" name="obs_piel"></ion-input>
-                </i>
+                  <ion-label position="stacked" class="italic">‣ Observacion</ion-label>
+                  <ion-textarea type="text" [(ngModel)]="atencion.obs_piel" name="obs_piel"></ion-textarea>
               </ion-item>
 
               <!-- Ojos -->
@@ -224,9 +225,8 @@
                 </ion-select>
               </ion-item>
               <ion-item>
-                <i>
-                  <ion-input label="‣ Observación" type="text" [(ngModel)]="atencion.obs_ojos" name="obs_ojos"></ion-input>
-                </i>
+                  <ion-label position="stacked" class="italic">‣ Observacion</ion-label>
+                  <ion-textarea type="text" [(ngModel)]="atencion.obs_ojos" name="obs_ojos"></ion-textarea>
               </ion-item>
 
               <!-- Oídos -->
@@ -238,9 +238,9 @@
                 </ion-select>
               </ion-item>
               <ion-item>
-                <i>
-                  <ion-input label="‣ Observación" type="text" [(ngModel)]="atencion.obs_oidos" name="obs_oidos"></ion-input>
-                </i>
+                  <ion-label position="stacked" class="italic">‣ Observacion</ion-label>
+                  <ion-textarea type="text" [(ngModel)]="atencion.obs_oidos" name="obs_oidos"></ion-textarea>
+
               </ion-item>
 
               <!-- Dentadura -->
@@ -252,9 +252,9 @@
                 </ion-select>
               </ion-item>
               <ion-item>
-                <i>
-                  <ion-input label="‣ Observación" type="text" [(ngModel)]="atencion.obs_dentadura" name="obs_dentadura"></ion-input>
-                </i>
+                  <ion-label position="stacked" class="italic">‣ Observacion</ion-label>
+                  <ion-textarea type="text" [(ngModel)]="atencion.obs_dentadura" name="obs_dentadura"></ion-textarea>
+
               </ion-item>
 
               <!-- Sistema Digestivo -->
@@ -266,9 +266,8 @@
                 </ion-select>
               </ion-item>
               <ion-item>
-                <i>
-                  <ion-input label="‣ Observación" type="text" [(ngModel)]="atencion.obs_sdigestivo" name="obs_sdigestivo"></ion-input>
-                </i>
+                  <ion-label position="stacked" class="italic">‣ Observacion</ion-label>
+                  <ion-textarea type="text" [(ngModel)]="atencion.obs_sdigestivo" name="obs_sdigestivo"></ion-textarea>
               </ion-item>
 
               <!-- Sistema Cardiovascular -->
@@ -280,9 +279,8 @@
                 </ion-select>
               </ion-item>
               <ion-item>
-                <i>
-                  <ion-input label="‣ Observación" type="text" [(ngModel)]="atencion.obs_scvascular" name="obs_scvascular"></ion-input>
-                </i>
+                  <ion-label position="stacked" class="italic">‣ Observacion</ion-label>
+                  <ion-textarea type="text" [(ngModel)]="atencion.obs_scvascular" name="obs_scvascular"></ion-textarea>
               </ion-item>
 
               <!-- Sistema Respiratorio -->
@@ -294,9 +292,9 @@
                 </ion-select>
               </ion-item>
               <ion-item>
-                <i>
-                  <ion-input label="‣ Observación" type="text" [(ngModel)]="atencion.obs_srespiratorio" name="obs_srespiratorio"></ion-input>
-                </i>
+                  <ion-label position="stacked" class="italic">‣ Observacion</ion-label>
+                  <ion-textarea type="text" [(ngModel)]="atencion.obs_srespiratorio" name="obs_srespiratorio"></ion-textarea>
+
               </ion-item>
 
               <!-- Sistema Urinario -->
@@ -308,9 +306,9 @@
                 </ion-select>
               </ion-item>
               <ion-item>
-                <i>
-                  <ion-input label="‣ Observación" type="text" [(ngModel)]="atencion.obs_surinario" name="obs_surinario"></ion-input>
-                </i>
+                  <ion-label position="stacked" class="italic">‣ Observacion</ion-label>
+                  <ion-textarea type="text" [(ngModel)]="atencion.obs_surinario" name="obs_surinario"></ion-textarea>
+
               </ion-item>
 
               <!-- Sistema Nervioso -->
@@ -322,9 +320,9 @@
                 </ion-select>
               </ion-item>
               <ion-item>
-                <i>
-                  <ion-input label="‣ Observación" type="text" [(ngModel)]="atencion.obs_snervioso" name="obs_snervioso"></ion-input>
-                </i>
+                  <ion-label position="stacked" class="italic">‣ Observacion</ion-label>
+                  <ion-textarea type="text" [(ngModel)]="atencion.obs_snervioso" name="obs_snervioso"></ion-textarea>
+
               </ion-item>
 
               <!-- Sistema Linfático -->
@@ -336,9 +334,9 @@
                 </ion-select>
               </ion-item>
               <ion-item>
-                <i>
-                  <ion-input label="‣ Observación" type="text" [(ngModel)]="atencion.obs_slinfatico" name="obs_slinfatico"></ion-input>
-                </i>
+                  <ion-label position="stacked" class="italic">‣ Observacion</ion-label>
+                  <ion-textarea type="text" [(ngModel)]="atencion.obs_slinfatico" name="obs_slinfatico"></ion-textarea>
+
               </ion-item>
 
               <!-- Sistema Locomotor -->
@@ -350,9 +348,8 @@
                 </ion-select>
               </ion-item>
               <ion-item>
-                <i>
-                  <ion-input label="‣ Observación" type="text" [(ngModel)]="atencion.obs_slocomotor" name="obs_slocomotor"></ion-input>
-                </i>
+                  <ion-label position="stacked" class="italic">‣ Observacion</ion-label>
+                  <ion-textarea type="text" [(ngModel)]="atencion.obs_slocomotor" name="obs_slocomotor"></ion-textarea>
               </ion-item>
 
               <!-- Sistema Reproductor -->
@@ -364,9 +361,8 @@
                 </ion-select>
               </ion-item>
               <ion-item>
-                <i>
-                  <ion-input label="‣ Observación" type="text" [(ngModel)]="atencion.obs_sreproductor" name="obs_sreproductor"></ion-input>
-                </i>
+                  <ion-label position="stacked" class="italic">‣ Observacion</ion-label>
+                  <ion-textarea type="text" [(ngModel)]="atencion.obs_sreproductor" name="obs_sreproductor"></ion-textarea>
               </ion-item>
             </div>
           </ion-accordion>
@@ -375,19 +371,20 @@
         <!-- Diagnóstico -->
         <ion-item class="consulta-item" lines="none">
           <ion-label position="stacked">Diagnóstico</ion-label>
-          <ion-textarea [(ngModel)]="atencion.diagnostico" name="diagnostico" placeholder="Diagnóstico..."></ion-textarea>
+          <ion-textarea [(ngModel)]="atencion.diagnostico" name="diagnostico"></ion-textarea>
         </ion-item>
 
         <!-- Tratamiento -->
         <ion-accordion-group expand="inset">
           <ion-accordion>
             <ion-item slot="header" class="acordeon-consulta" lines="none">
-              <ion-label><strong>Tratamiento</strong></ion-label>
+              <ion-label><strong>Tratamiento/Receta</strong></ion-label>
             </ion-item>
             <div slot="content">
 
               <ion-item>
-                <ion-textarea label="Indicaciones: " [(ngModel)]="atencion.tratamiento_indicaciones" name="indicaciones"></ion-textarea>
+                <ion-label position="stacked" >Indicaciones</ion-label>
+                <ion-textarea [(ngModel)]="atencion.tratamiento_indicaciones" name="indicaciones"></ion-textarea>
               </ion-item>
 
               <!-- Botón agregar medicamento -->
@@ -411,19 +408,23 @@
                 </ion-button>
 
                 <ion-item>
-                  <ion-textarea label="Medicamento: " [(ngModel)]="med.nombre" name="nombreMedicamento{{i}}"></ion-textarea>
+                  <ion-label position="stacked" >Medicamento</ion-label>
+                  <ion-textarea [(ngModel)]="med.nombre" name="nombreMedicamento{{i}}"></ion-textarea>
                 </ion-item>
 
                 <ion-item>
-                  <ion-textarea label="Dosis: " [(ngModel)]="med.dosis" name="dosisMedicamento{{i}}"></ion-textarea>
+                  <ion-label position="stacked" >Dosis</ion-label>
+                  <ion-textarea [(ngModel)]="med.dosis" name="dosisMedicamento{{i}}"></ion-textarea>
                 </ion-item>
 
                 <ion-item>
-                  <ion-textarea label="Frecuencia (hrs): " [(ngModel)]="med.frecuencia" name="frecuenciaMedicamento{{i}}"></ion-textarea>
+                    <ion-label position="stacked" >Frecuencia (hrs)</ion-label>
+                  <ion-textarea [(ngModel)]="med.frecuencia" name="frecuenciaMedicamento{{i}}"></ion-textarea>
                 </ion-item>
 
-                <ion-item>
-                  <ion-textarea label="Duración tratamiento: " [(ngModel)]="med.duracion" name="duracionMedicamento{{i}}"></ion-textarea>
+                <ion-item lines="none">
+                  <ion-label position="stacked" >Duración tratamiento</ion-label>
+                  <ion-textarea [(ngModel)]="med.duracion" name="duracionMedicamento{{i}}"></ion-textarea>
                 </ion-item>
               </div>
 
@@ -437,9 +438,6 @@
           <ion-textarea [(ngModel)]="atencion.observaciones" name="observaciones" placeholder="Observaciones..."></ion-textarea>
         </ion-item>
 
-        <ion-item lines="none">
-          <ion-label>Próximo control</ion-label>
-        </ion-item>
 
         <ion-button (click)="guardarAtencion()" class="boton-guardar-generico">
           <ion-icon name="save-outline" slot="start"></ion-icon>

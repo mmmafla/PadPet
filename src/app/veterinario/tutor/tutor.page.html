@@ -1,8 +1,7 @@
-<ion-header class="ion-safe-area-top ion-no-border">
-  <app-header backButton="/home" title=""></app-header>
-</ion-header>
 
-<ion-content fullscreen="true" class="ion-padding fondo">
+<app-header backButton="/home" title=""></app-header>
+
+<ion-content class="fondo" [fullscreen]="true">
 
   <!-- Refresher -->
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">

@@ -42,7 +42,7 @@ export class MascotasPage implements OnInit {
     // 1. Mascotas básicas filtrando por id_tutor
     const { data: mascotasData, error: err1 } = await supabase
       .from('mascota')
-      .select('id_masc, masc_nom, id_raza, id_estado, id_tutor')
+  .select('*')
       .eq('id_tutor', this.idTutor);
 
     if (err1) {
@@ -82,17 +82,16 @@ export class MascotasPage implements OnInit {
 
     // 5. Combinar datos
     this.mascotas = mascotasData.map(mascota => {
-      const raza = razasData.find(r => r.id_raza === mascota.id_raza);
-      const especie = raza ? especiesData.find(e => e.id_especie === raza.id_especie) : null;
-      const estado = estadosData.find(s => s.id_estado === mascota.id_estado);
+    const especie = especiesData.find(e => e.id_especie === mascota.id_especie);
+    const estado = estadosData.find(e => e.id_estado === mascota.id_estado);
+    return {
 
-      return {
-        id_masc: mascota.id_masc,
-        masc_nom: mascota.masc_nom,
-        nom_especie: especie ? especie.nom_especie : 'N/D',
-        estado: estado ? estado.estado : 'N/D'
-      };
-    });
+          id_masc: mascota.id_masc,
+          masc_nom: mascota.masc_nom,
+          nom_especie: especie? especie.nom_especie : 'N/D',
+          estado: estado? estado.estado :'N/D',
+        };
+      });
   }
 
   irAgregarMascota() {

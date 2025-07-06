@@ -5,10 +5,12 @@
 <ion-content class="fondo" [fullscreen]="true">
 
 <ion-card class="card3" *ngIf="atencion">
+
+<h2>Modificar consulta</h2>
   <ion-list class="formulario-editar">
 <!--------------------------------------------------------------------------------->
     <ion-item>
-      <ion-label slot="start">Motivo de consulta</ion-label>
+      <ion-label position="stacked">Motivo de consulta</ion-label>
       <ion-select [(ngModel)]="atencion.motivo_id" name="motivo_id" interface="popover">
         <ion-select-option *ngFor="let motivo of motivosDisponibles" [value]="motivo.id">
           {{ motivo.motivo }}
@@ -17,17 +19,17 @@
     </ion-item>
 
     <ion-item>
-      <ion-label slot="start">Anamnesis</ion-label>
-      <ion-input [(ngModel)]="atencion.anamnesis"></ion-input>
+      <ion-label position="stacked">Anamnesis</ion-label>
+      <ion-textarea [(ngModel)]="atencion.anamnesis"></ion-textarea>
     </ion-item>
 
     <ion-item>
-      <ion-label slot="start">Diagnóstico</ion-label>
+      <ion-label position="stacked">Diagnóstico</ion-label>
       <ion-input [(ngModel)]="atencion.diagnostico"></ion-input>
     </ion-item>
 
     <ion-item>
-      <ion-label slot="start">Observaciones</ion-label>
+      <ion-label position="stacked">Observaciones</ion-label>
       <ion-textarea [(ngModel)]="atencion.observaciones"></ion-textarea>
     </ion-item>
 <!--------------------------------------------------------------------------------->
@@ -35,27 +37,27 @@
   <h3 style="text-align: center; margin-top: 16px;">Examen General</h3>
 
     <ion-item>
-      <ion-label slot="start">Mucosas</ion-label>
+      <ion-label position="stacked">Mucosas</ion-label>
       <ion-textarea [(ngModel)]="atencion.mucosa"></ion-textarea>
     </ion-item>
 
     <ion-item>
-      <ion-label slot="start">Temperatura (°C)</ion-label>
+      <ion-label position="stacked">Temperatura (°C)</ion-label>
       <ion-input type="number" [(ngModel)]="atencion.temperatura"></ion-input>
     </ion-item>
 
     <ion-item>
-      <ion-label slot="start">Peso (Kg)</ion-label>
+      <ion-label position="stacked">Peso (Kg)</ion-label>
       <ion-input type="number" [(ngModel)]="atencion.peso"></ion-input>
     </ion-item>
 
     <ion-item>
-      <ion-label slot="start">Condición corporal</ion-label>
+      <ion-label position="stacked">Condición corporal</ion-label>
       <ion-input [(ngModel)]="atencion.condicion_corporal"></ion-input>
     </ion-item>
 
     <ion-item>
-      <ion-label slot="start">Estado sensorial</ion-label>
+      <ion-label position="stacked">Estado sensorial</ion-label>
       <ion-select [(ngModel)]="atencion.estado_sensorial_id" name="estado_sensorial_id" interface="popover">
         <ion-select-option *ngFor="let estado of estadoSensorial" [value]="estado.id_estado_sensorial">
           {{ estado.estado_sensorial }}
@@ -64,7 +66,7 @@
     </ion-item>
 
     <ion-item>
-      <ion-label slot="start">Hidratación</ion-label>
+      <ion-label position="stacked">Hidratación</ion-label>
       <ion-select [(ngModel)]="atencion.hidratacion_id" name="hidratacion_id" interface="popover">
         <ion-select-option *ngFor="let h of nivelesHidratacion" [value]="h.hidratacion_id">
           {{ h.estado_hidratacion }}
@@ -75,7 +77,7 @@
 <!------------------------------ALIMENTACION---------------------------------->
     <h3 style="text-align: center; margin-top: 16px;">Alimentación</h3>
     <ion-item>
-      <ion-label slot="start">Tipo de Alimentación</ion-label>
+      <ion-label position="stacked">Tipo de Alimentación</ion-label>
         <ion-select [(ngModel)]="atencion.id_tipo_alimentacion" name="id_tipo_alimentacion" interface="popover">
         <ion-select-option *ngFor="let ta of tipoAlimentacionOpciones" [value]="ta.id_tipo_alimentacion">
           {{ ta.tipo_alimentacion }}
@@ -84,32 +86,33 @@
     </ion-item>
 
     <ion-item>
-       <ion-label slot="start">Cantidad (gr/ml)</ion-label>     
+       <ion-label position="stacked">Cantidad (gr/ml)</ion-label>     
       <ion-input type="number" [(ngModel)]="atencion.cantidad_alimentacion">  </ion-input>
     </ion-item>
     <ion-item>
-      <ion-label slot="start">Veces al día</ion-label>
+      <ion-label position="stacked">Veces al día</ion-label>
       <ion-input  type="number" [(ngModel)]="atencion.veces_alimentacion" > </ion-input>
     </ion-item>
 
 <!------------------------------EXAMEN PARTICULAR---------------------------------->
     <h3 style="text-align: center; margin-top: 16px;">Examen Particular</h3>
 
-    <ion-item>
+    <ion-item  lines="none">
       <ion-label slot="start">Piel y Pelaje</ion-label>
         <ion-select [(ngModel)]="atencion.id_piel" name="id_piel" interface="popover">
         <ion-select-option *ngFor="let p of pielOpciones" [value]="p.id_piel">
           {{ p.estado_piel }}
-        </ion-select-option>
-      </ion-select>
+        </ion-select-option >
+      </ion-select >
     </ion-item>
 
-          <ion-item> <i>
-            <ion-input label="Obs:" [(ngModel)]="atencion.obs_piel"></ion-input></i>
+          <ion-item> 
+          <ion-label position="stacked">Observaciones</ion-label>
+            <ion-textarea  [(ngModel)]="atencion.obs_piel"></ion-textarea>
           </ion-item>
 
 
-    <ion-item>
+    <ion-item  lines="none">
       <ion-label slot="start">Ojos</ion-label>
         <ion-select [(ngModel)]="atencion.id_ojos" name="id_ojos" interface="popover">
         <ion-select-option *ngFor="let o of ojosOpciones" [value]="o.id_ojos">
@@ -118,12 +121,13 @@
       </ion-select>
     </ion-item>
 
-          <ion-item><i>
-            <ion-input label="Obs:" [(ngModel)]="atencion.obs_ojos"></ion-input></i>
+          <ion-item>
+            <ion-label position="stacked">Observaciones</ion-label>
+            <ion-textarea  [(ngModel)]="atencion.obs_ojos"></ion-textarea >
           </ion-item>
 
 
-    <ion-item>
+    <ion-item  lines="none">
       <ion-label slot="start">Oidos</ion-label>
         <ion-select [(ngModel)]="atencion.id_oidos" name="id_oidos" interface="popover">
         <ion-select-option *ngFor="let o of oidosOpciones" [value]="o.id_oidos">
@@ -132,11 +136,12 @@
       </ion-select>
     </ion-item>
 
-          <ion-item> <i>
-            <ion-input label="Obs:" [(ngModel)]="atencion.obs_oidos"></ion-input></i>
+          <ion-item>
+            <ion-label position="stacked">Observaciones</ion-label>
+            <ion-textarea  [(ngModel)]="atencion.obs_oidos"></ion-textarea >
           </ion-item>
 
-    <ion-item>
+    <ion-item  lines="none">
       <ion-label slot="start">Dentadura</ion-label>
         <ion-select [(ngModel)]="atencion.id_dentadura" name="id_dentadura" interface="popover">
         <ion-select-option *ngFor="let d of dentaduraOpciones" [value]="d.id_dentadura">
@@ -145,11 +150,12 @@
       </ion-select>
     </ion-item>
 
-          <ion-item><i>
-            <ion-input  label="Obs:" [(ngModel)]="atencion.obs_dentadura"></ion-input></i>
+          <ion-item>
+            <ion-label position="stacked">Observaciones</ion-label>
+            <ion-textarea   [(ngModel)]="atencion.obs_dentadura"></ion-textarea >
           </ion-item>
 <!-----------------------------sistema digestivo---------------------------------------------------->
-    <ion-item>
+    <ion-item  lines="none">
      <ion-label slot="start">Sistema Digestivo</ion-label>
         <ion-select [(ngModel)]="atencion.id_sdigestivo" name="id_sdigestivo" interface="popover">
         <ion-select-option *ngFor="let sd of sDigestivoOpciones" [value]="sd.id_sdigestivo">
@@ -157,11 +163,12 @@
         </ion-select-option>
       </ion-select> 
     </ion-item>
-          <ion-item><i>
-            <ion-input  label="Obs:" [(ngModel)]="atencion.obs_sdigestivo"></ion-input></i>
+          <ion-item>
+            <ion-label position="stacked">Observaciones</ion-label>
+            <ion-textarea   [(ngModel)]="atencion.obs_sdigestivo"></ion-textarea >
           </ion-item>
 <!-----------------------------sistema cardio vascular---------------------------------------------------->
-    <ion-item>
+    <ion-item  lines="none">
      <ion-label slot="start">Sistema Cardio Vascular</ion-label>
         <ion-select [(ngModel)]="atencion.id_scvascular" name="id_scvascular" interface="popover">
         <ion-select-option *ngFor="let scv of sCardioVascularOpciones" [value]="scv.id_scvascular">
@@ -169,11 +176,12 @@
         </ion-select-option>
       </ion-select> 
     </ion-item>
-          <ion-item><i>
-            <ion-input  label="Obs:" [(ngModel)]="atencion.obs_scvascular"></ion-input></i>
+          <ion-item>
+            <ion-label position="stacked">Observaciones</ion-label>
+            <ion-textarea  [(ngModel)]="atencion.obs_scvascular"></ion-textarea >
           </ion-item>
 <!-----------------------------sistema Respiratorio--------------------------------------------------->
-    <ion-item>
+    <ion-item  lines="none">
      <ion-label slot="start">Sistema Respiratorio</ion-label>
         <ion-select [(ngModel)]="atencion.id_srespiratorio" name="id_srespiratorio" interface="popover">
         <ion-select-option *ngFor="let sr of sRespiratorioOpciones" [value]="sr.id_srespiratorio">
@@ -181,12 +189,13 @@
         </ion-select-option>
       </ion-select> 
     </ion-item>
-          <ion-item><i>
-            <ion-input  label="Obs:" [(ngModel)]="atencion.obs_srespiratorio"></ion-input></i>
+          <ion-item>
+            <ion-label position="stacked">Observaciones</ion-label>
+            <ion-textarea   [(ngModel)]="atencion.obs_srespiratorio"></ion-textarea >
           </ion-item>
 
 <!-----------------------------sistema urinario---------------------------------------------------->
-    <ion-item>
+    <ion-item  lines="none">
      <ion-label slot="start">Sistema Urinario</ion-label>
         <ion-select [(ngModel)]="atencion.id_surinario" name="id_surinario" interface="popover">
         <ion-select-option *ngFor="let su of sUrinarioOpciones" [value]="su.id_surinario">
@@ -194,12 +203,13 @@
         </ion-select-option>
       </ion-select> 
     </ion-item>
-          <ion-item><i>
-            <ion-input  label="Obs:" [(ngModel)]="atencion.obs_surinario"></ion-input></i>
+          <ion-item>
+            <ion-label position="stacked">Observaciones</ion-label>
+            <ion-textarea  [(ngModel)]="atencion.obs_surinario"></ion-textarea >
           </ion-item>
 
 <!-----------------------------sistema nervioso---------------------------------------------------->
-    <ion-item>
+    <ion-item  lines="none">
      <ion-label slot="start">Sistema Nervioso</ion-label>
         <ion-select [(ngModel)]="atencion.id_snervioso" name="id_snervioso" interface="popover">
         <ion-select-option *ngFor="let n of sNerviosoOpciones" [value]="n.id_snervioso">
@@ -207,12 +217,13 @@
         </ion-select-option>
       </ion-select> 
     </ion-item>
-          <ion-item><i>
-            <ion-input  label="Obs:" [(ngModel)]="atencion.obs_snervioso"></ion-input></i>
+          <ion-item>
+            <ion-label position="stacked">Observaciones</ion-label>
+            <ion-textarea   [(ngModel)]="atencion.obs_snervioso"></ion-textarea >
           </ion-item>
 
 <!-----------------------------sistema Linfatico---------------------------------------------------->
-    <ion-item>
+    <ion-item  lines="none">
      <ion-label slot="start">Sistema Linfático</ion-label>
         <ion-select [(ngModel)]="atencion.id_slinfatico" name="id_slinfatico" interface="popover">
         <ion-select-option *ngFor="let sl of sLinfaticoOpciones" [value]="sl.id_slinfatico">
@@ -220,12 +231,13 @@
         </ion-select-option>
       </ion-select> 
     </ion-item>
-          <ion-item><i>
-            <ion-input  label="Obs:" [(ngModel)]="atencion.obs_slinfatico"></ion-input></i>
+          <ion-item>
+                      <ion-label position="stacked">Observaciones</ion-label>
+            <ion-textarea  [(ngModel)]="atencion.obs_slinfatico"></ion-textarea >
           </ion-item>
 
 <!-----------------------------sistema Locomotor---------------------------------------------------->
-    <ion-item>
+    <ion-item  lines="none">
      <ion-label slot="start">Sistema Locomotor</ion-label>
         <ion-select [(ngModel)]="atencion.id_slocomotor" name="id_slocomotor" interface="popover">
         <ion-select-option *ngFor="let lo of sLocomotorOpciones" [value]="lo.id_slocomotor">
@@ -233,11 +245,12 @@
         </ion-select-option>
       </ion-select> 
     </ion-item>
-          <ion-item><i>
-            <ion-input  label="Obs:" [(ngModel)]="atencion.obs_slocomotor"></ion-input></i>
+          <ion-item>
+                      <ion-label position="stacked">Observaciones</ion-label>
+            <ion-textarea  [(ngModel)]="atencion.obs_slocomotor"></ion-textarea >
           </ion-item>
 <!-----------------------------sistema Reproductor---------------------------------------------------->
-    <ion-item>
+    <ion-item  lines="none">
      <ion-label slot="start">Sistema Reproductor</ion-label>
         <ion-select [(ngModel)]="atencion.id_sreproductor" name="id_sreproductor" interface="popover">
         <ion-select-option *ngFor="let sr of sReproductorOpciones" [value]="sr.id_sreproductor">
@@ -245,8 +258,9 @@
         </ion-select-option>
       </ion-select> 
     </ion-item>
-          <ion-item><i>
-            <ion-input  label="Obs:" [(ngModel)]="atencion.obs_sreproductor"></ion-input></i>
+          <ion-item lines="none">
+                      <ion-label position="stacked">Observaciones</ion-label>
+            <ion-textarea [(ngModel)]="atencion.obs_sreproductor"></ion-textarea >
           </ion-item>
 
   </ion-list>
