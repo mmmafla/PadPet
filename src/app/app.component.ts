@@ -2,6 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, Platform } from '@ionic/angular';
 import { SupabaseService } from './services/supabase.service';
+ import { Keyboard } from '@capacitor/keyboard';
 
 @Component({
   selector: 'app-root',
@@ -18,8 +19,11 @@ export class AppComponent implements OnInit {
 
   async ngOnInit() {
     await this.verificarSesion();
-    this.controlarBotonAtras(); // ← Aquí llamamos la función
+    this.controlarBotonAtras();
+    this.configurarListenersTeclado(); 
+
   }
+
 
   private async verificarSesion() {
     const { data } = await this.supabaseService.getSession();
@@ -42,6 +46,19 @@ export class AppComponent implements OnInit {
       }
     });
   }
+
+    private configurarListenersTeclado() {
+    this.platform.ready().then(() => {
+      Keyboard.addListener('keyboardWillShow', () => {
+        document.body.classList.add('keyboard-is-open');
+      });
+
+      Keyboard.addListener('keyboardWillHide', () => {
+        document.body.classList.remove('keyboard-is-open');
+      });
+    });
+    }
+  
 
   // --------------------------------------------------------------
   // Alerta de ayuda

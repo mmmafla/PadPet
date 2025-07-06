@@ -207,6 +207,10 @@ ion-content {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+.keyboard-is-open ion-content {
+  --padding-bottom: 300px; // ajusta según el teclado
+}
+
 
 
 /*
