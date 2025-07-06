@@ -1,0 +1,127 @@
+.preview-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 150px;
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+  margin: 10px 0;
+}
+
+.preview-container img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: cover;
+}
+
+
+ion-menu::part(backdrop) {
+  background-color: black;
+}
+
+ion-menu::part(container) {
+  border-radius: 0 20px 20px 0;
+  box-shadow: 4px 0px 16px rgba(0, 0, 0, 0.18);
+}
+ion-menu .menu-content {
+  background-color: rgb(241, 246, 255) !important;
+}
+
+
+
+.checkbox-redondo {
+    --size: 22px;
+    --border-radius: 50%;
+    --checkbox-background-checked: #ffbf9a;
+    --checkmark-color: #3880ff;
+    --border-color: #3880ff;  
+}
+
+
+ion-menu {
+  --ion-background-color: rgb(241, 246, 255); 
+}
+
+
+
+ion-toolbar {
+  --background: transparent;
+  box-shadow: none; /* Quita la sombra */
+  border-bottom: none;
+}
+
+ion-title {
+  color: #000;
+  font-size: 18px;
+  font-weight: 600;
+  padding-left: 16px;
+}
+
+/* Quitar líneas separadoras */
+ion-list {
+  padding: 0;
+}
+
+ion-item {
+  --border-style: none;
+  --border-color: transparent;
+  --padding-start: 16px;
+  --padding-top: 4px;
+  --padding-bottom: 4px;
+  font-size: 18px;
+}
+
+ion-item ion-label {
+  font-size: 17px; 
+  font-weight: 500;
+}
+
+ion-item ion-icon {
+  color: #ffbf9a;
+  font-size: 25px;
+  margin-right: 8px;
+}
+
+ion-menu-toggle ion-item.ion-activated {
+  background-color: #e3f2fd;
+  --color: #000;
+  border-radius: 10px;
+  margin: 2px 6px;
+}
+
+
+/* Estilo cuando se selecciona */
+ion-menu-toggle ion-item.ion-activated {
+  background-color: #e3f2fd; 
+  --color: #000;
+  border-radius: 10px;
+  margin: 4px 8px;
+}
+
+.menu-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding-bottom: 0;
+}
+
+.menu-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+    background-color: rgb(241, 246, 255);
+}
+
+.menu-wrapper ion-list {
+  flex-grow: 1;
+}
+
+.cerrar-sesion {
+  padding: 12px 16px;
+  border-top: 1px solid #eee;
+}
+
+
+
+//
+

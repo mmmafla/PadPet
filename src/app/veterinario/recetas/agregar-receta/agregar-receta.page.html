@@ -1,0 +1,143 @@
+<ion-header class="ion-safe-area-top ion-no-border">
+  <app-header backButton="/recetas"></app-header>
+</ion-header>
+
+
+
+<ion-content fullscreen="true" class="ion-padding fondo" style="padding-bottom: 80px;">
+  <ion-card class="ion-card-atencion">
+    <h3 style="text-align: center;">Buscar Tutor</h3>
+
+    <ion-card-content>
+      <!-- Buscador tutor -->
+      <ion-item class="buscador" lines="none">
+        <ion-icon name="search-outline" slot="start"></ion-icon>
+        <ion-input
+          [(ngModel)]="busquedaTutor"
+          (ionInput)="filtrarTutores()"
+          placeholder="Ingrese nombre del tutor">
+        </ion-input>
+      </ion-item>
+
+      <!-- Lista de tutores filtrados -->
+      <ion-list *ngIf="tutoresFiltrados.length > 0">
+        <ion-item button detail *ngFor="let tutor of tutoresFiltrados" (click)="seleccionarTutor(tutor)" lines="none">
+          <ion-label>
+            {{ tutor.nombre_tutor }} {{ tutor.apellidos_tutor }}
+          </ion-label>
+        </ion-item>
+      </ion-list>
+
+      <!-- Selector de mascota -->
+      <div *ngIf="tutorSeleccionado">
+        <h3 style="text-align: center;">Mascotas de {{ tutorSeleccionado.nombre_tutor }}</h3>
+        <ion-item class="buscador" lines="none">
+          <ion-select label="Mascota" [(ngModel)]="mascotaSeleccionada" interface="popover">
+            <ion-select-option *ngFor="let mascota of tutorSeleccionado.mascota" [value]="mascota">
+              {{ mascota.masc_nom }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Receta médica -->
+  <ion-accordion-group *ngIf="mascotaSeleccionada" expand="inset">
+    <ion-accordion>
+      <ion-item slot="header" class="acordeon-consulta" lines="none">
+        <ion-label><strong>Receta Médica</strong></ion-label>
+      </ion-item>
+      <div slot="content">
+        <!-- Indicaciones generales (opcional) -->
+        <ion-item>
+          <ion-label position="stacked">
+            Indicaciones <span style="color: gray; font-size: 0.9em;">(opcional)</span>
+          </ion-label>
+          <ion-textarea
+            [(ngModel)]="tratamiento_indicaciones"
+            name="indicaciones"
+            placeholder="Ej: Reposo, control de temperatura...">
+          </ion-textarea>
+        </ion-item>
+
+        <!-- Botón agregar medicamento -->
+        <ion-item lines="none" class="ion-align-items-center">
+          <ion-label>Rp:</ion-label>
+          <ion-button fill="clear" color="primary" (click)="agregarMedicamento()" slot="end">
+            Agregar <ion-icon name="add-circle-outline"></ion-icon>
+          </ion-button>
+        </ion-item>
+
+        <!-- Lista dinámica -->
+        <div *ngFor="let med of tratamientoList; let i = index"
+             style="border: 1px solid #ccc; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; position: relative;">
+          <ion-button
+            fill="clear"
+            color="danger"
+            size="small"
+            style="position: absolute; top: 0.25rem; right: 0.25rem; z-index: 10;"
+            (click)="eliminarMedicamento(i)">
+            <ion-icon name="close-outline"></ion-icon>
+          </ion-button>
+
+          <!-- Medicamento (obligatorio) -->
+          <ion-item>
+            <ion-label position="stacked">
+              Medicamento <span style="color: red;">*</span>
+            </ion-label>
+            <ion-textarea
+              [(ngModel)]="med.nombre"
+              name="nombreMedicamento{{i}}"
+              placeholder="Nombre del medicamento"
+              required>
+            </ion-textarea>
+          </ion-item>
+
+          <!-- Dosis (opcional) -->
+          <ion-item>
+            <ion-label position="stacked">
+              Dosis <span style="color: gray; font-size: 0.9em;">(opcional)</span>
+            </ion-label>
+            <ion-textarea
+              [(ngModel)]="med.dosis"
+              name="dosisMedicamento{{i}}"
+              placeholder="Ej: 5 ml">
+            </ion-textarea>
+          </ion-item>
+
+          <!-- Frecuencia (opcional) -->
+          <ion-item>
+            <ion-label position="stacked">
+              Frecuencia (hrs) <span style="color: gray; font-size: 0.9em;">(opcional)</span>
+            </ion-label>
+            <ion-textarea
+              [(ngModel)]="med.frecuencia"
+              name="frecuenciaMedicamento{{i}}"
+              placeholder="Ej: Cada 12 horas">
+            </ion-textarea>
+          </ion-item>
+
+          <!-- Duración (opcional) -->
+          <ion-item>
+            <ion-label position="stacked">
+              Duración <span style="color: gray; font-size: 0.9em;">(opcional)</span>
+            </ion-label>
+            <ion-textarea
+              [(ngModel)]="med.duracion"
+              name="duracionMedicamento{{i}}"
+              placeholder="Ej: 7 días">
+            </ion-textarea>
+          </ion-item>
+        </div>
+
+        <!-- Botón guardar -->
+        <ion-toolbar>
+          <ion-button expand="block" shape="round" color="primary" (click)="guardarReceta()" class="boton-guardar-generico">
+            Guardar Receta
+          </ion-button>
+        </ion-toolbar>
+      </div>
+    </ion-accordion>
+  </ion-accordion-group>
+</ion-content>

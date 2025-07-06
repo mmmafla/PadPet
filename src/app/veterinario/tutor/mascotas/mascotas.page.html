@@ -1,0 +1,63 @@
+<ion-header class="ion-safe-area-top ion-no-border">
+  <app-header backButton="/tutor" title=""></app-header>
+</ion-header>
+
+<ion-content fullscreen="true" class="ion-padding fondo">
+
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+
+  <ion-card class="ion-card">
+    <ion-card-title>
+      <h2>Lista de mascotas</h2>
+    </ion-card-title>
+    <ion-card-content>
+        <ion-list *ngIf="mascotas.length > 0; else sinMascotas">
+
+<ion-item-sliding *ngFor="let mascota of mascotas">
+  <ion-item>
+    <ion-label>
+      <h3>{{ mascota.masc_nom }}</h3>
+      <p>Especie: {{ mascota.nom_especie }}</p>
+      <p>Estado: {{ mascota.estado }}</p>
+    </ion-label>
+  </ion-item>
+
+  <ion-item-options side="end">
+    <ion-item-option style="background-color: #8acabd;" (click)="irEditarMascota(mascota.id_masc)">
+                      <ion-icon slot="icon-only" name="create-outline"></ion-icon>
+                    </ion-item-option>
+    <ion-item-option style="background-color: #8a9aca;" (click)="verHistorialClinico(mascota.id_masc)">Ver Historial</ion-item-option>
+      <ion-item-option 
+        style="background-color: #8a9aca;" 
+        (click)="iniciarAtencionMedica(mascota.id_masc, idTutor)">
+        Iniciar consulta
+      </ion-item-option>
+
+
+
+  </ion-item-options>
+</ion-item-sliding>
+
+
+
+
+        </ion-list>
+
+      <ng-template #sinMascotas>
+        <p>No hay mascotas registradas aún.</p>
+      </ng-template>
+    </ion-card-content>
+  </ion-card>
+
+
+    <!-- Botón agregar mascota -->
+  <div class="boton-agregar">
+    <ion-button class="agregar-mascota" expand="block" (click)="irAgregarMascota()">
+      <ion-icon name="add" slot="start"></ion-icon> Agregar mascota
+    </ion-button>
+  </div>
+
+</ion-content>

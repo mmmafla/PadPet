@@ -1,0 +1,452 @@
+<ion-header class="ion-no-border">
+  <app-header backButton="/atencion-medica" title="Nueva Atención"></app-header>
+</ion-header>
+
+<ion-content class="fondo" [fullscreen]="true">
+
+  <ion-card class="ion-card-atencion">
+    <h3 style="text-align: center;">Buscar Tutor</h3>
+
+    <ion-card-content>
+      <!-- Buscador tutor -->
+      <ion-item class="buscador" lines="none">
+        <ion-icon name="search-outline" slot="start"></ion-icon>
+        <ion-input
+          [(ngModel)]="busquedaTutor"
+          (ionInput)="filtrarTutores()"
+          placeholder="Ingrese nombre del tutor">
+        </ion-input>
+      </ion-item>
+
+      <!-- Lista de tutores filtrados -->
+      <ion-list *ngIf="tutoresFiltrados.length > 0">
+        <ion-item button detail *ngFor="let tutor of tutoresFiltrados" (click)="seleccionarTutor(tutor)" lines="none">
+          <ion-label>
+            {{ tutor.nombre_tutor }} {{ tutor.apellidos_tutor }}
+          </ion-label>
+        </ion-item>
+      </ion-list>
+
+      <!-- Buscador mascotas -->
+      <div *ngIf="tutorSeleccionado">
+        <h3 style="text-align: center;">Mascotas de {{ tutorSeleccionado.nombre_tutor }}</h3>
+        <ion-item class="buscador" lines="none">
+          <ion-select label="Mascota" [(ngModel)]="mascotaSeleccionada" interface="popover">
+            <ion-select-option *ngFor="let mascota of tutorSeleccionado.mascota" [value]="mascota" slot="end">
+              {{ mascota.masc_nom }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Mensaje informativo si no hay tutor o mascota seleccionada -->
+  <ion-card *ngIf="!tutorSeleccionado || !mascotaSeleccionada" class="ion-card">
+    <ion-card-content class="ion-text-center">
+      <ion-icon name="information-circle-outline" size="large" color="medium"></ion-icon>
+      <p style="margin-top: 10px;">
+        Para poder generar una atención médica primero debes seleccionar un tutor y una mascota.
+      </p>
+    </ion-card-content>
+  </ion-card>
+
+  <!-- Formulario de atención médica -->
+  <ion-card *ngIf="mascotaSeleccionada" class="ion-card-atencion">
+    <h2>Atención Médica</h2>
+
+    <ion-card-content>
+      <form>
+        <!-- Fecha y hora de atención -->
+        <ion-accordion-group expand="inset">
+          <ion-accordion value="fecha-hora">
+            <ion-item slot="header" class="acordeon-consulta" lines="none">
+              <ion-label><strong>Fecha y Hora de Atención</strong></ion-label>
+            </ion-item>
+            <div slot="content">
+
+              <div class="botones-fecha-hora ion-padding">
+                <ion-button expand="block" (click)="asignarFechaHoraActual()" class="btn-accion btn-editar">
+                  Usar actual
+                </ion-button>
+
+                <ion-button expand="block" (click)="abrirSelectorFecha()" class="btn-accion btn-editar">
+                  Seleccionar manual
+                </ion-button>
+              </div>
+
+              <ion-text class="texto-fecha-hora">
+                <p><strong>Seleccionado:</strong></p>
+                <p class="espacio-abajo">{{ atencion.fecha && atencion.hora ? (atencion.fecha + ' - ' + atencion.hora) : 'No seleccionadas' }}</p>
+              </ion-text>
+
+
+            </div>
+          </ion-accordion>
+        </ion-accordion-group>
+
+
+        <!-- Motivo de consulta -->
+        <ion-item class="consulta-item" lines="none">
+          <ion-label position="stacked">Motivo de consulta</ion-label>
+          <ion-select
+            [(ngModel)]="atencion.motivo"
+            name="motivo"
+            placeholder="Selecciona motivo"
+            interface="popover"
+            class="custom-select"
+            required>
+            <ion-select-option *ngFor="let motivo of motivosConsulta" [value]="motivo.id">
+              {{ motivo.motivo }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <!-- Anamnesis -->
+        <ion-item class="consulta-item" lines="none">
+          <ion-label position="stacked">Anamnesis</ion-label>
+          <ion-textarea [(ngModel)]="atencion.anamnesis" name="anamnesis" placeholder="Anamnesis..."></ion-textarea>
+        </ion-item>
+
+        <!-- Alimentación -->
+        <ion-accordion-group expand="inset">
+          <ion-accordion>
+            <ion-item slot="header" class="acordeon-consulta" lines="none">
+              <ion-label><strong>Alimentación</strong></ion-label>
+            </ion-item>
+            <div slot="content">
+              <ion-item>
+                <ion-select
+                  label="Tipo de Alimentación"
+                  [(ngModel)]="atencion.id_tipo_alimentacion"
+                  name="id_tipo_alimentacion"
+                  interface="popover">
+                  <ion-select-option *ngFor="let tipo of tipoAlimentacion" [value]="tipo.id_tipo_alimentacion">
+                    {{ tipo.tipo_alimentacion }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <ion-item>
+                <ion-input
+                  label="Cantidad (gr/ml)"
+                  type="number"
+                  [(ngModel)]="atencion.cantidad_alimentacion"
+                  name="cantidad_alimentacion">
+                </ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-input
+                  label="Veces al día"
+                  type="number"
+                  [(ngModel)]="atencion.veces_alimentacion"
+                  name="veces_alimentacion">
+                </ion-input>
+              </ion-item>
+            </div>
+          </ion-accordion>
+        </ion-accordion-group>
+
+        <!-- Examen objetivo general -->
+        <ion-accordion-group expand="inset">
+          <ion-accordion>
+            <ion-item slot="header" class="acordeon-consulta" lines="none">
+              <ion-label><strong>Examen General</strong></ion-label>
+            </ion-item>
+            <div slot="content">
+              <ion-item>
+                <ion-textarea label="Mucosa" [(ngModel)]="atencion.mucosa" name="mucosa"></ion-textarea>
+              </ion-item>
+
+              <ion-item>
+                <ion-input label="Temperatura (°C)" type="number" [(ngModel)]="atencion.temperatura" name="temperatura"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-input label="Peso (Kg)" type="number" [(ngModel)]="atencion.peso" name="peso"></ion-input>
+              </ion-item>
+
+              <ion-item>
+                <ion-textarea label="Condición corporal" [(ngModel)]="atencion.condicion_corporal" name="condicion_corporal"></ion-textarea>
+              </ion-item>
+
+              <ion-item>
+                <ion-select label="Estado sensorial" [(ngModel)]="atencion.estado_sensorial_id" name="estado_sensorial_id" interface="popover">
+                  <ion-select-option *ngFor="let estado of estadoSensorial" [value]="estado.id_estado_sensorial">
+                    {{ estado.estado_sensorial }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <ion-item>
+                <ion-select label="Hidratación" [(ngModel)]="atencion.hidratacion_id" name="hidratacion_id" interface="popover">
+                  <ion-select-option *ngFor="let h of nivelesHidratacion" [value]="h.hidratacion_id">
+                    {{ h.estado_hidratacion }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+
+              <ion-item>
+                <ion-textarea label="Observaciones" [(ngModel)]="atencion.observacion" name="observacion"></ion-textarea>
+              </ion-item>
+            </div>
+          </ion-accordion>
+        </ion-accordion-group>
+
+        <!-- Examen particular -->
+        <ion-accordion-group expand="inset">
+          <ion-accordion>
+            <ion-item slot="header" class="acordeon-consulta" lines="none">
+              <ion-label><strong>Examen Particular</strong></ion-label>
+            </ion-item>
+            <div slot="content">
+              <!-- Piel -->
+              <ion-item lines="none">
+                <ion-select label="Piel/Pelaje" [(ngModel)]="atencion.id_piel" name="piel_id" interface="popover">
+                  <ion-select-option *ngFor="let p of pielOpciones" [value]="p.id_piel">
+                    {{ p.estado_piel }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <ion-item>
+                <i>
+                  <ion-input label="‣ Observación" type="text" [(ngModel)]="atencion.obs_piel" name="obs_piel"></ion-input>
+                </i>
+              </ion-item>
+
+              <!-- Ojos -->
+              <ion-item lines="none">
+                <ion-select label="Ojos" [(ngModel)]="atencion.id_ojos" name="id_ojos" interface="popover">
+                  <ion-select-option *ngFor="let o of ojosOpciones" [value]="o.id_ojos">
+                    {{ o.estado_ojos }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <ion-item>
+                <i>
+                  <ion-input label="‣ Observación" type="text" [(ngModel)]="atencion.obs_ojos" name="obs_ojos"></ion-input>
+                </i>
+              </ion-item>
+
+              <!-- Oídos -->
+              <ion-item lines="none">
+                <ion-select label="Oídos" [(ngModel)]="atencion.id_oidos" name="id_oido" interface="popover">
+                  <ion-select-option *ngFor="let o of oidosOpciones" [value]="o.id_oidos">
+                    {{ o.estado_oidos }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <ion-item>
+                <i>
+                  <ion-input label="‣ Observación" type="text" [(ngModel)]="atencion.obs_oidos" name="obs_oidos"></ion-input>
+                </i>
+              </ion-item>
+
+              <!-- Dentadura -->
+              <ion-item lines="none">
+                <ion-select label="Dentadura" [(ngModel)]="atencion.id_dentadura" name="id_dentadura" interface="popover">
+                  <ion-select-option *ngFor="let d of dentaduraOpciones" [value]="d.id_dentadura">
+                    {{ d.estado_dentadura }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <ion-item>
+                <i>
+                  <ion-input label="‣ Observación" type="text" [(ngModel)]="atencion.obs_dentadura" name="obs_dentadura"></ion-input>
+                </i>
+              </ion-item>
+
+              <!-- Sistema Digestivo -->
+              <ion-item lines="none">
+                <ion-select label="Sistema Digestivo" [(ngModel)]="atencion.id_sdigestivo" name="id_sdigestivo" interface="popover">
+                  <ion-select-option *ngFor="let s of sDigestivoOpciones" [value]="s.id_sdigestivo">
+                    {{ s.estado_sdigestivo }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <ion-item>
+                <i>
+                  <ion-input label="‣ Observación" type="text" [(ngModel)]="atencion.obs_sdigestivo" name="obs_sdigestivo"></ion-input>
+                </i>
+              </ion-item>
+
+              <!-- Sistema Cardiovascular -->
+              <ion-item lines="none">
+                <ion-select label="Sistema C.Vascular" [(ngModel)]="atencion.id_scvascular" name="id_scvascular" interface="popover">
+                  <ion-select-option *ngFor="let x of sCardioVascularOpciones" [value]="x.id_scvascular">
+                    {{ x.estado_scvascular }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <ion-item>
+                <i>
+                  <ion-input label="‣ Observación" type="text" [(ngModel)]="atencion.obs_scvascular" name="obs_scvascular"></ion-input>
+                </i>
+              </ion-item>
+
+              <!-- Sistema Respiratorio -->
+              <ion-item lines="none">
+                <ion-select label="Sistema Respiratorio" [(ngModel)]="atencion.id_srespiratorio" name="id_srespiratorio" interface="popover">
+                  <ion-select-option *ngFor="let y of sRespiratorioOpciones" [value]="y.id_srespiratorio">
+                    {{ y.estado_srespiratorio }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <ion-item>
+                <i>
+                  <ion-input label="‣ Observación" type="text" [(ngModel)]="atencion.obs_srespiratorio" name="obs_srespiratorio"></ion-input>
+                </i>
+              </ion-item>
+
+              <!-- Sistema Urinario -->
+              <ion-item lines="none">
+                <ion-select label="Sistema Urinario" [(ngModel)]="atencion.id_surinario" name="id_surinario" interface="popover">
+                  <ion-select-option *ngFor="let u of sUrinarioOpciones" [value]="u.id_surinario">
+                    {{ u.estado_surinario }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <ion-item>
+                <i>
+                  <ion-input label="‣ Observación" type="text" [(ngModel)]="atencion.obs_surinario" name="obs_surinario"></ion-input>
+                </i>
+              </ion-item>
+
+              <!-- Sistema Nervioso -->
+              <ion-item lines="none">
+                <ion-select label="Sistema Nervioso" [(ngModel)]="atencion.id_snervioso" name="id_snervioso" interface="popover">
+                  <ion-select-option *ngFor="let n of sNerviosoOpciones" [value]="n.id_snervioso">
+                    {{ n.estado_snervioso }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <ion-item>
+                <i>
+                  <ion-input label="‣ Observación" type="text" [(ngModel)]="atencion.obs_snervioso" name="obs_snervioso"></ion-input>
+                </i>
+              </ion-item>
+
+              <!-- Sistema Linfático -->
+              <ion-item lines="none">
+                <ion-select label="Sistema Linfático" [(ngModel)]="atencion.id_slinfatico" name="id_slinfatico" interface="popover">
+                  <ion-select-option *ngFor="let l of sLinfaticoOpciones" [value]="l.id_slinfatico">
+                    {{ l.estado_slinfatico }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <ion-item>
+                <i>
+                  <ion-input label="‣ Observación" type="text" [(ngModel)]="atencion.obs_slinfatico" name="obs_slinfatico"></ion-input>
+                </i>
+              </ion-item>
+
+              <!-- Sistema Locomotor -->
+              <ion-item lines="none">
+                <ion-select label="Sistema Locomotor" [(ngModel)]="atencion.id_slocomotor" name="id_slocomotor" interface="popover">
+                  <ion-select-option *ngFor="let lo of sLocomotorOpciones" [value]="lo.id_slocomotor">
+                    {{ lo.estado_slocomotor }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <ion-item>
+                <i>
+                  <ion-input label="‣ Observación" type="text" [(ngModel)]="atencion.obs_slocomotor" name="obs_slocomotor"></ion-input>
+                </i>
+              </ion-item>
+
+              <!-- Sistema Reproductor -->
+              <ion-item lines="none">
+                <ion-select label="Sistema Reproductor" [(ngModel)]="atencion.id_sreproductor" name="id_sreproductor" interface="popover">
+                  <ion-select-option *ngFor="let r of sReproductorOpciones" [value]="r.id_sreproductor">
+                    {{ r.estado_sreproductor }}
+                  </ion-select-option>
+                </ion-select>
+              </ion-item>
+              <ion-item>
+                <i>
+                  <ion-input label="‣ Observación" type="text" [(ngModel)]="atencion.obs_sreproductor" name="obs_sreproductor"></ion-input>
+                </i>
+              </ion-item>
+            </div>
+          </ion-accordion>
+        </ion-accordion-group>
+
+        <!-- Diagnóstico -->
+        <ion-item class="consulta-item" lines="none">
+          <ion-label position="stacked">Diagnóstico</ion-label>
+          <ion-textarea [(ngModel)]="atencion.diagnostico" name="diagnostico" placeholder="Diagnóstico..."></ion-textarea>
+        </ion-item>
+
+        <!-- Tratamiento -->
+        <ion-accordion-group expand="inset">
+          <ion-accordion>
+            <ion-item slot="header" class="acordeon-consulta" lines="none">
+              <ion-label><strong>Tratamiento</strong></ion-label>
+            </ion-item>
+            <div slot="content">
+
+              <ion-item>
+                <ion-textarea label="Indicaciones: " [(ngModel)]="atencion.tratamiento_indicaciones" name="indicaciones"></ion-textarea>
+              </ion-item>
+
+              <!-- Botón agregar medicamento -->
+              <ion-item lines="none" class="ion-align-items-center">
+                <ion-label>Rp: </ion-label>
+                <ion-button fill="clear" color="primary" (click)="agregarMedicamento()" slot="end">
+                  Agregar <ion-icon name="add-circle-outline"></ion-icon>
+                </ion-button>
+              </ion-item>
+
+              <!-- Lista dinámica medicamentos -->
+              <div *ngFor="let med of tratamientoList; let i = index"
+                   style="border: 1px solid #ccc; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; position: relative;">
+                <ion-button
+                  fill="clear"
+                  color="danger"
+                  size="small"
+                  style="position: absolute; top: 0.25rem; right: 0.25rem; z-index: 10;"
+                  (click)="eliminarMedicamento(i)">
+                  <ion-icon name="close-outline"></ion-icon>
+                </ion-button>
+
+                <ion-item>
+                  <ion-textarea label="Medicamento: " [(ngModel)]="med.nombre" name="nombreMedicamento{{i}}"></ion-textarea>
+                </ion-item>
+
+                <ion-item>
+                  <ion-textarea label="Dosis: " [(ngModel)]="med.dosis" name="dosisMedicamento{{i}}"></ion-textarea>
+                </ion-item>
+
+                <ion-item>
+                  <ion-textarea label="Frecuencia (hrs): " [(ngModel)]="med.frecuencia" name="frecuenciaMedicamento{{i}}"></ion-textarea>
+                </ion-item>
+
+                <ion-item>
+                  <ion-textarea label="Duración tratamiento: " [(ngModel)]="med.duracion" name="duracionMedicamento{{i}}"></ion-textarea>
+                </ion-item>
+              </div>
+
+            </div>
+          </ion-accordion>
+        </ion-accordion-group>
+
+        <!-- Observaciones -->
+        <ion-item class="consulta-item" lines="none">
+          <ion-label position="stacked">Observaciones</ion-label>
+          <ion-textarea [(ngModel)]="atencion.observaciones" name="observaciones" placeholder="Observaciones..."></ion-textarea>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-label>Próximo control</ion-label>
+        </ion-item>
+
+        <ion-button (click)="guardarAtencion()" class="boton-guardar-generico">
+          <ion-icon name="save-outline" slot="start"></ion-icon>
+          Guardar Atención
+        </ion-button>
+      </form>
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

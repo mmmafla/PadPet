@@ -1,0 +1,16 @@
+ion-button {
+    --background: #F7A072;
+    --background-hover: #F7A072;
+    --background-activated: #F7A072;
+    --background-focused: #F7A072;
+    --color: #000000 ;
+    --border-radius: 10px;
+  
+    --box-shadow: 0 2px 6px 0 rgba(99, 98, 98, 0.25);
+    --ripple-color:#0FA3B1 ;
+  
+    margin-top: 20px;
+    display: block;
+    --padding-top: 10px;
+    --padding-bottom: 10px;
+  }

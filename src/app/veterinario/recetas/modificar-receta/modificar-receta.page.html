@@ -1,0 +1,80 @@
+<ion-header class="ion-safe-area-top ion-no-border">
+  <app-header backButton="/recetas"></app-header>
+</ion-header>
+
+<ion-content fullscreen="true" class="ion-padding fondo">
+
+  <ion-card class="card3">
+    <h2 style="text-align: center;">Editar tratamiento</h2>
+
+    <ion-list class="formulario-editar" style="text-align: center;" *ngIf="receta?.mascota?.masc_nom" lines="none">
+      <!-- Mostrar el nombre de la mascota asociada a la receta -->
+      <h3>Tratamiento de {{ receta.mascota.masc_nom }} </h3>
+
+      <!-- Indicaciones generales (NO obligatorio) -->
+      <ion-item lines="full">
+        <ion-label position="stacked">Indicaciones</ion-label>
+        <ion-textarea
+          [(ngModel)]="tratamiento_indicaciones" autoGrow="true" name="tratamiento_indicaciones">
+        </ion-textarea>
+      </ion-item>
+
+      <!-- Botón agregar medicamento -->
+      <ion-item lines="none" class="ion-align-items-center">
+        <ion-label>Rp</ion-label>
+        <ion-button fill="clear" color="primary" (click)="agregarMedicamento()" slot="end">
+          Agregar <ion-icon name="add-circle-outline"></ion-icon>
+        </ion-button>
+      </ion-item>
+
+      <!-- Lista dinámica medicamentos -->
+      <div *ngFor="let med of tratamientoList; let i = index"
+           style="border: 1px solid #ccc; border-radius: 8px; padding: 1rem; margin-bottom: 1rem; position: relative;">
+        <ion-button
+          fill="clear"
+          color="danger"
+          size="small"
+          style="position: absolute; top: 0.25rem; right: 0.25rem; z-index: 10;"
+          (click)="eliminarMedicamento(i)">
+          <ion-icon name="close-outline"></ion-icon>
+        </ion-button>
+
+        <!-- Medicamento obligatorio con asterisco rojo -->
+        <ion-item>
+          <ion-label slot="start">
+            Medicamento: <span style="color: red;">*</span>
+          </ion-label>
+          <ion-input [(ngModel)]="tratamientoList[i].nombre" name="nombre_medicamento{{i}}" required>
+          </ion-input>
+        </ion-item>
+
+        <!-- Dosis NO obligatorio -->
+        <ion-item>
+          <ion-label slot="start">Dosis:</ion-label>
+          <ion-input [(ngModel)]="med.dosis" name="dosisMedicamento{{i}}">
+          </ion-input>
+        </ion-item>
+
+        <!-- Frecuencia NO obligatorio -->
+        <ion-item>
+          <ion-label slot="start">Frecuencia:</ion-label>
+          <ion-input [(ngModel)]="med.frecuencia" name="frecuencia{{i}}">
+          </ion-input>
+        </ion-item>
+
+        <!-- Duración NO obligatorio -->
+        <ion-item lines="none">
+          <ion-label slot="start">Duración</ion-label>
+          <ion-input [(ngModel)]="med.duracion" name="duracionMedicamento{{i}}">
+          </ion-input>
+        </ion-item>
+      </div>
+
+    </ion-list>
+
+    <!-- Botones de acción -->
+    <ion-button expand="block" class="boton-guardar-generico" (click)="guardarCambiosReceta()">Guardar Cambios</ion-button>
+    <ion-button expand="block" class="boton-eliminar" (click)="eliminarReceta()" style="margin-top: 10px;">Eliminar Receta</ion-button>
+
+  </ion-card>
+</ion-content>

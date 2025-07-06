@@ -1,0 +1,86 @@
+<ion-header class="ion-no-border">
+  <app-header  backButton="/home"></app-header>
+</ion-header>
+
+
+<ion-content class="fondo" [fullscreen]="true">
+
+
+<h2>Historial de atención</h2>
+<!-----------------------FILTRO----------------------------------->
+<ion-card class="filtro-card">
+<ion-accordion-group expand="inset">
+  <ion-accordion value="filtro">
+    <ion-item slot="header" color="light">
+      <ion-icon name="funnel-outline" slot="start"></ion-icon>
+      <ion-label>Filtrar</ion-label>
+    </ion-item>
+
+    <div class="ion-padding" slot="content">
+
+      <!-- FILTRAR POR MOTIVO -->
+      <ion-item lines="none">
+        <ion-select label="Motivo de consulta"  [(ngModel)]="filtroMotivo" (ionChange)="filtrarAtenciones()" interface="popover" placeholder="Selecciona motivo">
+          <ion-select-option *ngFor="let motivo of motivosDisponibles" [value]="motivo.motivo">
+            {{ motivo.motivo }}
+          </ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- FILTRAR POR FECHA -->
+<!-- FILTRAR POR FECHA -->
+<ion-item lines="none">
+  <ion-label>Fecha</ion-label>
+  <ion-datetime-button datetime="filtroFechaPopover"></ion-datetime-button>
+  <ion-modal [keepContentsMounted]="true">
+    <ng-template>
+      <ion-datetime
+        id="filtroFechaPopover"
+        presentation="date"
+        [(ngModel)]="filtroFecha"
+        (ionChange)="filtrarAtenciones()"
+        cancel-text="Cancelar"
+        done-text="Aplicar"
+        show-default-buttons="true"
+        prefer-wheel="false">
+      </ion-datetime>
+    </ng-template>
+  </ion-modal>
+</ion-item>
+
+
+      <ion-button class="btn-limpiar" expand="block" fill="outline" color="medium" (click)="limpiarFiltros()">Limpiar filtros</ion-button>
+
+    </div>
+  </ion-accordion>
+</ion-accordion-group>
+</ion-card>
+
+
+<!-----------------------HISTORIAL DE ATENCION----------------------------------->
+  <ion-card *ngFor="let atencion of historialAtenciones" class="card2" (click)="verDetalle(atencion.id)">
+      <h3>{{ atencion?.mascota?.masc_nom }}</h3>
+      <p><strong>Fecha:</strong> {{ atencion?.fecha_hora_atencion | date: 'medium'}}</p>
+      <p><strong>Motivo:</strong> {{ atencion?.motivo_consulta.motivo }}</p>
+      <p><strong>Diagnóstico:</strong> {{ atencion?.diagnostico }}</p>
+
+  </ion-card>
+
+  <ion-card *ngIf="historialAtenciones.length === 0" class="card2">
+    <ion-card-content class="ion-text-center">
+      No hay atenciones médicas registradas aún.
+    </ion-card-content>
+  </ion-card>
+
+
+<!-----------------------HISTORIAL DE ATENCION----------------------------------->
+
+  <!----------- Botón agregar atencion ---------------->
+<div class="boton-agregar">
+  <ion-button class="agregar-atencion" expand="block"  (click)="irAgregarAtencion()">
+    <ion-icon name="add" slot="start"></ion-icon> Nueva Atención
+  </ion-button>
+</div>
+<!----------- Botón agregar atencion ---------------->
+  
+</ion-content>

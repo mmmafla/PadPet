@@ -1,0 +1,73 @@
+  .ion-card-atencion{
+    padding-top: 5%;
+    padding-bottom: 5%;
+    padding-left: 0%;
+    padding-right: 0%;
+    background: rgba(255, 255, 255);
+    border-radius: 20px; 
+  }
+
+ .buscador{
+  --border-radius: 16px;
+  --background: #f4f4f4;
+  --box-shadow: 0 0px 0px rgba(0, 0, 0, 0.1);
+  --color: #222;
+  --placeholder-color: #999;
+  margin-bottom: 16px;
+  padding: 0 8px;
+}
+
+
+.consulta-item{
+    --border-radius: 16px;
+    --background: #f4f4f4;
+    --box-shadow: 0 0px 0px rgba(0, 0, 0, 0.1);
+    --color: #222;
+    --placeholder-color: #999;
+    margin-bottom: 16px;
+    padding: 0 8px;
+
+}
+
+ion-item.consulta-item {
+  --padding-start: 16px;
+  --inner-padding-end: 16px;
+  --min-height: 60px;
+
+}
+
+.custom-select {
+  font-size: 16px;
+}
+
+ion-select::part(text) {
+  color: #222;
+  font-weight: 500;
+}
+
+
+.btn-editar {
+  --background: #b0b9d1; 
+  --color: #fff;
+  --border-radius: 12px;
+  font-size: 14px;
+  font-weight: 300;
+  text-transform: capitalize;
+}
+
+.btn-accion {
+  --color: #fff;
+  --border-radius: 12px;
+  width: 40%;
+  font-size: 14px;
+  font-weight: 500;
+  text-transform: capitalize;
+  transition: transform 0.2s ease;
+}
+
+.acordeon-consulta {
+  --background: #f4f4f4;
+  --box-shadow: 0 0 0 rgba(0, 0, 0, 0.1);
+
+}
+
