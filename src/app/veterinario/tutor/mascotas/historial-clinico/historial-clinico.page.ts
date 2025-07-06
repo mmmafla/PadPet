@@ -4,6 +4,7 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { IonicModule } from '@ionic/angular';
 import { createClient } from '@supabase/supabase-js';
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
+import { Router } from '@angular/router';
 
 // Configuración Supabase
 const supabaseUrl = 'https://irorlonysbmkbdthvrmt.supabase.co';
@@ -22,7 +23,7 @@ export class HistorialClinicoPage implements OnInit {
  idMasc!: number;
   atenciones: any[] = [];
 
-  constructor(private route: ActivatedRoute) { }
+  constructor(private route: ActivatedRoute, private router:Router) { }
 
   async ngOnInit() {
     this.idMasc = Number(this.route.snapshot.paramMap.get('id_masc')) || 0;
@@ -46,4 +47,9 @@ export class HistorialClinicoPage implements OnInit {
       this.atenciones = data || []; 
     }
   }
+
+  verDetalle(id: number) {
+  this.router.navigate(['/detalle-atencion'], { state: { id: id }  });
+}
+
 }

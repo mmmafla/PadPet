@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { IonicModule, ToastController, AlertController } from '@ionic/angular';
 import { createClient } from '@supabase/supabase-js';
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
@@ -37,6 +37,7 @@ export class DetalleAtencionPage implements OnInit {
   toastController = inject(ToastController);
   recetaService = inject(RecetaService);
   atencionService = inject(AtencionService);
+  route =inject(ActivatedRoute);
 
 
   constructor(private router: Router) {
@@ -47,6 +48,10 @@ export class DetalleAtencionPage implements OnInit {
 
 
 async ngOnInit() {
+
+    const idAtencion = this.route.snapshot.paramMap.get('id');
+  console.log('ID de atención:', idAtencion);
+
   this.receta = await this.recetaService.cargarRecetaCompleta(this.atencionId);
   if (this.atencionId) {
     this.atencion = await this.atencionService.cargarAtencionCompleta(this.atencionId);

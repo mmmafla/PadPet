@@ -7,7 +7,7 @@
 
   <ion-card *ngIf="atenciones.length > 0" class="ion-card">
     <ion-list>
-<ion-item *ngFor="let atencion of atenciones" [routerLink]="['/veterinario/detalle-atencion', atencion.id_atencion]">
+<ion-item *ngFor="let atencion of atenciones" (click)="verDetalle(atencion.id)">
         <ion-label>
           <h4>{{ atencion.anamnesis }}</h4>
           <p>Diagnóstico: {{ atencion.diagnostico }}</p>

@@ -97,7 +97,7 @@ const routes: Routes = [
     canActivate: [AuthGuard] 
   },
     {
-    path: 'veterinario/detalle-atencion/:id',
+    path: 'detalle-atencion',
     loadChildren: () => import('./veterinario/atencion-medica/detalle-atencion/detalle-atencion.module').then( m => m.DetalleAtencionPageModule ),
     canActivate: [AuthGuard] 
   },
