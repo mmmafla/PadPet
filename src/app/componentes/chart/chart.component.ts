@@ -1,7 +1,4 @@
-import { Component, Input, AfterViewInit } from '@angular/core';
-import { Chart, registerables } from 'chart.js';
-
-Chart.register(...registerables);
+import { Component, Input, AfterViewInit, ViewChild, ElementRef, OnChanges, SimpleChanges } from '@angular/core';
 
 @Component({
   selector: 'app-chart',
@@ -9,65 +6,81 @@ Chart.register(...registerables);
   styleUrls: ['./chart.component.scss'],
   standalone: true
 })
-export class ChartComponent implements AfterViewInit {
-
+export class ChartComponent implements AfterViewInit, OnChanges {
   @Input() data: number[] = [];
   @Input() labels: string[] = [];
+  @ViewChild('canvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
 
-  ngAfterViewInit(): void {
-    const canvas = document.getElementById('chartCanvas') as HTMLCanvasElement;
-    const ctx = canvas.getContext('2d');
+  private ctx!: CanvasRenderingContext2D;
 
-    if (!canvas) {
-      console.error('No se encontró el elemento canvas');
-      return;
+  colors = [
+    '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF',
+    '#FF9F40', '#8A2BE2', '#00CED1', '#FFD700', '#DC143C',
+    '#00FA9A', '#FF4500', '#2E8B57', '#FF1493'
+  ];
+
+  ngAfterViewInit() {
+    const canvas = this.canvasRef.nativeElement;
+    const context = canvas.getContext('2d');
+    if (context) {
+      this.ctx = context;
+      this.drawChart();
     }
+  }
 
-    if (!ctx) {
-      console.error('No se pudo obtener el contexto del canvas');
-      return;
+  ngOnChanges(changes: SimpleChanges) {
+    if (this.ctx && (changes['data'] || changes['labels'])) {
+      this.drawChart();
     }
+  }
 
-    if (!this.data.length || !this.labels.length) {
-      console.error('Datos o etiquetas vacías');
-      return;
+  drawChart() {
+    const canvas = this.canvasRef.nativeElement;
+    const ctx = this.ctx;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const total = this.data.reduce((sum, val) => sum + val, 0);
+    if (total === 0) return;
+
+    const cx = canvas.width / 2;
+    const cy = canvas.height / 2;
+    const radius = Math.min(cx, cy) - 20;
+    let startAngle = 0;
+
+    for (let i = 0; i < this.data.length; i++) {
+      const value = this.data[i];
+      const sliceAngle = (value / total) * 2 * Math.PI;
+      const color = this.colors[i % this.colors.length];
+      const midAngle = startAngle + sliceAngle / 2;
+
+      // Dibuja sector
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, radius, startAngle, startAngle + sliceAngle);
+      ctx.closePath();
+      ctx.fillStyle = color;
+      ctx.fill();
+
+      // Línea blanca entre sectores
+      ctx.strokeStyle = '#fff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      // Etiqueta centrada en el sector
+      const labelRadius = radius * 0.6;
+      const labelX = cx + labelRadius * Math.cos(midAngle);
+      const labelY = cy + labelRadius * Math.sin(midAngle);
+
+      ctx.fillStyle = '#000';
+      ctx.font = 'bold 30px Segoe UI';
+      ctx.textAlign = 'center';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+      ctx.shadowBlur = 3;
+      ctx.fillText(this.labels[i], labelX, labelY);
+      ctx.shadowBlur = 0;
+
+      startAngle += sliceAngle;
     }
-
-  console.log('Creando gráfico con datos:', this.data);
-  console.log('Etiquetas:', this.labels);
-
-    new Chart(ctx, {
-      type: 'pie', // 👈 Aquí cambiamos el tipo de gráfico
-      data: {
-        labels: this.labels,
-        datasets: [{
-          label: 'Atenciones por especie',
-          data: this.data,
-          backgroundColor: [
-            'rgba(255, 99, 132, 0.6)',
-            'rgba(54, 162, 235, 0.6)',
-            'rgba(255, 206, 86, 0.6)'
-          ],
-          borderColor: [
-            'rgba(255, 99, 132, 1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)'
-          ],
-          borderWidth: 1
-        }]
-      },
-      options: {
-        responsive: true,
-        plugins: {
-          legend: {
-            position: 'top'
-          },
-          title: {
-            display: true,
-            text: 'Especies atendidas'
-          }
-        }
-      }
-    });
   }
 }

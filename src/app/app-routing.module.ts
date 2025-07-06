@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './guards/auth.guard';
+import { NoAuthGuard } from './guards/no-auth.guard';
 
 const routes: Routes = [
   {
@@ -11,15 +12,17 @@ const routes: Routes = [
   {
     path: 'login',
     loadChildren: () => import('./cuenta/login/login.module').then( m => m.LoginPageModule),
-
+    canActivate: [NoAuthGuard]
   },
   {
     path: 'nuevacuenta',
-    loadChildren: () => import('./cuenta/nuevacuenta/nuevacuenta.module').then( m => m.NuevacuentaPageModule)
+    loadChildren: () => import('./cuenta/nuevacuenta/nuevacuenta.module').then( m => m.NuevacuentaPageModule),
+    canActivate: [NoAuthGuard]
   },
   {
     path: 'olvidopass',
-    loadChildren: () => import('./cuenta/olvidopass/olvidopass.module').then( m => m.OlvidopassPageModule)
+    loadChildren: () => import('./cuenta/olvidopass/olvidopass.module').then( m => m.OlvidopassPageModule),
+    canActivate: [NoAuthGuard]
   },
   {
   path: 'nueva-contrasena',
@@ -131,8 +134,8 @@ const routes: Routes = [
   },
   {
     path: 'dashboard',
-    loadComponent: () =>
-      import('./veterinario/dashboard/dashboard.page').then(m => m.DashboardPage)
+    loadChildren: () =>  import('./veterinario/dashboard/dashboard.module').then(m => m.DashboardPageModule),
+        canActivate: [AuthGuard]
   }
 ];
 

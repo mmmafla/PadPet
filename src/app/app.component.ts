@@ -1,36 +1,78 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AlertController, Platform } from '@ionic/angular';
+import { AlertController, Platform, ToastController } from '@ionic/angular';
 import { SupabaseService } from './services/supabase.service';
-
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
   standalone: false,
-  
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
 
-  alertController = inject(AlertController);
-  router = inject(Router);
-  supabaseService = inject(SupabaseService);
+  private platform = inject(Platform);
+  private alertController = inject(AlertController);
+  private router = inject(Router);
+  private supabaseService = inject(SupabaseService);
+  private toastController = inject(ToastController);
 
+  async ngOnInit() {
+    await this.procesarTokenDeUrl();
+    await this.verificarSesion();
+    this.controlarBotonAtras();
+  }
 
-constructor(private platform: Platform) {
-  this.platform.ready().then(() => {
-    this.platform.backButton.subscribeWithPriority(10, () => {
-      // Aquí controlas que no vuelva al login
-      // o puedes mostrar un confirm de salida
-      console.log('Botón atrás presionado');
+  private async procesarTokenDeUrl() {
+    try {
+      const { data, error } = await this.supabaseService.processSessionFromUrl();
+
+      if (error) {
+        console.error('Error obteniendo sesión:', error.message);
+        this.mostrarToast('Error procesando la confirmación de email', 'danger');
+        return;
+      }
+
+      if (data?.session) {
+        console.log('Sesión actualizada tras confirmar token:', data.session);
+        this.mostrarToast('Correo confirmado correctamente', 'success');
+        // Aquí puedes recargar datos o navegar si quieres
+      }
+    } catch (error) {
+      console.error('Error inesperado procesando token de URL:', error);
+    }
+  }
+
+  private async mostrarToast(mensaje: string, color: string = 'success') {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: 3000,
+      color,
+      position: 'middle',
     });
-  });
-}
+    await toast.present();
+  }
 
+  private async verificarSesion() {
+    const { data } = await this.supabaseService.getSession();
+    if (!data.session) {
+      this.router.navigate(['/login']);
+    }
+  }
 
-  // --------------------------------------------------------------
-  // Alerta de ayuda
+  private controlarBotonAtras() {
+    this.platform.backButton.subscribeWithPriority(10, () => {
+      const currentUrl = this.router.url;
+
+      if (currentUrl === '/home') {
+        console.log('Botón atrás desactivado en /home');
+        return;
+      } else {
+        window.history.back();
+      }
+    });
+  }
+
   async showHelpAlert() {
     const alert = await this.alertController.create({
       header: 'Centro de Ayuda',
@@ -58,8 +100,6 @@ constructor(private platform: Platform) {
     await alert.present();
   }
 
-  // --------------------------------------------------------------
-  // Alerta de cierre de sesión
   async presentAlert() {
     const alert = await this.alertController.create({
       header: '¿Estás seguro?',
@@ -68,18 +108,14 @@ constructor(private platform: Platform) {
         {
           text: 'No',
           role: 'cancel',
-          handler: () => {
-            console.log('Alerta cancelada');
-          }
         },
         {
           text: 'Sí',
           handler: async () => {
             try {
               await this.supabaseService.signOut();
-              console.log('Sesión cerrada correctamente');
               localStorage.removeItem('user_veterinario');
-              this.router.navigate(['/login']); // Redirige al login o la ruta que prefieras
+              this.router.navigate(['/login']);
             } catch (error) {
               console.error('Error cerrando sesión:', (error as Error).message);
             }
@@ -90,7 +126,4 @@ constructor(private platform: Platform) {
 
     await alert.present();
   }
-
-
-  
 }
