@@ -19,7 +19,8 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 })
 export class MascotasPage implements OnInit {
   mascotas: any[] = [];
-  idTutor!: string;  // Cambié el nombre para ser más claro
+  idTutor!: string;
+    // Cambié el nombre para ser más claro
 
   constructor(
     private route: ActivatedRoute,
