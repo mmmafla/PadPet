@@ -38,8 +38,11 @@ export class HomePage implements OnInit {
   runVet = '';
   logoVet = '';
 
-  estadoSolicitud: string = 'rechazada'; // <-- valor por defecto
-  mostrarMensajeSolicitud = false;
+  estadoSolicitud: string = 'rechazada'; // valor por defecto
+  mostrarMensajeSolicitud = true; // ahora siempre visible
+
+  estadosPosibles: { id: string; nombre: string }[] = [];
+  estadoNombre: string = 'Desconocido';
 
   slidingOpen = false;
   slidingOpenAgenda = false;
@@ -73,7 +76,23 @@ export class HomePage implements OnInit {
     }
 
     try {
-      const { data, error } = await this.supabase
+      // 1. Consultar la tabla de estados desde Supabase
+      const { data: estados, error: errorEstados } = await this.supabase
+        .from('estado_solicitud')
+        .select('id_est_solicitud, nombre_solicitud');
+
+      if (errorEstados) {
+        console.error('Error al obtener estados:', errorEstados);
+        return;
+      }
+
+      this.estadosPosibles = estados.map(e => ({
+        id: String(e.id_est_solicitud),
+        nombre: e.nombre_solicitud
+      }));
+
+      // 2. Obtener datos del veterinario
+      const { data, error: errorVet } = await this.supabase
         .from('veterinario')
         .select(`
           nombre_vet, 
@@ -88,8 +107,8 @@ export class HomePage implements OnInit {
         .eq('id_auth', user.id)
         .single();
 
-      if (error) {
-        console.error('Error al obtener los datos del veterinario:', error);
+      if (errorVet) {
+        console.error('Error al obtener los datos del veterinario:', errorVet);
         return;
       }
 
@@ -97,13 +116,20 @@ export class HomePage implements OnInit {
         this.nombreVet = `${data.nombre_vet} ${data.apellidos_vet}`;
         this.runVet = this.formatRut(data.run_vet || '');
         this.logoVet = (data.dato_profesional as any)?.foto_perfil || 'assets/default-user.png';
-        this.estadoSolicitud = data.estado_solicitud ?? 'rechazada'; // <-- importante
-        this.mostrarMensajeSolicitud = this.estadoSolicitud !== 'aceptada';
+        this.estadoSolicitud = data.estado_solicitud ?? 'rechazada';
+
+        // Buscar el nombre legible desde estadosPosibles
+        const estado = this.estadosPosibles.find(e => e.id === this.estadoSolicitud);
+        this.estadoNombre = estado ? estado.nombre : 'Desconocido';
+
+        // Mostrar siempre el mensaje
+        this.mostrarMensajeSolicitud = true;
       } else {
         console.warn('No se encontraron datos para este veterinario.');
       }
+
     } catch (error) {
-      console.error('Error en la consulta a Supabase:', error);
+      console.error('Error general en ngOnInit:', error);
     }
   }
 
@@ -150,4 +176,19 @@ export class HomePage implements OnInit {
       this.router.navigate(['/dashboard']);
     }
   }
+
+  getColorEstado(): string {
+    switch(this.estadoSolicitud) {
+      case '1': // aceptado
+        return 'success';    // verde
+      case '2': // pendiente
+        return 'danger';    // amarillo
+      case '3': // rechazada
+        return 'warning';     // rojo
+      default:
+        return 'medium';     // gris o color por defecto
+    }
+  }
+
+
 }

@@ -5,16 +5,17 @@
 <ion-content class="fondo" [fullscreen]="true">
 
   <!-- Mensaje de solicitud -->
-  <ion-card *ngIf="mostrarMensajeSolicitud" color="warning" class="ion-padding position-relative" style="border-radius: 20px;">
+  <ion-card *ngIf="mostrarMensajeSolicitud" [color]="getColorEstado()" class="ion-padding position-relative" style="border-radius: 20px;">
     <ion-button fill="clear" size="small" class="cerrar-btn" (click)="cerrarMensajeSolicitud()">
       <ion-icon name="close-outline"></ion-icon>
     </ion-button>
 
     <ion-card-content style="text-align: center;">
       <ion-icon name="information-circle-outline" style="font-size: 25px; vertical-align: middle; margin-right: 4px;"></ion-icon>
-      <strong>Solicitud enviada:</strong> {{ estadoSolicitud | titlecase }} <br />
+      <strong>Solicitud enviada:</strong> {{ estadoNombre | titlecase }} <br />
     </ion-card-content>
   </ion-card>
+
 
   <ion-grid>
 
@@ -130,38 +131,6 @@
               (click)="irAConsulta()"
             >
               Agrega una nueva atención médica para un animal y registra el tratamiento correspondiente.
-            </ion-item-option>
-          </ion-item-options>
-        </ion-item-sliding>
-      </ion-col>
-
-      <!-- Recetas médicas -->
-      <ion-col size="12">
-        <ion-item-sliding
-          class="ion-card-otros"
-          #slidingRecetas
-          (ionOpen)="slidingOpenRecetas = true"
-          (ionClose)="slidingOpenRecetas = false"
-        >
-          <ion-item
-            lines="none"
-            [disabled]="estadoSolicitud !== '1'"
-            [class.disabled]="estadoSolicitud !== '1'"
-            button
-            (click)="estadoSolicitud === '1' ? irARecetas() : null"
-            [style.background]="slidingOpenRecetas ? '#fff' : 'transparent'"
-          >
-            <div class="contenido-centro">
-              <ion-card-title class="card-title">Receta médica</ion-card-title>
-            </div>
-          </ion-item>
-
-          <ion-item-options side="end">
-            <ion-item-option
-              style="white-space: normal; width: 240px; cursor: pointer; background-color: #fffffa; color:#658faf"
-              (click)="irARecetas()"
-            >
-              Visualiza y gestiona los tratamientos médicos prescritos a los animales atendidos.
             </ion-item-option>
           </ion-item-options>
         </ion-item-sliding>

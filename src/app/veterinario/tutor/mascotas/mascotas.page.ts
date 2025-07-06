@@ -144,4 +144,16 @@ export class MascotasPage implements OnInit {
   verHistorialClinico(idMasc: number) {
     this.router.navigate([`/veterinario/tutor/mascotas/${this.idTutor}/${idMasc}/historial-clinico`]);
   }
+
+  iniciarAtencionMedica(idMasc: number, runTutor: string) {
+    this.router.navigate(['/veterinario/atencion-medica/agregar-atencion-medica'], {
+      queryParams: {
+        id_mascota: idMasc,
+        run_tutor: runTutor
+      }
+    });
+  }
+
+
+
 }

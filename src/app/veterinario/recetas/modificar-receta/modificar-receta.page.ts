@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { createClient } from '@supabase/supabase-js';
 import { ToastController, AlertController, IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
@@ -18,24 +18,58 @@ const supabase = createClient(supabaseUrl, supabaseKey);
   imports: [IonicModule, CommonModule, FormsModule, HeaderComponent]
 })
 export class ModificarRecetaPage implements OnInit {
-  idReceta: number;
+  idReceta!: number;
   receta: any;
   tratamiento_indicaciones: string = '';
   tratamientoList: { nombre: string; dosis: string; duracion: string; frecuencia: string }[] = [];
+  runVet: string | null = null;
 
   constructor(
     private toastController: ToastController,
     private alertController: AlertController,
-    private router: Router
-  ) {
-    const nav = this.router.getCurrentNavigation();
-    this.idReceta = nav?.extras?.state?.['id'];
-  }
+    private router: Router,
+    private route: ActivatedRoute  // <-- Inyectamos ActivatedRoute
+  ) {}
 
   async ngOnInit() {
+    // Obtener id_receta desde la URL
+    this.idReceta = Number(this.route.snapshot.paramMap.get('id_receta'));
+
+    if (!this.idReceta) {
+      this.mostrarToast('No se especificó id de receta', 'danger');
+      return;
+    }
+
+    await this.obtenerRunVet();
+
     if (this.idReceta) {
       await this.cargarDatosReceta(this.idReceta);
     }
+  }
+
+  async obtenerRunVet() {
+    const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
+    const userId = sessionData.session?.user?.id;
+
+    if (!userId) {
+      console.error('No se pudo obtener user.id desde la sesión:', sessionError);
+      await this.mostrarToast('No se pudo identificar al usuario', 'danger');
+      return;
+    }
+
+    const { data, error } = await supabase
+      .from('veterinario')
+      .select('run_vet')
+      .eq('id_auth', userId)
+      .single();
+
+    if (error || !data) {
+      console.error('Error obteniendo run_vet:', error);
+      await this.mostrarToast('Error obteniendo datos del veterinario', 'danger');
+      return;
+    }
+
+    this.runVet = data.run_vet;
   }
 
   async cargarDatosReceta(id: number) {
@@ -92,7 +126,9 @@ export class ModificarRecetaPage implements OnInit {
   }
 
   async guardarCambiosReceta() {
-    // Indicaciones NO obligatorias, por eso no se valida aquí.
+    if (!this.runVet) {
+      return this.mostrarToast('No se pudo obtener identificación del veterinario', 'danger');
+    }
 
     if (this.tratamientoList.length === 0) {
       return this.mostrarToast('Agrega al menos un medicamento', 'warning');
@@ -102,7 +138,6 @@ export class ModificarRecetaPage implements OnInit {
       if (!med.nombre.trim()) {
         return this.mostrarToast('El nombre del medicamento es obligatorio', 'warning');
       }
-      // dosis, duración y frecuencia NO obligatorios
     }
 
     const alert = await this.alertController.create({
@@ -195,8 +230,10 @@ export class ModificarRecetaPage implements OnInit {
     }
 
     this.mostrarToast('Receta actualizada correctamente');
-    this.router.navigate(['/veterinario/recetas/detalle-receta'], {
-      state: { id: this.idReceta }
+
+    // Cambio aquí para navegar a detalle-atencion
+    this.router.navigate(['/detalle-atencion'], {
+      state: { id_receta: this.idReceta }
     });
   }
 
@@ -235,6 +272,6 @@ export class ModificarRecetaPage implements OnInit {
     }
 
     this.mostrarToast('Receta eliminada correctamente', 'success');
-    this.router.navigate(['/recetas']);
+    this.router.navigate(['/home']);
   }
 }

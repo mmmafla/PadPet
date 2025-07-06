@@ -30,6 +30,14 @@
                       <ion-icon slot="icon-only" name="create-outline"></ion-icon>
                     </ion-item-option>
     <ion-item-option style="background-color: #8a9aca;" (click)="verHistorialClinico(mascota.id_masc)">Ver Historial</ion-item-option>
+      <ion-item-option 
+        style="background-color: #8a9aca;" 
+        (click)="iniciarAtencionMedica(mascota.id_masc, idTutor)">
+        Iniciar consulta
+      </ion-item-option>
+
+
+
   </ion-item-options>
 </ion-item-sliding>
 
