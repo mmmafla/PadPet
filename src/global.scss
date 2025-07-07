@@ -4,7 +4,7 @@
 
 
   .ion-card{
-    padding-top: 10%;
+
     padding-bottom: 10%;
     padding-left: 5%;
     padding-right: 5%;
@@ -14,7 +14,7 @@
   }
 
   .card{
-    padding-top: 5%;
+
     padding-bottom: 5%;
     padding-left: 5%;
     padding-right: 5%;
@@ -47,13 +47,26 @@
       }
 
   .card3{
-    padding-top:5%;
+
     padding-bottom: 5%;
     padding-left: 5%;
     padding-right: 5%;
     margin-left: 5%;
     margin-right: 5%;
     background: rgb(251, 251, 251);
+    border: 1px solid rgb(100, 181, 239);
+    box-shadow: 0 0 0px;
+    border-radius: 20px; 
+}
+
+  .card4{
+
+    padding-bottom: 1%;
+    padding-left: 5%;
+    padding-right: 5%;
+    margin-left: 2%;
+    margin-right: 2%;
+    background: rgba(255, 255, 255);
     border: 1px solid rgb(100, 181, 239);
     box-shadow: 0 0 0px;
     border-radius: 20px; 
@@ -162,10 +175,63 @@ p{
   align-items: center;
 }
 
-ion-header, ion-footer, ion-content {
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
+.italic {
+  font-style: italic;
 }
+
+.consulta-item{
+    --border-radius: 16px;
+    --background: #f4f4f4;
+    --box-shadow: 0 0px 0px rgba(0, 0, 0, 0.1);
+    --color: #222;
+    --placeholder-color: #999;
+    margin-bottom: 16px;
+    padding: 0 8px;
+
+}
+
+ion-item.consulta-item {
+  --padding-start: 16px;
+  --inner-padding-end: 16px;
+  --min-height: 60px;
+
+}
+
+
+
+
+.footer-transparente {
+  --background: transparent !important; /* fondo totalmente transparente */
+  border-top: none !important;          /* sin línea superior */
+  box-shadow: none !important;          /* sin sombra */
+  backdrop-filter: none !important;     /* elimina efecto de difuminado */
+  --ion-safe-area-bottom: 0px !important; /* elimina espacio extra abajo si aplica */
+
+    padding-bottom: env(safe-area-inset-bottom);
+}
+
+.sticky-footer {
+  position: fixed !important;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 9999; /* que quede encima */
+}
+
+ion-content {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 60px); /* 56px es el alto típico del footer */
+}
+
+.page-content {
+  padding-bottom: env(safe-area-inset-bottom); // iOS + Android moderno
+}
+
+
+.keyboard-is-open ion-content {
+  --padding-bottom: 300px; // ajusta según el teclado
+}
+
 
 
 /*
