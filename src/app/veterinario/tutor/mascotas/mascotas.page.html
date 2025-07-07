@@ -1,8 +1,8 @@
-<ion-header class="ion-no-border">
-<app-header backButton="/tutor"></app-header>
+<ion-header class="ion-safe-area-top ion-no-border">
+  <app-header backButton="/tutor" title=""></app-header>
 </ion-header>
 
-<ion-content class="fondo ion-padding" [fullscreen]="true">
+<ion-content fullscreen="true" class="ion-padding-bottom fondo">
 
   <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
     <ion-refresher-content></ion-refresher-content>
@@ -30,6 +30,14 @@
                       <ion-icon slot="icon-only" name="create-outline"></ion-icon>
                     </ion-item-option>
     <ion-item-option style="background-color: #8a9aca;" (click)="verHistorialClinico(mascota.id_masc)">Ver Historial</ion-item-option>
+      <ion-item-option 
+        style="background-color: #8a9aca;" 
+        (click)="iniciarAtencionMedica(mascota.id_masc, idTutor)">
+        Iniciar consulta
+      </ion-item-option>
+
+
+
   </ion-item-options>
 </ion-item-sliding>
 
@@ -46,10 +54,12 @@
 
 
     <!-- Botón agregar mascota -->
-  <div class="boton-agregar">
+
+  <ion-footer class="footer-transparente sticky-footer">
     <ion-button class="agregar-mascota" expand="block" (click)="irAgregarMascota()">
-      <ion-icon name="add" slot="start"></ion-icon> Agregar mascota
+      <ion-icon name="add" slot="start"></ion-icon>
+      Agregar Mascota
     </ion-button>
-  </div>
+    </ion-footer>
 
 </ion-content>

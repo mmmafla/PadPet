@@ -1,8 +1,10 @@
-<ion-header class="ion-no-border">
-<app-header [backButton]="'/veterinario/tutor/mascotas/' + idTutor"></app-header>
+<ion-header class="ion-safe-area-top ion-no-border">
+  <app-header [backButton]="'/veterinario/tutor/mascotas/' + idTutor" title=""></app-header>
 </ion-header>
 
-<ion-content class="fondo" [fullscreen]="true">
+<ion-content class="fondo ion-padding-bottom" [fullscreen]="true">
+
+  
   
   <ion-card class="ion-card">
     <h2>Agregar mascota</h2>
@@ -15,11 +17,11 @@
         </ion-item>
 <!--SEXO --------------------->
         <ion-item>
-          <ion-select label="Sexo" interface="popover" formControlName="id_sexo" required>
+          <ion-select label="Sexo" interface="popover" formControlName="id_sexo">
             <ion-select-option *ngFor="let s of sexo" [value]="s.id_sexo">
               {{ s.masc_sexo }}
             </ion-select-option>
-          </ion-select><span style="color: red">*</span>
+          </ion-select>
         </ion-item>
 <!-- FECHA NACIMIENTO -->
 
@@ -30,10 +32,10 @@
 
                       slot="end"
                       class="checkbox-redondo"
-    formControlName="fecha_desconocida"
-    (ionChange)="onFechaDesconocidaChange()"
-  ></ion-checkbox>
-</ion-item>
+                      formControlName="fecha_desconocida"
+                      (ionChange)="onFechaDesconocidaChange()"
+                    ></ion-checkbox>
+                  </ion-item>
 
 
 <!-- FECHA DE NACIMIENTO (solo si fecha conocida) -->
@@ -86,7 +88,7 @@
             <ion-select-option *ngFor="let raza of razas" [value]="raza.id_raza">
               {{ raza.nom_raza }}
             </ion-select-option>
-          </ion-select> <span style="color: red">*</span>
+          </ion-select>
         </ion-item>
 
 <!--TAMAÑO --------------------->
@@ -115,7 +117,7 @@
             <ion-select-option *ngFor="let e of esterilizado" [value]="e.id_esterilizado">
               {{ e.esterilizado_estado }}
             </ion-select-option>
-          </ion-select> <span style="color: red">*</span>
+          </ion-select>
         </ion-item>
 <!--GRUPO SANGUINEO --------------------->
         <ion-item>

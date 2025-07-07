@@ -1,17 +1,18 @@
-<ion-header class="ion-no-border">
+<ion-header class="ion-safe-area-top ion-no-border">
 <app-header [backButton]="'/veterinario/tutor/mascotas/' + idMasc"></app-header>
 </ion-header>
 
 
-<ion-content class="fondo ion-padding" [fullscreen]="true">
+<ion-content class="fondo ion-padding-bottom" [fullscreen]="true">
 
-  <ion-card *ngIf="atenciones.length > 0">
+  <ion-card *ngIf="atenciones.length > 0" class="ion-card">
     <ion-list>
-      <ion-item *ngFor="let atencion of atenciones">
+<ion-item *ngFor="let atencion of atenciones" (click)="verDetalle(atencion.id)">
         <ion-label>
-          <h3>{{ atencion.fecha_atencion | date:'medium' }}</h3>
+          <h4>{{ atencion.anamnesis }}</h4>
           <p>Diagnóstico: {{ atencion.diagnostico }}</p>
           <p>Tratamientos: {{ atencion.tratamientos }}</p>
+          <p>{{atencion.fecha_hora_atencion | date: 'medium'}}</p>
         </ion-label>
       </ion-item>
     </ion-list>

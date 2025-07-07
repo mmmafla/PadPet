@@ -1,48 +1,73 @@
-<ion-header class="ion-no-border">
-<app-header backButton="/home"></app-header>
+<ion-header class="ion-safe-area-top ion-no-border">
+  <app-header backButton="/tutor" title=""></app-header>
 </ion-header>
 
-
-<ion-content class="fondo" [fullscreen]="true">
+<ion-content class="fondo ion-padding-bottom" [fullscreen]="true">
   
   <ion-card class="ion-card">
       <h2>Nuevo tutor</h2>
       
-    <form [formGroup]="tutorForm" (ngSubmit)="guardarTutor()">
+    <form [formGroup]="tutorForm" >
       <ion-list>
         <ion-item>
-          <ion-input  label="RUN Tutor" type="text" formControlName="run_tutor"></ion-input>
+          <ion-label position="stacked">RUN Tutor</ion-label>
+          <ion-input type="text" formControlName="run_tutor"></ion-input>
         </ion-item>
+
         <ion-item>
-          <ion-input label="Nombre" type="text" formControlName="nombre_tutor"></ion-input>
+          <ion-label position="stacked">
+            Nombre <span class="requerido">*</span>
+          </ion-label>
+          <ion-input type="text" formControlName="nombre_tutor"></ion-input>
         </ion-item>
+
         <ion-item>
-          <ion-input label="Apellidos" type="text" formControlName="apellidos_tutor"></ion-input>
+          <ion-label position="stacked">
+            Apellidos <span class="requerido">*</span>
+          </ion-label>
+          <ion-input type="text" formControlName="apellidos_tutor"></ion-input>
         </ion-item>
+
         <ion-item>
-          <ion-input label="Dirección" type="text" formControlName="direccion_tutor"></ion-input>
+          <ion-label position="stacked">Dirección</ion-label>
+          <ion-input type="text" formControlName="direccion_tutor"></ion-input>
         </ion-item>
+
         <ion-item>
-          <ion-input label="Correo" type="email" formControlName="correo_tutor"></ion-input>
+          <ion-label position="stacked">Correo</ion-label>
+          <ion-input type="email" formControlName="correo_tutor"></ion-input>
         </ion-item>
+
         <ion-item>
-          <ion-input label="Celular" maxlength="11" inputmode="numeric" type="tel" formControlName="celular_tutor"></ion-input>
+          <ion-label position="stacked">
+            Celular <span class="requerido">*</span>
+          </ion-label>
+          <ion-input
+            type="number"
+            maxlength="11"
+            formControlName="celular_tutor"
+          ></ion-input>
         </ion-item>
+
         <ion-item>
-          <ion-select formControlName="id_region" label="Región" interface="popover" placeholder="Selecciona una región" (ionChange)="cargarCiudades()">
+          <ion-label position="stacked">Región</ion-label>
+          <ion-select formControlName="id_region" interface="popover" placeholder="Selecciona una región" (ionChange)="cargarCiudades()">
             <ion-select-option *ngFor="let region of regiones" [value]="region.id_region">
               {{ region.nombre_region }}
             </ion-select-option>
           </ion-select>
         </ion-item>
+
         <ion-item>
-          <ion-select formControlName="id_ciudad" label="Ciudad" interface="popover" placeholder="Selecciona una ciudad">
+          <ion-label position="stacked">Ciudad</ion-label>
+          <ion-select formControlName="id_ciudad" interface="popover" placeholder="Selecciona una ciudad">
             <ion-select-option *ngFor="let ciudad of ciudades" [value]="ciudad.id_ciudad">
               {{ ciudad.nombre_ciudad }}
             </ion-select-option>
           </ion-select>
         </ion-item>
       </ion-list>
+
       <ion-button expand="block" class="boton-editar" [disabled]="tutorForm.invalid" (click)="guardarTutor()">Crear Tutor</ion-button>
     </form>
   </ion-card>

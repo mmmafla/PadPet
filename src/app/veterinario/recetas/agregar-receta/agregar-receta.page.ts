@@ -10,8 +10,6 @@ const supabaseUrl = 'https://irorlonysbmkbdthvrmt.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyb3Jsb255c2Jta2JkdGh2cm10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYyODgwMDQsImV4cCI6MjA2MTg2NDAwNH0.s-ZEteHxMWX43NCQIuNmTWpbBoEUxseKyg_YaXpi6Ek';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// ... (importaciones y configuración igual que antes)
-
 @Component({
   selector: 'app-agregar-receta',
   templateUrl: './agregar-receta.page.html',
@@ -27,8 +25,7 @@ export class AgregarRecetaPage implements OnInit {
   mascotaSeleccionada: any | null = null;
 
   tratamiento_indicaciones: string = '';
-  tratamientoList: { id_medicamento: number | null; dosis: string; duracion: string }[] = [];
-  medicamentosDisponibles: any[] = [];
+  tratamientoList: { nombre: string; dosis: string; duracion: string; frecuencia: string }[] = [];
 
   runVet: string | null = null;
 
@@ -42,21 +39,7 @@ export class AgregarRecetaPage implements OnInit {
     await this.obtenerRunVet();
     if (this.runVet) {
       this.cargarTutores();
-      this.cargarMedicamentos();
     }
-  }
-
-  async cargarMedicamentos() {
-    const { data, error } = await supabase
-      .from('medicamento')
-      .select('id_medicamento, nombre_medicamento');
-
-    if (error) {
-      console.error('Error al cargar medicamentos:', error);
-      return;
-    }
-
-    this.medicamentosDisponibles = data || [];
   }
 
   async obtenerRunVet() {
@@ -119,7 +102,7 @@ export class AgregarRecetaPage implements OnInit {
   }
 
   agregarMedicamento() {
-    this.tratamientoList.push({ id_medicamento: null, dosis: '', duracion: '' });
+    this.tratamientoList.push({ nombre: '', dosis: '', duracion: '', frecuencia: '' });
   }
 
   eliminarMedicamento(index: number) {
@@ -140,15 +123,13 @@ export class AgregarRecetaPage implements OnInit {
     if (!this.tutorSeleccionado || !this.mascotaSeleccionada) {
       return this.mostrarToast('Debes seleccionar tutor y mascota', 'warning');
     }
-    if (!this.tratamiento_indicaciones.trim()) {
-      return this.mostrarToast('Escribe indicaciones generales', 'warning');
-    }
     if (this.tratamientoList.length === 0) {
       return this.mostrarToast('Agrega al menos un medicamento', 'warning');
     }
+
     for (const med of this.tratamientoList) {
-      if (!med.id_medicamento || !med.dosis.trim() || !med.duracion.trim()) {
-        return this.mostrarToast('Completa todos los datos de los medicamentos', 'warning');
+      if (!med.nombre.trim()) {
+        return this.mostrarToast('Cada medicamento debe tener al menos un nombre', 'warning');
       }
     }
 
@@ -164,15 +145,49 @@ export class AgregarRecetaPage implements OnInit {
     await alert.present();
   }
 
+  async insertarOMedicamento(nombre: string): Promise<number | null> {
+    const { data: existente, error: errorBusqueda } = await supabase
+      .from('medicamento')
+      .select('id_medicamento')
+      .ilike('nombre_medicamento', nombre.trim())
+      .maybeSingle();
+
+    if (errorBusqueda) {
+      console.error('Error buscando medicamento:', errorBusqueda);
+      return null;
+    }
+
+    if (existente) return existente.id_medicamento;
+
+    const { data: insertado, error: errorInsert } = await supabase
+      .from('medicamento')
+      .insert({ nombre_medicamento: nombre.trim() })
+      .select('id_medicamento')
+      .single();
+
+    if (errorInsert) {
+      console.error('Error insertando nuevo medicamento:', errorInsert);
+      return null;
+    }
+
+    return insertado.id_medicamento;
+  }
+
   async guardarRecetaEnBD() {
+    if (!this.runVet) {
+      return this.mostrarToast('No se pudo obtener identificación del veterinario', 'danger');
+    }
+
     const fechaActual = new Date().toISOString();
 
+    // Agrego run_vet en la inserción para asociar receta al veterinario
     const { data: recetaInsertada, error: recetaError } = await supabase
       .from('receta')
       .insert([{
-        indicaciones: this.tratamiento_indicaciones,
+        indicaciones: this.tratamiento_indicaciones || '',
         id_masc: this.mascotaSeleccionada.id_masc,
-        fecha_receta: fechaActual
+        fecha_receta: fechaActual,
+        run_vet: this.runVet  // <-- clave para asociación
       }])
       .select('id_receta')
       .single();
@@ -184,25 +199,37 @@ export class AgregarRecetaPage implements OnInit {
 
     const idReceta = recetaInsertada.id_receta;
 
-    const detalles = this.tratamientoList.map(med => ({
-      id_receta: idReceta,
-      id_medicamento: med.id_medicamento,
-      dosis_medicamento: med.dosis,
-      duracion_medicamento: med.duracion
-    }));
+    const detalles: any[] = [];
+
+    for (const med of this.tratamientoList) {
+      const idMedicamento = await this.insertarOMedicamento(med.nombre);
+      if (!idMedicamento) continue;
+
+      detalles.push({
+        id_receta: idReceta,
+        id_medicamento: idMedicamento,
+        dosis_medicamento: med.dosis || '',
+        duracion_medicamento: med.duracion || '',
+        frecuencia_medicamento: med.frecuencia || ''
+      });
+    }
+
+    if (detalles.length === 0) {
+      return this.mostrarToast('No se pudieron insertar los medicamentos', 'danger');
+    }
 
     const { error: detalleError } = await supabase
       .from('detalle_receta')
       .insert(detalles);
 
     if (detalleError) {
-      console.error('Error al guardar medicamentos:', detalleError);
-      return this.mostrarToast('No se pudieron guardar los medicamentos', 'danger');
+      console.error('Error al guardar detalle receta:', detalleError);
+      return this.mostrarToast('Error al guardar detalle de la receta', 'danger');
     }
 
     this.mostrarToast('Receta registrada exitosamente');
     this.limpiarFormulario();
-    this.router.navigate(['/veterinario/recetas']);
+    this.router.navigate(['/recetas']);
   }
 
   limpiarFormulario() {
@@ -214,4 +241,3 @@ export class AgregarRecetaPage implements OnInit {
     this.tratamientoList = [];
   }
 }
-

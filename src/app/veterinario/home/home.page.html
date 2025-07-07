@@ -1,20 +1,20 @@
-<ion-header class="ion-no-border">
-  <app-header title=""></app-header>
-</ion-header>
+ <app-header title=""></app-header>
 
-<ion-content class="fondo" [fullscreen]="true">
+
+<ion-content class="fondo ion-padding-bottom" [fullscreen]="true">
 
   <!-- Mensaje de solicitud -->
-  <ion-card *ngIf="mostrarMensajeSolicitud" color="warning" class="ion-padding position-relative" style="border-radius: 20px;">
+  <ion-card *ngIf="mostrarMensajeSolicitud" [color]="getColorEstado()" class="ion-padding position-relative" style="border-radius: 20px;">
     <ion-button fill="clear" size="small" class="cerrar-btn" (click)="cerrarMensajeSolicitud()">
       <ion-icon name="close-outline"></ion-icon>
     </ion-button>
 
     <ion-card-content style="text-align: center;">
       <ion-icon name="information-circle-outline" style="font-size: 25px; vertical-align: middle; margin-right: 4px;"></ion-icon>
-      <strong>Solicitud enviada:</strong> {{ estadoSolicitud | titlecase }} <br />
+      <strong>Solicitud:</strong> {{ estadoNombre | titlecase }} <br />
     </ion-card-content>
   </ion-card>
+
 
   <ion-grid>
 
@@ -24,7 +24,12 @@
         <ion-grid>
           <ion-row class="fila-perfil" align-items-center>
             <ion-col size="12" size-md="auto" class="img-perfil">
-              <img [src]="logoVet" alt="Logo" class="profile-img">
+              <ng-container *ngIf="logoVet; else noLogo">
+                <img [src]="logoVet" alt="Foto de perfil" class="profile-img">
+              </ng-container>
+              <ng-template #noLogo>
+                <div class="placeholder-img"></div>
+              </ng-template>
             </ion-col>
             <ion-col size="12" size-md="true" class="datos-medico">
               <ion-card-title class="nombre">MV. {{ nombreVet || 'Cargando nombre'}}</ion-card-title>
@@ -39,7 +44,7 @@
     <ion-row>
 
       <!-- Tutores -->
-      <ion-col size="6">
+      <ion-col size="6" [routerLink]="['/tutor']">
         <ion-item-sliding
           class="ion-card-importantes"
           #slidingItem
@@ -48,9 +53,10 @@
         >
           <ion-item
             lines="none"
-            [class.disabled]="estadoSolicitud !== 'aceptada'"
+            [disabled]="estadoSolicitud !== '1'"
+            [class.disabled]="estadoSolicitud !== '1'"
             button
-            (click)="estadoSolicitud === 'aceptada' ? irATutor() : null"
+            (click)="estadoSolicitud === '1' ? irATutor() : null"
           >
             <div class="contenido-centro">
               <ion-icon name="paw-sharp" class="icono2"></ion-icon>
@@ -79,9 +85,10 @@
         >
           <ion-item
             lines="none"
-            [class.disabled]="estadoSolicitud !== 'aceptada'"
+            [disabled]="estadoSolicitud !== '1'"
+            [class.disabled]="estadoSolicitud !== '1'"
             button
-            (click)="estadoSolicitud === 'aceptada' ? irAAgenda() : null"
+            (click)="estadoSolicitud === '1' ? irAAgenda() : null"
             [style.background]="slidingOpenAgenda ? '#fff' : 'transparent'"
           >
             <div class="contenido-centro">
@@ -111,9 +118,10 @@
         >
           <ion-item
             lines="none"
-            [class.disabled]="estadoSolicitud !== 'aceptada'"
+            [disabled]="estadoSolicitud !== '1'"
+            [class.disabled]="estadoSolicitud !== '1'"
             button
-            (click)="estadoSolicitud === 'aceptada' ? irAConsulta() : null"
+            (click)="estadoSolicitud === '1' ? irAConsulta() : null"
             [style.background]="slidingOpenConsulta ? '#fff' : 'transparent'"
           >
             <div class="contenido-centro">
@@ -132,37 +140,6 @@
         </ion-item-sliding>
       </ion-col>
 
-      <!-- Recetas médicas -->
-      <ion-col size="12">
-        <ion-item-sliding
-          class="ion-card-otros"
-          #slidingRecetas
-          (ionOpen)="slidingOpenRecetas = true"
-          (ionClose)="slidingOpenRecetas = false"
-        >
-          <ion-item
-            lines="none"
-            [class.disabled]="estadoSolicitud !== 'aceptada'"
-            button
-            (click)="estadoSolicitud === 'aceptada' ? irARecetas() : null"
-            [style.background]="slidingOpenRecetas ? '#fff' : 'transparent'"
-          >
-            <div class="contenido-centro">
-              <ion-card-title class="card-title">Receta médica</ion-card-title>
-            </div>
-          </ion-item>
-
-          <ion-item-options side="end">
-            <ion-item-option
-              style="white-space: normal; width: 240px; cursor: pointer; background-color: #fffffa; color:#658faf"
-              (click)="irARecetas()"
-            >
-              Visualiza y gestiona los tratamientos médicos prescritos a los animales atendidos.
-            </ion-item-option>
-          </ion-item-options>
-        </ion-item-sliding>
-      </ion-col>
-
       <!-- Estadísticas -->
       <ion-col size="12">
         <ion-item-sliding
@@ -173,9 +150,10 @@
         >
           <ion-item
             lines="none"
-            [class.disabled]="estadoSolicitud !== 'aceptada'"
+            [disabled]="estadoSolicitud !== '1'"
+            [class.disabled]="estadoSolicitud !== '1'"
             button
-            (click)="estadoSolicitud === 'aceptada' ? irADashboard() : null"
+            (click)="estadoSolicitud === '1' ? irADashboard() : null"
             [style.background]="slidingOpenEstadisticas ? '#fff' : 'transparent'"
           >
             <div class="contenido-centro">

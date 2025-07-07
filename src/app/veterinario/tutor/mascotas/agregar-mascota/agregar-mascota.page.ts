@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
 } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
-import { IonicModule, ToastController } from '@ionic/angular';
+import { IonicModule, ToastController, AlertController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { createClient } from '@supabase/supabase-js';
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
@@ -44,19 +44,20 @@ export class AgregarMascotaPage implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private toastController: ToastController
+    private toastController: ToastController,
+    private alertController: AlertController
   ) {
     this.mascotaForm = this.fb.group({
       masc_nom: ['', Validators.required],
-      id_sexo: ['', Validators.required],
+      id_sexo: [''],
       masc_nacimiento: [null],
       masc_edad: [null],
       id_especie: ['', Validators.required],
-      id_raza: [null, Validators.required],
+      id_raza: [null],
       id_tamanio: [null],
       id_pelaje: [null],
       masc_color: [''],
-      id_esterilizado: ['',Validators.required],
+      id_esterilizado: [''],
       id_grupo_sanguineo: [null],
       masc_num_chip: [null],
       masc_observaciones: [''],
@@ -253,15 +254,15 @@ export class AgregarMascotaPage implements OnInit {
     const formData = { ...this.mascotaForm.value };
 
     formData.id_estado = 1;
-    formData.masc_num_chip = formData.masc_num_chip ? Number(formData.masc_num_chip) : null;
-    formData.masc_edad = formData.masc_edad ? Number(formData.masc_edad) : null;
+    formData.masc_num_chip = formData.masc_num_chip ? Number(formData.masc_num_chip) : 0;
+    formData.masc_edad = formData.masc_edad ? Number(formData.masc_edad) : 0;
     formData.id_especie = Number(formData.id_especie);
     formData.id_raza = formData.id_raza ? Number(formData.id_raza) : null;
-    formData.id_grupo_sanguineo = formData.id_grupo_sanguineo ? Number(formData.id_grupo_sanguineo) : null;
-    formData.id_sexo = Number(formData.id_sexo);
-    formData.id_pelaje = Number(formData.id_pelaje);
-    formData.id_tamanio = Number(formData.id_tamanio);
-    formData.id_esterilizado = Number(formData.id_esterilizado);
+    formData.id_grupo_sanguineo = formData.id_grupo_sanguineo ? Number(formData.id_grupo_sanguineo): null;
+    formData.id_sexo = formData.id_sexo ? Number(formData.id_sexo) : 30;
+    formData.id_pelaje = formData.id_pelaje? Number(formData.id_pelaje):8;
+    formData.id_tamanio = formData.id_tamanio? Number(formData.id_tamanio):6;
+    formData.id_esterilizado = formData.id_esterilizado ? Number(formData.id_esterilizado) : 3;
 
     delete formData.masc_edad_texto;
     delete formData.fecha_desconocida;
@@ -270,11 +271,73 @@ export class AgregarMascotaPage implements OnInit {
 
     if (error) {
       this.presentToast('Error guardando mascota: ' + error.message, 'danger');
-    } else {
-      this.presentToast('Mascota guardada correctamente', 'success');
-      this.router.navigate(['/veterinario/tutor/mascotas', this.idTutor]);
+      return;
     }
+
+    this.presentToast('Mascota guardada correctamente', 'success');
+
+    // Obtener ID de la mascota recién ingresada
+    const { data, error: fetchError } = await supabase
+      .from('mascota')
+      .select('id_masc')
+      .eq('id_tutor', this.idTutor)
+      .order('id_masc', { ascending: false })
+      .limit(1);
+
+    if (fetchError || !data || data.length === 0) {
+      this.router.navigate(['/veterinario/tutor/mascotas', this.idTutor]);
+      return;
+    }
+
+    const idMascota = data[0].id_masc;
+    const nombreMascota = this.mascotaForm.value.masc_nom;
+
+    // Obtener nombre del tutor
+    let nombreTutor = '';
+    const { data: tutorData, error: tutorError } = await supabase
+      .from('tutor')
+      .select('nombre_tutor')
+      .eq('id_tutor', this.idTutor)
+      .single();
+
+    if (tutorError) {
+      console.error('Error obteniendo nombre del tutor:', tutorError);
+    } else {
+      nombreTutor = tutorData?.nombre_tutor || '';
+    }
+
+    // Mostrar alerta para iniciar atención médica
+    const alert = await this.alertController.create({
+      header: '¿Iniciar atención médica ahora?',
+      message: 'La mascota fue registrada exitosamente. ¿Deseas comenzar una atención médica ahora mismo?',
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel',
+          handler: () => {
+            this.router.navigate(['/veterinario/tutor/mascotas', this.idTutor]);
+          },
+        },
+        {
+          text: 'Sí',
+          handler: () => {
+            this.router.navigate(['/veterinario/atencion-medica/agregar-atencion-medica'], {
+              state: {
+                id_tutor: this.idTutor,
+                id_mascota: idMascota,
+                nombre_tutor: nombreTutor,
+                nombre_mascota: nombreMascota,
+              },
+            });
+          },
+        },
+      ],
+    });
+
+    await alert.present();
   }
+
+
 
   async presentToast(message: string, color: string) {
     const toast = await this.toastController.create({

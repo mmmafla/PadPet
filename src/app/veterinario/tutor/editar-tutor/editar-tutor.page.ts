@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AlertController, IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl } from '@angular/forms';
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
 import { createClient } from '@supabase/supabase-js';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -35,11 +35,11 @@ export class EditarTutorPage implements OnInit {
 
   async ngOnInit() {
     this.tutorForm = this.fb.group({
-      run_tutor: [{ value: '', disabled: true }, Validators.required],
+      run_tutor: ['', [Validators.required, this.rutValidator]],
       nombre_tutor: ['', Validators.required],
       apellidos_tutor: ['', Validators.required],
-      direccion_tutor: ['', Validators.required],
-      correo_tutor: ['', [Validators.required, Validators.email]],
+      direccion_tutor: [''],
+      correo_tutor: [''],
       celular_tutor: ['', [Validators.required, Validators.maxLength(11)]],
       id_region: ['', Validators.required],
       id_ciudad: ['', Validators.required]
@@ -187,6 +187,34 @@ export class EditarTutorPage implements OnInit {
     });
 
     await toast.present();
+  }
+
+  rutValidator(control: AbstractControl) {
+    const run = control.value;
+    if (!run) return null;
+
+    const rut = run.toString().replace(/\./g, '').replace(/-/g, '').toUpperCase();
+    if (rut.length < 2) return { invalidRut: true };
+
+    const cuerpo = rut.slice(0, -1);
+    const dv = rut.slice(-1);
+
+    let suma = 0;
+    let multiplo = 2;
+
+    for (let i = cuerpo.length - 1; i >= 0; i--) {
+      suma += parseInt(cuerpo.charAt(i)) * multiplo;
+      multiplo = multiplo < 7 ? multiplo + 1 : 2;
+    }
+
+    const dvEsperado = 11 - (suma % 11);
+    const dvCalc = dvEsperado === 11 ? '0' : dvEsperado === 10 ? 'K' : dvEsperado.toString();
+
+    if (dv !== dvCalc) {
+      return { invalidRut: true };
+    }
+
+    return null;
   }
 
   async mostrarToast(mensaje: string, color: string = 'success') {
