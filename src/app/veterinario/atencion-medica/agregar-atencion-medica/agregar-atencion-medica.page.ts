@@ -6,6 +6,7 @@ import { IonicModule, ModalController, ToastController, AlertController } from '
 import { createClient } from '@supabase/supabase-js';
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
 import { ModalFechaComponent } from 'src/app/modal-fecha/modal-fecha.component';
+import { ActivatedRoute } from '@angular/router';
 
 const supabaseUrl = 'https://irorlonysbmkbdthvrmt.supabase.co';
 const supabaseKey =
@@ -30,7 +31,7 @@ export class AgregarAtencionMedicaPage implements OnInit {
   nivelesHidratacion: any[] = [];
   tipoAlimentacion: any[] = [];
 
-  tratamientoList: any[] = [];
+  tratamientoList: { nombre?: string; dosis: string; duracion: string; frecuencia?: string }[] = [];
 
   pielOpciones: any[] = [];
   ojosOpciones: any[] = [];
@@ -49,8 +50,6 @@ export class AgregarAtencionMedicaPage implements OnInit {
 
   mostrarSelectorFecha = false;
   mostrarSelectorHora = false;
-
-  medicamentosDisponibles: any[] = [];
 
   atencion = {
     motivo: null,
@@ -101,10 +100,44 @@ export class AgregarAtencionMedicaPage implements OnInit {
     private modalCtrl: ModalController,
     private toastController: ToastController,
     private router: Router,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit() {
+
+    this.cargarTutores().then(() => {
+      this.route.queryParams.subscribe((params) => {
+      const runTutor = params['run_tutor'];
+      const idMascota = params['id_mascota'];
+
+      console.log('📥 Parámetros recibidos:', { idMascota, runTutor });
+      console.log('📋 Tutores disponibles:', this.tutores);
+
+      if (runTutor && idMascota) {
+        
+        const tutor = this.tutores.find((t) => t.run_tutor === runTutor);
+        console.log('👤 Tutor encontrado:', tutor);
+
+        if (tutor) {
+          this.seleccionarTutor(tutor);
+
+          const mascota = tutor.mascota.find((m: any) => m.id_masc === idMascota);
+          console.log('🐾 Mascota encontrada:', mascota);
+
+          if (mascota) {
+            this.mascotaSeleccionada = mascota;
+          } else {
+            console.warn('❌ Mascota no encontrada dentro del tutor.');
+          }
+        } else {
+          console.warn('❌ Tutor no encontrado con run:', runTutor);
+        }
+      }
+    });
+
+    });
+
     this.cargarTutores();
     this.cargarMotivosConsulta();
     this.cargarEstadosSensoriales();
@@ -122,7 +155,7 @@ export class AgregarAtencionMedicaPage implements OnInit {
     this.cargarsLocomotorOpciones();
     this.cargarsReproductorOpciones();
     this.cargarTiposAlimentacion();
-    this.cargarMedicamentos();
+    
   }
 
   // ------------------------- Carga de datos -------------------------
@@ -171,13 +204,6 @@ export class AgregarAtencionMedicaPage implements OnInit {
     this.tipoAlimentacion = data;
   }
 
-  async cargarMedicamentos() {
-    const { data, error } = await supabase.from('medicamento').select('id_medicamento, nombre_medicamento');
-    if (error) return console.error('Error al cargar medicamentos:', error);
-    this.medicamentosDisponibles = data;
-  }
-
-  //--------------------------------------
   async cargarPielOpciones() {
     const { data, error } = await supabase.from('piel_obp').select('*');
     if (error) return console.error('Error al cargar Piel', error);
@@ -291,9 +317,25 @@ export class AgregarAtencionMedicaPage implements OnInit {
     }
   }
 
+  // ** FUNCION AGREGADA PARA CORREGIR ERROR DEL BOTON EN HTML **
+  asignarFechaHoraActual() {
+    const ahora = new Date();
+
+    // Formato fecha: yyyy-mm-dd
+    const yyyy = ahora.getFullYear();
+    const mm = String(ahora.getMonth() + 1).padStart(2, '0');
+    const dd = String(ahora.getDate()).padStart(2, '0');
+    this.atencion.fecha = `${yyyy}-${mm}-${dd}`;
+
+    // Formato hora: hh:mm (24 horas)
+    const hh = String(ahora.getHours()).padStart(2, '0');
+    const min = String(ahora.getMinutes()).padStart(2, '0');
+    this.atencion.hora = `${hh}:${min}`;
+  }
+
   // ------------------------- Tratamiento -------------------------
   agregarMedicamento() {
-    this.tratamientoList.push({ id_medicamento: null, dosis: '', duracion: '' });
+    this.tratamientoList.push({ nombre: '', dosis: '', duracion: '', frecuencia: '' });
   }
 
   eliminarMedicamento(index: number) {
@@ -319,6 +361,8 @@ export class AgregarAtencionMedicaPage implements OnInit {
 
     return data.run_vet;
   }
+
+    // ... (todo el código anterior permanece igual hasta la función guardarAtencion)
 
   async guardarAtencion() {
     if (!this.tutorSeleccionado || !this.mascotaSeleccionada)
@@ -388,111 +432,89 @@ export class AgregarAtencionMedicaPage implements OnInit {
       return this.mostrarToast('Hubo un error al guardar la atención.', 'danger');
     }
 
-    // Guardar receta y detalle receta solo si hay medicamentos
+    const idAtencion = data.id;
+
+    // Si hay tratamientos, insertamos la receta
     if (this.tratamientoList.length > 0) {
-      await this.guardarRecetaEnBD(data.id);
+      const { data: recetaData, error: errorReceta } = await supabase
+        .from('receta')
+        .insert([
+          {
+            indicaciones: this.atencion.tratamiento_indicaciones || '',
+            id_masc: this.mascotaSeleccionada.id_masc,
+            run_vet: runVet,
+            id_atencion: idAtencion,
+          },
+        ])
+        .select('id_receta')
+        .single();
+
+      if (errorReceta || !recetaData) {
+        console.error('Error insertando receta:', errorReceta);
+      } else {
+        const idReceta = recetaData.id_receta;
+
+        for (const tratamiento of this.tratamientoList) {
+          if (!tratamiento.nombre) continue;
+
+          let { data: medicamentoExistente, error: errorMed } = await supabase
+            .from('medicamento')
+            .select('id_medicamento')
+            .eq('nombre_medicamento', tratamiento.nombre)
+            .limit(1)
+            .single();
+
+          if (errorMed && errorMed.code !== 'PGRST116') {
+            console.error('Error buscando medicamento:', errorMed);
+            continue;
+          }
+
+          let idMedicamento: number;
+
+          if (medicamentoExistente) {
+            idMedicamento = medicamentoExistente.id_medicamento;
+          } else {
+            const { data: nuevoMed, error: errorInsertMed } = await supabase
+              .from('medicamento')
+              .insert([{ nombre_medicamento: tratamiento.nombre }])
+              .select('id_medicamento')
+              .single();
+
+            if (errorInsertMed || !nuevoMed) {
+              console.error('Error insertando medicamento:', errorInsertMed);
+              continue;
+            }
+
+            idMedicamento = nuevoMed.id_medicamento;
+          }
+
+          const { error: errorDetalle } = await supabase.from('detalle_receta').insert([
+            {
+              id_receta: idReceta,
+              id_medicamento: idMedicamento,
+              dosis_medicamento: tratamiento.dosis || null,
+              duracion_medicamento: tratamiento.duracion || null,
+              frecuencia_medicamento: tratamiento.frecuencia || null,
+            },
+          ]);
+
+          if (errorDetalle) {
+            console.error('Error insertando detalle de receta:', errorDetalle);
+          }
+        }
+      }
     }
 
-    this.mostrarToast('Atención médica guardada exitosamente.');
-    this.reiniciarFormulario();
+    this.mostrarToast('Atención médica guardada exitosamente', 'success');
     this.router.navigate(['/atencion-medica']);
   }
-
-  // ------------------------- Guardar receta y detalle receta -------------------------
-  async guardarRecetaEnBD(idAtencion: number) {
-    if (this.tratamientoList.length === 0) return;
-
-    const { data: recetaData, error: recetaError } = await supabase
-      .from('receta')
-      .insert([
-        {
-          indicaciones: this.atencion.tratamiento_indicaciones,
-          id_masc: this.mascotaSeleccionada.id_masc,
-          fecha_receta: new Date().toISOString(),
-        },
-      ])
-      .select('id_receta')
-      .single();
-
-    if (recetaError || !recetaData) {
-      console.error('Error al insertar receta:', recetaError);
-      return this.mostrarToast('No se pudo guardar la receta.', 'danger');
-    }
-
-    const idReceta = recetaData.id_receta;
-
-    const detalles = this.tratamientoList.map((med) => ({
-      id_receta: idReceta,
-      id_medicamento: med.id_medicamento,
-      dosis_medicamento: med.dosis,
-      duracion_medicamento: med.duracion,
-    }));
-
-    const { error: detalleError } = await supabase.from('detalle_receta').insert(detalles);
-
-    if (detalleError) {
-      console.error('Error al guardar detalle receta:', detalleError);
-      return this.mostrarToast('No se pudieron guardar los medicamentos de la receta.', 'danger');
-    }
-  }
-
-  reiniciarFormulario() {
-    this.tutorSeleccionado = null;
-    this.mascotaSeleccionada = null;
-    this.busquedaTutor = '';
-    this.atencion = {
-      motivo: null,
-      anamnesis: '',
-      diagnostico: '',
-      tratamiento: '',
-      tratamiento_indicaciones: '',
-      observaciones: '',
-      mucosa: '',
-      temperatura: null,
-      peso: null,
-      condicion_corporal: '',
-      observacion: '',
-      estado_sensorial_id: null,
-      hidratacion_id: null,
-      fecha: '',
-      hora: '',
-      id_piel: null,
-      obs_piel: '',
-      id_ojos: null,
-      obs_ojos: '',
-      id_oidos: null,
-      obs_oidos: '',
-      id_dentadura: null,
-      obs_dentadura: '',
-      id_sdigestivo: null,
-      obs_sdigestivo: '',
-      id_scvascular: null,
-      obs_scvascular: '',
-      id_srespiratorio: null,
-      obs_srespiratorio: '',
-      id_surinario: null,
-      obs_surinario: '',
-      id_snervioso: null,
-      obs_snervioso: '',
-      id_slinfatico: null,
-      obs_slinfatico: '',
-      id_slocomotor: null,
-      obs_slocomotor: '',
-      id_sreproductor: null,
-      obs_sreproductor: '',
-      cantidad_alimentacion: null,
-      veces_alimentacion: null,
-      id_tipo_alimentacion: null,
-    };
-    this.tratamientoList = [];
-  }
-
+  
   // ------------------------- Toast -------------------------
-  async mostrarToast(mensaje: string, color: 'success' | 'danger' = 'success', duracion = 2000) {
+  async mostrarToast(mensaje: string, color: string = 'primary', duracion: number = 3000) {
     const toast = await this.toastController.create({
       message: mensaje,
+      color: color,
       duration: duracion,
-      color,
       position: 'bottom',
     });
     toast.present();

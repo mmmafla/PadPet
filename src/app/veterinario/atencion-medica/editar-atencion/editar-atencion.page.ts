@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { IonicModule, ToastController} from '@ionic/angular';
+import { IonicModule, ToastController, AlertController  } from '@ionic/angular';
 import { createClient } from '@supabase/supabase-js';
 import { HeaderComponent } from 'src/app/componentes/header/header.component';
 
@@ -44,7 +44,8 @@ export class EditarAtencionPage implements OnInit {
 
 constructor(
       private router: Router,
-      private toastController: ToastController
+      private toastController: ToastController,
+      private alertController: AlertController
 ) {
   const nav = this.router.getCurrentNavigation();
   this.atencion = nav?.extras?.state?.['atencion'];
@@ -269,9 +270,50 @@ async guardarCambios() {
       message: mensaje,
       duration: 2000,
       color,
-      position: 'middle',
+      position: 'top',
     });
     toast.present();
   }
+
+  async eliminarAtencion() {
+      if (!this.atencion || !this.atencion.id) {
+        this.mostrarToast('Atención médica no válida.', 'danger');
+        return;
+      }
+
+      const alerta = await this.alertController.create({
+        header: 'Confirmar eliminación',
+        message: '¿Estás seguro de que deseas eliminar esta atención médica? Esta acción no se puede deshacer.',
+        buttons: [
+          {
+            text: 'Cancelar',
+            role: 'cancel',
+            cssClass: 'secondary'
+          },
+          {
+            text: 'Eliminar',
+            role: 'destructive',
+            handler: async () => {
+              const { error } = await supabase
+                .from('atencion_medica')
+                .delete()
+                .eq('id', this.atencion.id);
+
+              if (error) {
+                console.error('Error al eliminar atención médica:', error.message);
+                this.mostrarToast('Error al eliminar la atención', 'danger');
+                return;
+              }
+
+              this.mostrarToast('Atención eliminada correctamente');
+              this.router.navigate(['/atencion-medica']); // Ajusta la ruta si es otra
+            }
+          }
+        ]
+      });
+
+      await alerta.present();
+    }
+
 
 }

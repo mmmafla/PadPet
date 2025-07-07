@@ -1,30 +1,40 @@
-<ion-header>
-  <app-header backButton="/home" title="Dashboard"></app-header>
+<ion-header class="ion-no-border">
+  <app-header title="" backButton="/home"></app-header>
 </ion-header>
 
-<ion-content class="fondo" [fullscreen]="true">
+<ion-content class="fondo ion-padding-bottom" [fullscreen]="true">
 
-  <!-- Filtro de mes y año -->
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Filtrar por mes y año</ion-card-title>
-    </ion-card-header>
+  <!-- Filtro de mes y año --> 
+  <ion-card class="card4">
+    <h3 style="text-align: center;">Resumen Mensual</h3>
     <ion-card-content>
       <ion-grid>
         <ion-row>
           <ion-col size="6">
             <ion-item>
               <ion-label position="floating">Mes</ion-label>
-              <ion-select [(ngModel)]="mesSeleccionado" (ionChange)="obtenerEstadisticasDashboard()">
-                <ion-select-option *ngFor="let mes of meses; let i = index" [value]="i + 1">{{ mes }}</ion-select-option>
+              <ion-select 
+                [(ngModel)]="mesSeleccionado" 
+                (ionChange)="obtenerEstadisticasDashboard()"
+                interface="popover"
+                class="select-small">
+                <ion-select-option *ngFor="let mes of meses; let i = index" [value]="i + 1">
+                  {{ mes }}
+                </ion-select-option>
               </ion-select>
             </ion-item>
           </ion-col>
           <ion-col size="6">
             <ion-item>
               <ion-label position="floating">Año</ion-label>
-              <ion-select [(ngModel)]="annoSeleccionado" (ionChange)="obtenerEstadisticasDashboard()">
-                <ion-select-option *ngFor="let anio of anios" [value]="anio">{{ anio }}</ion-select-option>
+              <ion-select 
+                [(ngModel)]="annoSeleccionado" 
+                (ionChange)="obtenerEstadisticasDashboard()"
+                interface="popover"
+                class="select-small">
+                <ion-select-option *ngFor="let anio of anios" [value]="anio">
+                  {{ anio }}
+                </ion-select-option>
               </ion-select>
             </ion-item>
           </ion-col>
@@ -34,29 +44,48 @@
   </ion-card>
 
   <!-- Estadísticas del mes -->
-  <ion-card *ngIf="estadisticas">
-    <ion-card-header>
-      <ion-card-title>Resumen mensual</ion-card-title>
-    </ion-card-header>
+  <ion-card *ngIf="estadisticas" class="card4">
+
+    <h3 style="text-align: center;">
+      {{ estadisticas.total_atenciones > 0 ? 'Total atenciones: ' + estadisticas.total_atenciones : 'No hay atenciones registradas aún' }}
+    </h3>
+
     <ion-card-content>
-      <p><strong>Total atenciones:</strong> {{ estadisticas.total_atenciones }}</p>
 
-      <h3>Motivos de consulta</h3>
-      <ul>
-        <li *ngFor="let motivo of getKeys(estadisticas.motivos)">
-          {{ motivo }}: {{ estadisticas.motivos[motivo] }} atenciones
-        </li>
-      </ul>
+      <!-- Gráfico o mensaje si no hay datos -->
+      <ion-card>
+        <ion-card-content>
+          <div style="width: 100%; min-height: 300px; background-color: #fff; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center;">
+            <ng-container *ngIf="estadisticas.especies && getKeys(estadisticas.especies).length > 0; else sinDatosGrafico">
+              <app-chart [data]="getEspeciesData()" [labels]="getEspeciesLabels()"></app-chart>
+            </ng-container>
+            <ng-template #sinDatosGrafico>
+              <p style="text-align: center; padding: 1rem;">No hay datos suficientes para generar el gráfico</p>
+            </ng-template>
+          </div>
+        </ion-card-content>
+      </ion-card>
 
-      <h3>Sistemas comprometidos</h3>
-      <ul>
-        <li *ngFor="let sistema of getKeys(estadisticas.sistemas)">
-          {{ sistema }}: {{ estadisticas.sistemas[sistema] }}
-        </li>
-      </ul>
+      <!-- Especies atendidas -->
+      <div class="section" *ngIf="estadisticas.especies && getKeys(estadisticas.especies).length > 0">
+        <h3>Especies atendidas</h3>
+        <ul>
+          <li *ngFor="let especie of getKeys(estadisticas.especies)">
+            {{ especie }}: {{ estadisticas.especies[especie] }} atenciones
+          </li>
+        </ul>
+      </div>
 
-      <p><strong>Promedio de temperatura:</strong> {{ estadisticas.temperatura_prom | number:'1.1-2' }} °C</p>
-      <p><strong>Promedio de peso:</strong> {{ estadisticas.peso_prom | number:'1.1-2' }} kg</p>
+      <!-- Motivos de consulta -->
+      <div class="section" *ngIf="estadisticas.motivos && getKeys(estadisticas.motivos).length > 0">
+        <h3>Motivos de consulta</h3>
+        <ul>
+          <li *ngFor="let motivo of getKeys(estadisticas.motivos)">
+            {{ motivo }}: {{ estadisticas.motivos[motivo] }} atenciones
+          </li>
+        </ul>
+      </div>
+
     </ion-card-content>
   </ion-card>
 

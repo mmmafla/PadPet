@@ -1,0 +1,84 @@
+<ion-header class="ion-no-border">
+  <app-header backButton="/agenda"></app-header>
+</ion-header>
+
+<ion-content class="fondo" [fullscreen]="true" style="padding-bottom: 80px;">
+  <ion-card class="ion-card-atencion">
+    <ion-card-content>
+      <h3 style="text-align: center;">Buscar Tutor</h3>
+
+      <!-- Buscador tutor -->
+      <ion-item class="buscador" lines="none">
+        <ion-icon name="search-outline" slot="start"></ion-icon>
+        <ion-input
+          [(ngModel)]="busquedaTutor"
+          (ionInput)="filtrarTutores()"
+          placeholder="Ingrese nombre del tutor">
+        </ion-input>
+      </ion-item>
+
+      <!-- Lista de tutores filtrados -->
+      <ion-list *ngIf="tutoresFiltrados.length > 0">
+        <ion-item 
+          button 
+          detail 
+          *ngFor="let tutor of tutoresFiltrados" 
+          (click)="seleccionarTutor(tutor)" 
+          lines="none">
+          <ion-label>
+            {{ tutor.nombre_tutor }} {{ tutor.apellidos_tutor }}
+          </ion-label>
+        </ion-item>
+      </ion-list>
+
+      <!-- Selector de mascota -->
+      <div *ngIf="tutorSeleccionado">
+        <h3 style="text-align: center; margin-top: 20px;">
+          Mascotas de {{ tutorSeleccionado.nombre_tutor }}
+        </h3>
+        <ion-list>
+          <ion-item lines="none">
+            <ion-select
+              label="Mascota"
+              [(ngModel)]="mascotaSeleccionada"
+              interface="popover"
+              placeholder="Seleccione mascota">
+              <ion-select-option *ngFor="let mascota of mascotasDelTutor" [value]="mascota">
+                {{ mascota.masc_nom }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </ion-list>
+      </div>
+
+      <!-- Fecha y hora cita -->
+      <ion-item lines="none" style="margin-top: 20px;">
+        <ion-label position="stacked">Fecha y Hora de la Cita</ion-label>
+        <ion-datetime
+          presentation="date-time"
+          [(ngModel)]="fechaHoraCita"
+          placeholder="Seleccione fecha y hora"
+          cancel-text="Cancelar"
+          done-text="Aceptar">
+        </ion-datetime>
+      </ion-item>
+
+      <!-- Comentario cita -->
+      <ion-item lines="none" style="margin-top: 20px;">
+        <ion-label position="stacked">Comentario (opcional)</ion-label>
+        <ion-textarea [(ngModel)]="comentarioCita" placeholder="Comentario para la cita"></ion-textarea>
+      </ion-item>
+
+      <!-- Botón Guardar cita -->
+      <ion-button
+        expand="block"
+        shape="round"
+        color="primary"
+        (click)="guardarCita()"
+        [disabled]="!mascotaSeleccionada || !fechaHoraCita"
+        style="margin-top: 20px;">
+        Guardar Cita
+      </ion-button>
+    </ion-card-content>
+  </ion-card>
+</ion-content>

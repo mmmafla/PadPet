@@ -1,0 +1,75 @@
+<ion-header class="ion-no-border">
+  <app-header backButton="/veterinario/agenda" title="Modificar Cita"></app-header>
+</ion-header>
+
+<ion-content class="fondo" [fullscreen]="true" style="padding-bottom: 80px;">
+  <ion-card class="ion-card-atencion">
+    <form [formGroup]="citaForm" (ngSubmit)="guardarCambios()">
+
+      <ion-list>
+        <!-- Fecha y Hora de la Cita con ion-datetime -->
+        <ion-item lines="none" style="margin-top: 10px;">
+          <ion-label position="stacked">Fecha y Hora de la Cita <ion-text color="danger">*</ion-text></ion-label>
+          <ion-datetime
+            presentation="date-time"
+            formControlName="fecha_hora_cita"
+            placeholder="Seleccione fecha y hora"
+            cancel-text="Cancelar"
+            done-text="Aceptar"
+          >
+          </ion-datetime>
+        </ion-item>
+
+        <!-- Estado de la cita -->
+        <ion-item>
+          <ion-label position="stacked">Estado de la Cita <ion-text color="danger">*</ion-text></ion-label>
+          <ion-select
+            placeholder="Seleccione estado"
+            formControlName="id_estado_cita"
+            ok-text="OK"
+            cancel-text="Cancelar"
+            interface="alert"
+            required
+          >
+            <ion-select-option *ngFor="let estado of estadosCita" [value]="estado.id_estado_cita">
+              {{ estado.nombre_estado_cita }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <!-- Comentario -->
+        <ion-item>
+          <ion-label position="stacked">Comentario</ion-label>
+          <ion-textarea
+            formControlName="comentario_cita"
+            rows="4"
+            placeholder="Comentario adicional..."
+          >
+          </ion-textarea>
+        </ion-item>
+      </ion-list>
+
+      <ion-button
+      class="agregar-atencion"
+        expand="block"
+        (click)="guardarCambios()"
+        [disabled]="citaForm.invalid || loading"
+        style="margin-top: 1rem;"
+      >
+        Guardar Cambios
+      </ion-button>
+
+      <ion-button
+      class="agregar-atencion"
+        expand="block"
+        fill="outline"
+        color="medium"
+        (click)="cancelar()"
+        style="margin-top: 0.5rem;"
+      >
+        Cancelar
+      </ion-button>
+
+    </form>
+  </ion-card>
+</ion-content>

@@ -1,0 +1,33 @@
+<ion-header class="ion-no-border">
+  <app-header backButton="/agenda"></app-header>
+</ion-header>
+
+<ion-content class="fondo" [fullscreen]="true">
+  <ion-card class="card3" *ngIf="cita">
+
+    <h2 style="text-align: center;">
+      Cita para {{ cita.mascota?.masc_nom }}
+    </h2>
+
+    <h3 style="text-align: center;">
+      Dueño: {{ cita.mascota?.tutor?.nombre_tutor }} {{ cita.mascota?.tutor?.apellidos_tutor }}
+    </h3>
+
+    <p><strong>Correo Tutor:</strong> {{ cita.mascota?.tutor?.correo_tutor }}</p>
+    <p><strong>Teléfono Tutor:</strong> {{ cita.mascota?.tutor?.celular_tutor }}</p>
+    <p><strong>Dirección:</strong> {{ cita.mascota?.tutor?.direccion_tutor }}</p>
+
+    <h3 style="text-align: center; margin-top: 1.5rem; border-top: 1px solid #ccc; padding-top: 1rem;">
+      Detalles de la Cita
+    </h3>
+
+    <p><strong>Fecha y Hora:</strong> {{ cita.fecha_cita | date: 'medium' }}</p>
+    <p><strong>Estado de la Cita:</strong> {{ cita.estado_cita?.nombre_estado_cita || 'Sin estado' }}</p>
+    <p><strong>Comentario:</strong> {{ cita.comentario_cita || 'Sin comentario' }}</p>
+
+    <ion-button expand="block" class="boton-editar" (click)="modificarCita()" style="margin-top: 1.5rem;">
+      Modificar Cita
+    </ion-button>
+
+  </ion-card>
+</ion-content>
