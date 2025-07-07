@@ -1,12 +1,11 @@
-import { inject, Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { CanActivate, Router } from '@angular/router';
 import { SupabaseService } from '../services/supabase.service';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
-export class AuthGuard implements CanActivate {
-
+export class NoAuthGuard implements CanActivate {
   private supabaseService = inject(SupabaseService);
   private router = inject(Router);
 
@@ -14,10 +13,10 @@ export class AuthGuard implements CanActivate {
     const session = await this.supabaseService.getSession();
     const isLogged = !!session.data.session;
 
-    if (isLogged) {
+    if (!isLogged) {
       return true;
     } else {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/home']);
       return false;
     }
   }

@@ -1,11 +1,15 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { LocalStorageService } from 'src/app/services/local-storage.service';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class SupabaseService {
   private supabase: SupabaseClient;
+
+  localStorageService = inject(LocalStorageService);
 
   constructor() {
     const supabaseUrl = 'https://irorlonysbmkbdthvrmt.supabase.co';
@@ -46,10 +50,8 @@ export class SupabaseService {
   }
   
 
-
-async isLoggedIn(): Promise<boolean> {
-  const { data, error } = await this.supabase.auth.getUser();
-  return !!data.user;
+async getSession() {
+  return await this.supabase.auth.getSession();
 }
 
 
@@ -75,15 +77,17 @@ async registrarVeterinario(run: string, nombre: string, apellidos: string, email
     const { error: insertError } = await this.supabase
       .from('veterinario')
       .insert([
-        {
-          id_auth: userId,   
-          run_vet: run,
-          nombre_vet: nombre,
-          apellidos_vet: apellidos,
-          email_vet: email,
-          celular_vet: celular
-        }
-      ]);
+          {
+            id_auth: userId,   
+            run_vet: run,
+            nombre_vet: nombre,
+            apellidos_vet: apellidos,
+            email_vet: email,
+            celular_vet: celular,
+            estado_solicitud: 4 // ← Estado "Sin solicitud"
+          }
+        ]);
+
 
     if (insertError) {
       console.error('Error al insertar veterinario:', insertError);
@@ -106,10 +110,15 @@ async registrarVeterinario(run: string, nombre: string, apellidos: string, email
 async login(email: string, password: string) {
   return await this.supabase.auth.signInWithPassword({ email, password });
 }
+
+async isLoggedIn(): Promise<boolean> {
+  const { data: { session } } = await this.supabase.auth.getSession();
+  return !!session;
+}
+
 //------------------------ INICIO DE SESION ---------------------------
 
 //------------------------ CERRAR SESION ---------------------------
-
 async signOut() {
   const { error } = await this.supabase.auth.signOut();
   if (error) {

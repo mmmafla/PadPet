@@ -1,12 +1,3 @@
-.centrar {
-    text-transform: uppercase;
-
+ion-title {
+     text-align:left;
 }
-
-
-
-:host {
-  display: block;
-  padding-top: env(safe-area-inset-top);
-}
-

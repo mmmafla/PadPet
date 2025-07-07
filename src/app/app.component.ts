@@ -1,33 +1,64 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AlertController, Platform } from '@ionic/angular';
 import { SupabaseService } from './services/supabase.service';
-
+ import { Keyboard } from '@capacitor/keyboard';
 
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
   standalone: false,
-  
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
 
-  alertController = inject(AlertController);
-  router = inject(Router);
-  supabaseService = inject(SupabaseService);
+  private platform = inject(Platform);
+  private alertController = inject(AlertController);
+  private router = inject(Router);
+  private supabaseService = inject(SupabaseService);
+
+  async ngOnInit() {
+    await this.verificarSesion();
+    this.controlarBotonAtras();
+    this.configurarListenersTeclado(); 
+
+  }
 
 
-constructor(private platform: Platform) {
-  this.platform.ready().then(() => {
+  private async verificarSesion() {
+    const { data } = await this.supabaseService.getSession();
+    if (!data.session) {
+      this.router.navigate(['/login']);
+    }
+  }
+
+  private controlarBotonAtras() {
     this.platform.backButton.subscribeWithPriority(10, () => {
-      // Aquí controlas que no vuelva al login
-      // o puedes mostrar un confirm de salida
-      console.log('Botón atrás presionado');
-    });
-  });
-}
+      const currentUrl = this.router.url;
 
+      if (currentUrl === '/home') {
+        // Si estamos en /home, desactivamos el botón atrás (no hace nada)
+        console.log('Botón atrás desactivado en /home');
+        return;
+      } else {
+        // En otras páginas, ejecuta la navegación hacia atrás
+        window.history.back();
+      }
+    });
+  }
+
+    private configurarListenersTeclado() {
+    this.platform.ready().then(() => {
+      Keyboard.addListener('keyboardWillShow', () => {
+        document.body.classList.add('keyboard-is-open');
+      });
+
+      Keyboard.addListener('keyboardWillHide', () => {
+        document.body.classList.remove('keyboard-is-open');
+      });
+    });
+    }
+  
 
   // --------------------------------------------------------------
   // Alerta de ayuda
@@ -39,13 +70,13 @@ constructor(private platform: Platform) {
         {
           text: 'Enviar Correo',
           handler: () => {
-            window.open('mailto:ja.alvarezc@duocuc.cl');
+            window.open('mailto:padpet.contacto@gmail.com');
           }
         },
         {
           text: 'WhatsApp',
           handler: () => {
-            window.open('https://wa.me/56984048112');
+            window.open('https://wa.me/56930555576');
           }
         },
         {
@@ -68,18 +99,14 @@ constructor(private platform: Platform) {
         {
           text: 'No',
           role: 'cancel',
-          handler: () => {
-            console.log('Alerta cancelada');
-          }
         },
         {
           text: 'Sí',
           handler: async () => {
             try {
               await this.supabaseService.signOut();
-              console.log('Sesión cerrada correctamente');
               localStorage.removeItem('user_veterinario');
-              this.router.navigate(['/login']); // Redirige al login o la ruta que prefieras
+              this.router.navigate(['/login']);
             } catch (error) {
               console.error('Error cerrando sesión:', (error as Error).message);
             }
@@ -90,7 +117,4 @@ constructor(private platform: Platform) {
 
     await alert.present();
   }
-
-
-  
 }

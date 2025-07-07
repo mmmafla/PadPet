@@ -132,7 +132,7 @@ export class NuevacuentaPage implements OnInit {
   private async mostrarToast(mensaje: string, color: string = 'success') {
     const toast = await this.toastController.create({
       message: mensaje,
-      position: 'middle',
+      position: 'bottom',
       duration: 2000,
       color: color
     });

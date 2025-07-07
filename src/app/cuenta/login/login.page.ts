@@ -25,54 +25,52 @@ export class LoginPage implements OnInit {
 
   ngOnInit(): void {}
 
-  async submit() {
-    if (this.form.invalid) return;
+ async submit() {
+  if (this.form.invalid) return;
 
-    const { run, password } = this.form.value;
+  const { run, password } = this.form.value;
 
-    try {
-      // Buscar al veterinario por run_vet
-      const { data: vetData, error: vetError } = await this.supabaseService
-        .from('veterinario')
-        .select('id_auth, nombre_vet, email_vet')
-        .eq('run_vet', run)
-        .maybeSingle();
+  try {
+    // 1. Buscar al veterinario por run
+    const { data: vetData, error: vetError } = await this.supabaseService
+      .from('veterinario')
+      .select('id_auth, nombre_vet, email_vet')
+      .eq('run_vet', run)
+      .maybeSingle();
 
-      if (vetError || !vetData) {
-        this.mostrarToast('RUN no registrado', 'danger');
-        console.error('Error al obtener veterinario:', vetError?.message);
-        return;
-      }
-
-      const email = vetData.email_vet;
-
-      // Iniciar sesión con el email encontrado
-      const { error: loginError } = await this.supabaseService.login(email, password!);
-
-      if (loginError) {
-        this.mostrarToast('Contraseña incorrecta', 'danger');
-        console.error('Error de login:', loginError.message);
-        return;
-      }
-
-      // Obtener usuario autenticado
-      const { data: userData, error: userError } = await this.supabaseService.auth.getUser();
-
-      if (userError || !userData?.user) {
-        this.mostrarToast('No se pudo obtener el usuario autenticado', 'danger');
-        console.error('Error al obtener usuario:', userError?.message);
-        return;
-      }
-
-      const nombreVet = (vetData.nombre_vet || 'Veterinario').toUpperCase();
-      this.mostrarToast(`¡Bienvenido MV. ${nombreVet}! Sesión iniciada con éxito`, 'success');
-
-      localStorage.setItem('user_veterinario', 'true');
-      this.router.navigate(['/home']);
-    } catch (err: any) {
-      this.mostrarToast('Error inesperado: ' + err.message, 'danger');
+    if (vetError || !vetData) {
+      this.mostrarToast('RUN no registrado', 'danger');
+      return;
     }
+
+    const email = vetData.email_vet;
+
+    // 2. Login con email
+    const { data: loginData, error: loginError } = await this.supabaseService.login(email, password!);
+
+    if (loginError || !loginData?.user) {
+      this.mostrarToast('Contraseña incorrecta', 'danger');
+      return;
+    }
+
+    // 3. Obtener datos completos del veterinario por su id_auth
+    const id_auth = loginData.user.id;
+    const veterinario = await this.supabaseService.getVeterinario(id_auth);
+
+    // 4. Guardar en localStorage
+    localStorage.setItem('user_veterinario', JSON.stringify(veterinario));
+
+    // 5. Bienvenida
+    const nombreVet = (veterinario.nombre_vet || 'Veterinario').toUpperCase();
+    this.mostrarToast(`¡Bienvenido MV. ${nombreVet}!`, 'success');
+
+    // 6. Redirigir
+    this.router.navigate(['/home']);
+  } catch (err: any) {
+    this.mostrarToast('Error inesperado: ' + err.message, 'danger');
   }
+}
+
 
   private async mostrarToast(mensaje: string, color: string = 'success') {
     const toast = await this.toastController.create({
