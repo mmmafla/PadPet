@@ -99,8 +99,7 @@
 
       <div class="botones-receta">
         <ion-button  class="boton-editar" (click)="  modificarReceta()">Modificar Receta</ion-button>
-     <ion-button class="boton-exportar" (click)="descargarPdfReceta()">Descargar Receta Local</ion-button>
-        <ion-button class="boton-exportar" >Compartir Receta</ion-button>
+      <ion-button class="boton-exportar" (click)="descargarPdfRecetaCelular()">Descargar Receta</ion-button>
       </div>
     </ng-container>
 
@@ -115,10 +114,7 @@
 
     <!--------------------------------------------------------------------------------------->
     <ion-button class="boton-editar" (click)="modificarConsulta()">Modificar consulta</ion-button>
-
-    <ion-button class="boton-exportar" (click)="descargarCelularPDFAtencion()">Descargar consulta</ion-button>
-    <ion-button class="boton-exportar" (click)="exportarPdfAtencion()">Descargar LOCALHOST</ion-button>   
-    <ion-button class="boton-enviar-directo" >Enviar consulta</ion-button>
+    <ion-button class="boton-exportar" (click)="descargarPdfAtencionCelular()">Descargar consulta</ion-button>
 
   </ion-card>
 

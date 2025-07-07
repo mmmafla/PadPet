@@ -11,6 +11,7 @@ import { Filesystem, Directory } from '@capacitor/filesystem';
 import { RecetaService } from 'src/app/services/receta.service';
 import { AtencionService } from 'src/app/services/atencion.service';
 
+
 const supabaseUrl = 'https://irorlonysbmkbdthvrmt.supabase.co';
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlyb3Jsb255c2Jta2JkdGh2cm10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDYyODgwMDQsImV4cCI6MjA2MTg2NDAwNH0.s-ZEteHxMWX43NCQIuNmTWpbBoEUxseKyg_YaXpi6Ek';
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -209,52 +210,71 @@ async exportarPdfAtencion() {
 
 // ------------------------------------------------------------- EXPORTAR PDF
 
-async descargarCelularPDFAtencion() {
-  if (!this.atencion) return;
-
-  const pdfBlob = await this.atencionService.generarPdfAtencion(this.atencion, this.logoVet);
-
-  // Convertir a base64
-  const base64 = await new Promise<string>((resolve) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(pdfBlob);
-    reader.onload = () => {
-      const base64Data = (reader.result as string).split(',')[1];
-      resolve(base64Data);
-    };
-    reader.onerror = () => resolve('');
-  });
-
-  const nombreMascota = (this.atencion?.mascota?.masc_nom ?? 'Consulta').replace(/[^a-zA-Z0-9]/g, '_');
-  const fileName = `Atencion_${nombreMascota}_${new Date().toISOString().split('T')[0]}.pdf`;
+async descargarPdfAtencionCelular() {
+  if (!this.atencion) {
+    const toast = await this.toastController.create({
+      message: 'No hay atención médica para descargar.',
+      duration: 2000,
+      color: 'warning'
+    });
+    await toast.present();
+    return;
+  }
 
   try {
-    const result = await Filesystem.writeFile({
-      path: fileName,
-      data: base64,
-      directory: Directory.Documents, // O Directory.Downloads
-      recursive: true
+    // 1. Generar PDF Blob desde el service
+    const pdfBlob = await this.atencionService.generarPdfAtencion(this.atencion, this.logoVet);
+
+    // 2. Convertir Blob a base64 (sin prefijo data:)
+    const base64Data = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64 = (reader.result as string).split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(pdfBlob);
     });
 
+    // 3. Definir nombre de archivo
+    const nombreMascota = this.atencion?.mascota?.masc_nom?.replace(/ /g, '_') || 'Consulta';
+    const fecha = new Date().toISOString().split('T')[0];
+    const fileName = `Atencion_${nombreMascota}_${fecha}.pdf`;
+
+    // 4. Guardar archivo con Filesystem en Documents
+    const result = await Filesystem.writeFile({
+      path: fileName,
+      data: base64Data,
+      directory: Directory.External,
+      recursive: true,
+    });
+
+    // 5. Obtener URI para compartir
+        const fileUri = await Filesystem.getUri({
+      path: fileName,
+      directory: Directory.External,
+    });
+
+    // 6. Mostrar toast de éxito
     const toast = await this.toastController.create({
-      message: 'PDF guardado correctamente en Documentos.',
+      message: 'Consulta guardada correctamente en Documentos 📄',
       duration: 2500,
       color: 'success'
     });
     await toast.present();
 
+    // 7. Compartir archivo (opcional)
     await Share.share({
-      title: 'Consulta médica',
-      text: 'Aquí tienes el PDF guardado.',
-      url: result.uri,
-      dialogTitle: 'Compartir PDF',
+      title: 'Consulta Veterinaria',
+      text: 'Aquí está la consulta en PDF.',
+      url: fileUri.uri,
+      dialogTitle: 'Compartir consulta',
     });
 
   } catch (error) {
-    console.error('Error al guardar el PDF:', error);
-
+    console.error('Error al guardar o compartir la consulta:', error);
     const toast = await this.toastController.create({
-      message: 'Error al guardar el PDF.',
+      message: 'No se pudo guardar o compartir la consulta.',
       duration: 2500,
       color: 'danger'
     });
@@ -262,7 +282,23 @@ async descargarCelularPDFAtencion() {
   }
 }
 
+
 // ------------------------------------------------------------- ENVIAR PDF
+
+async compartirConsultaConOpciones() {
+  if (!this.pdfAtencionBlob) {
+    const toast = await this.toastController.create({
+      message: 'La atención médica no está disponible.',
+      duration: 2000,
+      color: 'warning'
+    });
+    await toast.present();
+    return;
+  }
+
+  const base64Data = await this.convertBlobToBase64(this.pdfAtencionBlob) as string;
+  await this.mostrarOpcionesEnvio(base64Data);
+}
 
   // ------------
 async mostrarOpcionesEnvio(pdfPath: string) {
@@ -322,7 +358,7 @@ async mostrarOpcionesEnvio(pdfPath: string) {
 }
 
 
-
+// --------------------------
 async cargarRecetaDesdeServicio() {
   this.receta = await this.recetaService.cargarRecetaCompleta(this.atencionId);
   if (this.receta) {
@@ -333,10 +369,8 @@ async cargarRecetaDesdeServicio() {
     this.medicamentosReceta = [];
   }
 }
-
-
 // --- Receta
-async descargarPdfReceta() {
+async descargarPdfRecetalocal() {
   if (!this.receta) {
     const toast = await this.toastController.create({
       message: 'No hay receta para descargar.',
@@ -362,8 +396,87 @@ async descargarPdfReceta() {
   a.remove();
   URL.revokeObjectURL(url);
 }
+// ------------------------------------------- funciona NO TOCAR
+async descargarPdfRecetaCelular() {
+  if (!this.receta) {
+    const toast = await this.toastController.create({
+      message: 'No hay receta para descargar.',
+      duration: 2000,
+      color: 'warning'
+    });
+    await toast.present();
+    return;
+  }
+
+  try {
+    // 1. Generar PDF Blob desde service
+    const pdfBlob = await this.recetaService.generarPdfRecetaDetallado(this.receta, this.logoVet);
+
+    // 2. Convertir Blob a base64 (sin prefijo data:)
+const base64Data = await new Promise<string>((resolve, reject) => {
+  const reader = new FileReader();
+  reader.onloadend = () => {
+    const base64 = (reader.result as string).split(',')[1];
+    resolve(base64);
+  };
+  reader.onerror = reject;
+  reader.readAsDataURL(pdfBlob);
+});
 
 
+    // 3. Definir nombre de archivo
+    const nombreMascota = this.receta?.mascota?.masc_nom?.replace(/ /g, '_') || 'Receta';
+    const fecha = new Date().toISOString().split('T')[0];
+    const fileName = `Receta_${nombreMascota}_${fecha}.pdf`;
 
+    // 4. Guardar archivo con Filesystem
+    const result = await Filesystem.writeFile({
+      path: fileName,
+      data: base64Data,
+      directory: Directory.External,
+      recursive: true,
+    });
+        const fileUri = await Filesystem.getUri({
+      path: fileName,
+      directory: Directory.External,
+    });
+
+    // 5. Mostrar toast de éxito
+    const toast = await this.toastController.create({
+      message: 'Receta guardada correctamente en Documentos 🐾',
+      duration: 2500,
+      color: 'success'
+    });
+    await toast.present();
+
+    // 6. Opcional: compartir archivo
+    await Share.share({
+      title: 'Receta Veterinaria',
+      text: 'Aquí está la receta en PDF.',
+      url: fileUri.uri,
+      dialogTitle: 'Compartir receta',
+    });
+
+  } catch (error) {
+    console.error('Error al guardar o compartir la receta:', error);
+    const toast = await this.toastController.create({
+      message: 'No se pudo guardar o compartir la receta:  ${error.message || error}',
+      duration: 2500,
+      color: 'danger'
+    });
+    await toast.present();
+  }
+}
+
+
+// Conversor de Blob a base64
+private async convertBlobToBase64(blob: Blob): Promise<string | ArrayBuffer> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onerror = reject;
+    reader.onload = () => resolve(reader.result as string);
+    reader.readAsDataURL(blob);
+  });
+}
 
 }
